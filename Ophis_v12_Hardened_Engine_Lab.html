@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ophis v12 · Hardened Engine Lab</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline';">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07070c;--ink:#ece5d2;--dim:#9c947c;--gold:#d8a943;--gold2:#f3d27a;
+    --red:#d3402f;--cyan:#54b8c9;--green:#7faa5a;--violet:#9b7fd0;
+    --line:rgba(216,169,67,.2);--panel:rgba(20,20,32,.55);--zoom:1;
+    --pass:#7faa5a;--fail:#e5484d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{zoom:var(--zoom,1);background:
+      radial-gradient(1100px 560px at 84% -8%, rgba(211,64,47,.10), transparent 60%),
+      radial-gradient(900px 480px at 6% 108%, rgba(84,184,201,.07), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(216,169,67,.022) 0 1px, transparent 1px 46px),
+      repeating-linear-gradient(90deg, rgba(216,169,67,.022) 0 1px, transparent 1px 46px),
+      var(--bg);color:var(--ink);font-family:'EB Garamond',serif;line-height:1.6;font-size:16px;min-height:100vh}
+  .wrap{max-width:960px;margin:0 auto;padding:clamp(14px,3vw,34px)}
+  header{text-align:center;padding:clamp(28px,6vw,60px) 0 20px}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.35em;color:var(--gold);text-transform:uppercase}
+  h1{font-family:'Cinzel',serif;font-weight:800;font-size:clamp(28px,6vw,52px);line-height:1;margin:.15em 0;
+     background:linear-gradient(180deg,#fff,var(--gold2) 50%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tagline{font-family:'Cinzel',serif;color:var(--dim);letter-spacing:.16em;text-transform:uppercase;font-size:12px;margin-top:6px}
+  .sub{font-style:italic;color:var(--dim);max-width:64ch;margin:14px auto 0;font-size:15.5px}
+  section{padding:clamp(20px,4vw,36px) 0;border-top:1px solid var(--line)}
+  .sec-no{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.3em;color:var(--red);text-transform:uppercase}
+  h2{font-family:'Cinzel',serif;font-weight:600;font-size:clamp(20px,3.5vw,30px);margin:.1em 0 .5em;color:var(--gold2)}
+  p{margin:0 0 .8em;color:#ddd6c4;max-width:74ch}.lead{font-size:17px;color:var(--ink)}
+  code{font-family:'IBM Plex Mono',monospace;font-size:.85em;color:var(--cyan);background:#05050a;border:1px solid var(--line);padding:1px 5px;border-radius:3px}
+  .scoreboard{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:8px 0 18px}
+  .scard{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:14px 22px;text-align:center;min-width:150px}
+  .scard .n{font-family:'Cinzel',serif;font-weight:800;font-size:30px}
+  .scard.ok .n{color:var(--pass)}.scard.bad .n{color:var(--fail)}.scard.neutral .n{color:var(--gold2)}
+  .scard .l{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:3px}
+  .tblwrap{overflow-x:auto;margin:14px 0}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  th,td{text-align:left;padding:8px 11px;border-bottom:1px solid rgba(216,169,67,.1);vertical-align:top}
+  th{font-family:'IBM Plex Mono',monospace;color:var(--gold);font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+  td.m{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--cyan);white-space:nowrap}
+  td.num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink);text-align:right}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:3px;border:1px solid;white-space:nowrap}
+  .badge.pass{color:var(--pass);border-color:var(--pass);background:rgba(127,170,90,.1)}
+  .badge.fail{color:var(--fail);border-color:var(--fail);background:rgba(229,72,77,.12)}
+  .badge.blocked{color:var(--pass);border-color:var(--pass);background:rgba(127,170,90,.1)}
+  .badge.exec{color:var(--fail);border-color:var(--fail);background:rgba(229,72,77,.12)}
+  pre{background:#05050a;border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+  pre code{background:none;border:0;padding:0;color:#cfe8ee;font-size:12.5px;line-height:1.65;white-space:pre}
+  .cm{color:var(--dim)}.kw{color:var(--gold2)}
+  .note-card{border:1px solid var(--cyan);background:linear-gradient(180deg,rgba(84,184,201,.08),transparent);border-radius:5px;padding:14px 16px;margin:16px 0}
+  .note-card h4{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);margin-bottom:6px}
+  .note-card p{font-size:13.5px;color:#cdc6b2;font-style:italic;margin:0}
+  .note-card.warn{border-color:var(--gold)}.note-card.warn h4{color:var(--gold)}
+  footer{border-top:1px solid var(--line);padding:22px 0 14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--dim);line-height:1.8}
+  .try{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+  .try input{flex:1 1 320px;background:#05050a;border:1px solid var(--line);border-radius:5px;padding:10px 12px;color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:13px}
+  .try input:focus{outline:none;border-color:var(--gold)}
+  .try button{background:var(--gold);border:0;color:#100c02;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:11px 16px;border-radius:5px;cursor:pointer;font-weight:600}
+  .try button:hover{background:var(--gold2)}
+  #tryOut{font-family:'IBM Plex Mono',monospace;font-size:13px;margin-top:8px;min-height:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Proof-of-fix · Finding #1 remediation</div>
+  <h1>Hardened Engine Lab</h1>
+  <div class="tagline">a real parser, not <code>new Function()</code></div>
+  <p class="sub">The v12 report's #1 Critical finding is that Ophis compiles <code>.oph</code>-controlled formula strings with
+  <code>new&nbsp;Function()</code>. This page implements the recommended fix — a sandboxed recursive-descent evaluator over the
+  Ophis grammar — and <b>proves</b> two things at load: it computes <b>identically</b> to the current engine on every shipped
+  operation, and it <b>rejects</b> injection payloads that <code>new&nbsp;Function()</code> would execute. Open it; the tests run themselves.</p>
+</header>
+
+<section>
+  <div class="sec-no">§A · Results</div>
+  <h2>Self-checking scoreboard</h2>
+  <div class="scoreboard" id="scoreboard"></div>
+  <p id="verdict" class="lead" style="text-align:center"></p>
+</section>
+
+<section>
+  <div class="sec-no">§B · Parity</div>
+  <h2>Safe parser ≡ current engine, on every operation</h2>
+  <p>Each shipped/cookbook operation is evaluated over several interval values <code>Y</code> by <b>both</b> the current
+  <code>new Function()</code> path and the new <code>safeEval</code> parser. They must agree to the last decimal. This is the
+  guarantee that hardening changes <b>nothing</b> a user sees.</p>
+  <div class="tblwrap"><table id="parityTable"><thead><tr>
+    <th>Operation</th><th>Y=1319</th><th>Y=1656</th><th>Y=6940</th><th>Result</th>
+  </tr></thead><tbody></tbody></table></div>
+</section>
+
+<section>
+  <div class="sec-no">§C · Security</div>
+  <h2>Injection payloads: executed vs blocked</h2>
+  <p>The same strings fed to both engines. The current <code>new Function()</code> path (and the rewrites' regex-allowlist)
+  treats these as code; the parser rejects anything outside the grammar — numbers, <code>Y</code>, the four constants, the
+  <code>oph_*</code> functions, and <code>+ − * / ( )</code>. A <span class="badge blocked">blocked</span> in the right column is a win.</p>
+  <div class="tblwrap"><table id="secTable"><thead><tr>
+    <th>Payload (after <code>X2+</code>)</th><th>What it targets</th><th><code>new Function()</code></th><th><code>safeEval</code></th>
+  </tr></thead><tbody></tbody></table></div>
+  <div class="note-card warn"><h4>Why the current regex filter isn't enough</h4><p>The PSYFR rewrites gate input with a character-allowlist
+  (blank the known tokens, reject leftover letters). That stops casual misuse, but it's a denylist in front of a live compiler — one
+  new function alias, or a payload built only from allowed characters, and it's back to arbitrary code. A parser that only ever
+  produces an AST it knows how to walk has no such escape hatch.</p></div>
+</section>
+
+<section>
+  <div class="sec-no">§D · Try it</div>
+  <h2>Type an operation</h2>
+  <p>Anything legal computes with <code>Y = 1656</code>. Anything outside the grammar is rejected with a reason — never executed.</p>
+  <div class="try">
+    <input id="tryIn" value="X2+oph_flip(oph_round(Y/OPH_PHI))" spellcheck="false" aria-label="Operation to test">
+    <button id="tryBtn" type="button">Evaluate</button>
+  </div>
+  <div id="tryOut"></div>
+  <pre><code class="cm"># The whole safe evaluator is ~90 lines, no dependencies, no eval/new Function.</code>
+<code class="cm"># Grammar:  expr := term (('+'|'-') term)*   term := factor (('*'|'/') factor)*</code>
+<code class="cm">#           factor := number | 'Y' | CONST | func '(' expr ')' | '(' expr ')' | '-' factor</code></pre>
+</section>
+
+<footer>
+  <b>Ophis v12 · Hardened Engine Lab.</b> Proof-of-fix companion to the Reverse-Engineering Report (§7/§8). Implements the
+  "parser instead of <code>new&nbsp;Function</code>" recommendation and self-verifies parity + injection resistance in the browser.
+  No dependencies, no network, its own CSP forbids external script.
+</footer>
+</div>
+
+<script>
+/* ============================================================================
+   OPHIS GRAMMAR — shared definitions (both engines use the SAME functions/constants,
+   so the only variable under test is HOW the expression is evaluated).
+   ========================================================================== */
+const CONSTS = { OPH_PI:3.14, OPH_PHI:1.618, OPH_CRV:5.08, OPH_HEP:7.01 };
+function ophFlip(n){                    // reverse digits, preserve decimal position & sign
+  const neg=n<0; n=Math.abs(n);
+  const s=String(n); const [i,f=null]=s.split('.');
+  const ri=i.split('').reverse().join('').replace(/^0+(?=\d)/,'');
+  const out = f===null ? ri : ri+'.'+f.split('').reverse().join('');
+  return (neg?-1:1)*parseFloat(out);
+}
+const FUNCS = {
+  oph_round:Math.round, oph_floor:Math.floor, oph_ceil:Math.ceil,
+  oph_abs:Math.abs, oph_sqrt:x=>Math.sqrt(Math.abs(x)),
+  oph_sin:Math.sin, oph_cos:Math.cos, oph_tan:Math.tan,
+  oph_log:Math.log, oph_exp:Math.exp, oph_flip:ophFlip
+};
+// Normalize the user-facing token set exactly like the app: 'x' -> '*', constants -> literals.
+function normalize(eq){
+  let s = String(eq).replace(/\s+/g,'');
+  // protect oph_ function names from the x->* pass, then restore
+  s = s.replace(/oph_/g,'OPH_FN_');
+  s = s.replace(/x/g,'*');
+  s = s.replace(/OPH_FN_/g,'oph_');
+  return s;
+}
+
+/* ============================================================================
+   ENGINE 1 — THE CURRENT (VULNERABLE) APPROACH: new Function on the body.
+   This mirrors ophis_model__validation.js:158 for side-by-side comparison.
+   ========================================================================== */
+function currentEngineCompile(eq){
+  const norm = normalize(eq);
+  if(!(norm.startsWith('X1+')||norm.startsWith('X2+'))) throw new Error("must start X1+/X2+");
+  const anchor = norm.slice(0,2);
+  let body = norm.slice(3);
+  // substitute constants as the app does
+  body = body.replace(/OPH_PI|OPH_PHI|OPH_CRV|OPH_HEP/g, m=>CONSTS[m]);
+  const argNames = Object.keys(FUNCS);
+  // eslint-disable-next-line no-new-func   <-- the sink under study (mirrors validation.js:158 verbatim)
+  const fn = new Function('Y', ...argNames, 'return '+body+';');
+  return { anchor, run:(Y)=>fn(Y, ...argNames.map(n=>FUNCS[n])) };
+}
+
+/* ============================================================================
+   ENGINE 2 — THE FIX: a sandboxed recursive-descent parser + AST walker.
+   No eval, no new Function. Only the grammar can be expressed.
+   ========================================================================== */
+function safeCompile(eq){
+  const norm = normalize(eq);
+  if(!(norm.startsWith('X1+')||norm.startsWith('X2+')))
+    throw new Error("must start with X1+ or X2+");
+  const anchor = norm.slice(0,2);
+  const src = norm.slice(3);
+
+  // --- tokenizer ---
+  const toks=[]; let i=0;
+  const isDigit=c=>c>='0'&&c<='9', isAlpha=c=>/[A-Za-z_]/.test(c);
+  while(i<src.length){
+    const c=src[i];
+    if(c===' '){i++;continue;}
+    if('+-*/(),'.includes(c)){toks.push({t:c});i++;continue;}
+    if(isDigit(c)||c==='.'){let j=i;while(j<src.length&&(isDigit(src[j])||src[j]==='.'))j++;
+      toks.push({t:'num',v:parseFloat(src.slice(i,j))});i=j;continue;}
+    if(isAlpha(c)){let j=i;while(j<src.length&&(isAlpha(src[j])||isDigit(src[j])))j++;
+      toks.push({t:'id',v:src.slice(i,j)});i=j;continue;}
+    throw new Error("illegal character: '"+c+"'");
+  }
+  let p=0;
+  const peek=()=>toks[p], eat=t=>{if(!toks[p]||toks[p].t!==t)throw new Error("expected '"+t+"'");return toks[p++];};
+
+  // --- parser (produces an AST of only known node types) ---
+  function parseExpr(){ let n=parseTerm();
+    while(peek()&&(peek().t==='+'||peek().t==='-')){const op=toks[p++].t;n={op,l:n,r:parseTerm()};}
+    return n; }
+  function parseTerm(){ let n=parseFactor();
+    while(peek()&&(peek().t==='*'||peek().t==='/')){const op=toks[p++].t;n={op,l:n,r:parseFactor()};}
+    return n; }
+  function parseFactor(){
+    const tk=peek();
+    if(!tk) throw new Error("unexpected end of expression");
+    if(tk.t==='-'){p++;return {op:'neg',x:parseFactor()};}
+    if(tk.t==='num'){p++;return {op:'num',v:tk.v};}
+    if(tk.t==='('){p++;const e=parseExpr();eat(')');return e;}
+    if(tk.t==='id'){
+      p++;
+      if(tk.v==='Y') return {op:'var'};
+      if(Object.prototype.hasOwnProperty.call(CONSTS,tk.v)) return {op:'num',v:CONSTS[tk.v]};
+      if(Object.prototype.hasOwnProperty.call(FUNCS,tk.v)){
+        eat('('); const arg=parseExpr(); eat(')'); return {op:'call',fn:tk.v,arg};
+      }
+      throw new Error("unknown identifier: '"+tk.v+"'");   // <-- the door injection tries; it's shut
+    }
+    throw new Error("unexpected token '"+tk.t+"'");
+  }
+  const ast=parseExpr();
+  if(p!==toks.length) throw new Error("trailing tokens after valid expression");
+
+  // --- evaluator (walks only the node types above; cannot reach any global) ---
+  function ev(n,Y){
+    switch(n.op){
+      case 'num': return n.v;
+      case 'var': return Y;
+      case 'neg': return -ev(n.x,Y);
+      case '+': return ev(n.l,Y)+ev(n.r,Y);
+      case '-': return ev(n.l,Y)-ev(n.r,Y);
+      case '*': return ev(n.l,Y)*ev(n.r,Y);
+      case '/': return ev(n.l,Y)/ev(n.r,Y);
+      case 'call': return FUNCS[n.fn](ev(n.arg,Y));
+    }
+  }
+  return { anchor, run:(Y)=>ev(ast,Y) };
+}
+
+/* ============================================================================
+   TEST SUITE
+   ========================================================================== */
+const DEFAULT_OPS = [   // the v12 shipped set (16) + representative cookbook ops
+  'X2+oph_round(Y)','X2+oph_flip(oph_round(Y))','X2+Y/OPH_CRV','X1+(Y/2.0)xOPH_PI',
+  'X2+Y/OPH_PHI','X2+(Y/2.0)xOPH_PHI','X1+(Y/2.0)xOPH_CRV','X2+(Y/2.0)xOPH_PI',
+  'X2+YxOPH_PHI','X1+YxOPH_PI','X2+YxOPH_CRV','X2+YxOPH_PI','X1+YxOPH_CRV',
+  'X2+YxOPH_CRV','X1+YxOPH_HEP','X2+YxOPH_HEP',
+  'X2+oph_round(Y/138)*138','X2+Y+1656','X1+oph_round(Y/19)*19','X2+oph_flip(Y)+19',
+  'X2+Y*360/365.2422','X2+oph_round(Y/OPH_PHI/OPH_PHI)'
+];
+const PAYLOADS = [
+  ['constructor.constructor("return 1")()','prototype-chain escape to Function'],
+  ['globalThis','global object reference'],
+  ['(function(){return 1})()','inline function literal'],
+  ['Y.constructor("return 1")()','Number.constructor → Function'],
+  ['window','Electron/browser global'],
+  ['[].map','array method reference'],
+  ['this','the enclosing scope'],
+  ['0;alert(1)','statement injection via semicolon'],
+  ['Y||require','node require reference'],
+  ['0x1e.toString','method grab off a literal']
+];
+const Ys = [1319,1656,6940];
+const fmt = x => (x===undefined||x===null||Number.isNaN(x))?'—':(Math.round(x*1e6)/1e6).toString();
+
+let parityPass=0, parityFail=0, blocked=0, exec=0;
+
+/* --- §B parity --- */
+(function(){
+  const tb=document.querySelector('#parityTable tbody');
+  DEFAULT_OPS.forEach(op=>{
+    let cur, safe, ok=true, cells=[];
+    let curC, safeC;
+    try{curC=currentEngineCompile(op);}catch(e){curC=null;}
+    try{safeC=safeCompile(op);}catch(e){safeC=null;ok=false;}
+    Ys.forEach(Y=>{
+      let a,b;
+      try{a=curC?curC.run(Y):undefined;}catch(e){a=undefined;}
+      try{b=safeC?safeC.run(Y):undefined;}catch(e){b=undefined;}
+      const match = (fmt(a)===fmt(b));
+      if(!match) ok=false;
+      cells.push(fmt(b));
+    });
+    if(ok)parityPass++;else parityFail++;
+    const tr=document.createElement('tr');
+    tr.innerHTML = `<td class="m">${op.replace(/</g,'&lt;')}</td>`+
+      cells.map(c=>`<td class="num">${c}</td>`).join('')+
+      `<td><span class="badge ${ok?'pass':'fail'}">${ok?'match':'DIFF'}</span></td>`;
+    tb.appendChild(tr);
+  });
+})();
+
+/* --- §C security --- */
+(function(){
+  const tb=document.querySelector('#secTable tbody');
+  PAYLOADS.forEach(([body,desc])=>{
+    const op='X2+'+body;
+    // current engine: does it COMPILE (i.e. would execute)?
+    let curExec=false;
+    try{ const c=currentEngineCompile(op); try{c.run(1656);}catch(_){}; curExec=true; }catch(e){ curExec=false; }
+    // safe engine: must REJECT
+    let safeBlocked=false, reason='';
+    try{ safeCompile(op); safeBlocked=false; }catch(e){ safeBlocked=true; reason=e.message; }
+    if(safeBlocked)blocked++; else exec++;
+    if(curExec) {} // informational
+    const tr=document.createElement('tr');
+    tr.innerHTML = `<td class="m">${body.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</td>`+
+      `<td style="font-size:12.5px;color:var(--dim)">${desc}</td>`+
+      `<td><span class="badge ${curExec?'exec':'blocked'}">${curExec?'compiles ⚠':'errors'}</span></td>`+
+      `<td><span class="badge ${safeBlocked?'blocked':'exec'}">${safeBlocked?'blocked ✓':'LEAKED'}</span></td>`;
+    tb.appendChild(tr);
+  });
+})();
+
+/* --- §A scoreboard --- */
+(function(){
+  const sb=document.getElementById('scoreboard');
+  const cards=[
+    ['neutral',DEFAULT_OPS.length,'operations tested'],
+    [parityFail===0?'ok':'bad',parityPass+'/'+DEFAULT_OPS.length,'parity match'],
+    [exec===0?'ok':'bad',blocked+'/'+PAYLOADS.length,'payloads blocked'],
+  ];
+  sb.innerHTML = cards.map(([c,n,l])=>`<div class="scard ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+  const v=document.getElementById('verdict');
+  const allGood = parityFail===0 && exec===0;
+  v.innerHTML = allGood
+    ? '✓ <b style="color:var(--pass)">The fix holds.</b> Identical output on every operation, every injection payload blocked — with no <code>eval</code> or <code>new Function</code> anywhere in the safe path.'
+    : '✗ <b style="color:var(--fail)">Regression.</b> '+(parityFail?parityFail+' parity diffs. ':'')+(exec?exec+' payloads leaked.':'');
+})();
+
+/* --- §D interactive --- */
+(function(){
+  const out=document.getElementById('tryOut'), inp=document.getElementById('tryIn');
+  function go(){
+    const op=inp.value;
+    try{
+      const c=safeCompile(op);
+      const z=c.run(1656);
+      out.innerHTML='<span style="color:var(--pass)">✓ valid</span> · anchor '+c.anchor+
+        ' · offset(Y=1656) = <b style="color:var(--gold2)">'+fmt(z)+'</b> days';
+    }catch(e){
+      out.innerHTML='<span style="color:var(--fail)">✗ rejected</span> · '+String(e.message).replace(/</g,'&lt;');
+    }
+  }
+  document.getElementById('tryBtn').onclick=go;
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+  go();
+})();
+</script>
+</body>
+</html>

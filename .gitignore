@@ -1,0 +1,33 @@
+# --- large binaries & build output (ship as GitHub Release assets, not in git) ---
+*.exe
+*.zip
+*.AppImage
+*.dmg
+temp_release_folder/
+dist/
+out/
+
+# --- dependencies / tooling ---
+node_modules/
+package-lock.json
+
+# --- reverse-engineering scratch (extraction artifacts are reproducible via METHOD.md) ---
+scratchpad/
+extracted/
+unpacked_full/
+*.asar
+
+# --- OS / editor cruft ---
+.DS_Store
+**/.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# --- loose / personal media (not part of the study) ---
+photo_*.jpg
+Musicnotes*.exe
+
+# --- keep: source, reports, rewrites, data ---
+# src/ lib/ img/ *.html *.md *.oph package.json README/METHOD/SECURITY are tracked

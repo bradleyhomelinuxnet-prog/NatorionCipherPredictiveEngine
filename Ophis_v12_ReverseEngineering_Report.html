@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ophis v12 · Reverse-Engineering Report &amp; Security Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07070c;--bg2:#0d0d18;--ink:#ece5d2;--dim:#9c947c;--gold:#d8a943;--gold2:#f3d27a;
+    --red:#d3402f;--cyan:#54b8c9;--green:#7faa5a;--violet:#9b7fd0;--rose:#e07a9f;
+    --line:rgba(216,169,67,.2);--panel:rgba(20,20,32,.55);--panel2:rgba(20,20,32,.75);--zoom:1;
+    --crit:#e5484d;--high:#f5a524;--med:#54b8c9;--low:#7faa5a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    zoom:var(--zoom,1);
+    background:
+      radial-gradient(1100px 560px at 84% -8%, rgba(211,64,47,.10), transparent 60%),
+      radial-gradient(900px 480px at 6% 108%, rgba(84,184,201,.07), transparent 60%),
+      radial-gradient(700px 400px at 50% 40%, rgba(155,127,208,.05), transparent 65%),
+      repeating-linear-gradient(0deg, rgba(216,169,67,.022) 0 1px, transparent 1px 46px),
+      repeating-linear-gradient(90deg, rgba(216,169,67,.022) 0 1px, transparent 1px 46px),
+      var(--bg);
+    color:var(--ink);font-family:'EB Garamond',serif;line-height:1.65;font-size:17px;min-height:100vh;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:clamp(14px,3vw,34px)}
+  a:focus-visible,button:focus-visible,summary:focus-visible{outline:2.5px solid var(--cyan);outline-offset:2px;border-radius:3px}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*,*::before,*::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+
+  nav.top{position:sticky;top:0;z-index:60;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;
+      background:rgba(7,7,12,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:11px clamp(14px,3vw,34px)}
+  nav.top .brand{font-family:'Cinzel',serif;font-weight:800;color:var(--gold2);font-size:14px;letter-spacing:.03em}
+  nav.top .brand span{color:var(--red)}
+  nav.top .links{margin-left:auto;display:flex;gap:13px;flex-wrap:wrap}
+  nav.top a{color:var(--dim);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+  nav.top a:hover{color:var(--gold2)}
+  .navctl{display:flex;gap:10px;align-items:center}
+  .tsize{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .navbtn{background:transparent;border:0;color:var(--dim);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:6px 10px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .tsize .navbtn{border-right:1px solid var(--line)}.tsize .navbtn:last-child{border-right:0}
+  .navbtn:hover{color:var(--gold2);background:rgba(216,169,67,.1)}
+  #themeBtn{border:1px solid var(--line);border-radius:4px;color:var(--gold2)}
+  #themeBtn:hover{background:var(--gold);color:#100c02}
+
+  header.hero{text-align:center;padding:clamp(34px,7vw,72px) 0 clamp(10px,3vw,26px)}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.4em;color:var(--gold);text-transform:uppercase}
+  h1{font-family:'Cinzel',serif;font-weight:800;font-size:clamp(30px,7vw,60px);line-height:.98;margin:.18em 0;letter-spacing:.02em;overflow-wrap:break-word;
+     background:linear-gradient(180deg,#fff,var(--gold2) 50%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tagline{font-family:'Cinzel',serif;color:var(--dim);letter-spacing:.18em;text-transform:uppercase;font-size:12px;margin-top:6px}
+  .sub{font-style:italic;color:var(--dim);max-width:66ch;margin:16px auto 0;font-size:16px}
+  .verdict{max-width:70ch;margin:20px auto 0;padding:14px 18px;border:1px solid var(--red);border-radius:6px;
+    background:linear-gradient(180deg,rgba(211,64,47,.1),transparent);font-size:15.5px;color:var(--ink)}
+  .verdict b{color:var(--gold2)}
+  .hero-stats{display:flex;justify-content:center;flex-wrap:wrap;gap:20px 36px;margin:28px auto 0;max-width:820px}
+  .hs{text-align:center}
+  .hs .n{font-family:'Cinzel',serif;font-weight:800;font-size:23px;color:var(--gold2)}
+  .hs .l{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:2px}
+
+  section{padding:clamp(24px,4vw,40px) 0;border-top:1px solid var(--line);scroll-margin-top:60px}
+  .sec-no{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.3em;color:var(--red);text-transform:uppercase}
+  h2{font-family:'Cinzel',serif;font-weight:600;font-size:clamp(22px,4vw,33px);margin:.1em 0 .5em;color:var(--gold2);line-height:1.06}
+  h3{font-family:'Cinzel',serif;font-weight:600;font-size:19px;color:var(--ink);margin:1.4em 0 .3em}
+  p{margin:0 0 .9em;color:#ddd6c4;max-width:74ch}
+  .lead{font-size:18px;color:var(--ink);max-width:74ch}.lead b{color:var(--gold2)}
+  b.c{color:var(--cyan)}b.r{color:var(--red)}b.v{color:var(--violet)}b.g{color:var(--gold2)}b.ro{color:var(--rose)}
+  code{font-family:'IBM Plex Mono',monospace;font-size:.86em;color:var(--cyan);background:#05050a;border:1px solid var(--line);padding:1px 5px;border-radius:3px}
+  :root[data-theme="light"] code{background:#fffdf6}
+
+  .steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin:16px 0}
+  .step{display:grid;grid-template-columns:42px 1fr;gap:14px;align-items:start;border:1px solid var(--line);background:var(--panel);border-radius:5px;padding:14px 16px}
+  .step::before{counter-increment:step;content:counter(step);font-family:'Cinzel',serif;font-weight:800;font-size:22px;color:var(--gold2);
+    width:42px;height:42px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:50%;background:#05050a}
+  :root[data-theme="light"] .step::before{background:#fffdf6}
+  .step h4{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+  .step p{margin:0;font-size:14.5px}
+
+  pre{background:#05050a;border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin:12px 0;overflow-x:auto}
+  pre code{background:none;border:0;padding:0;color:#cfe8ee;font-size:12.5px;line-height:1.7;white-space:pre}
+  pre .cm{color:var(--dim)}pre .kw{color:var(--gold2)}pre .ar{color:var(--red)}
+  :root[data-theme="light"] pre{background:#fbf7ec}:root[data-theme="light"] pre code{color:#22333a}
+
+  table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0;background:var(--panel);border:1px solid var(--line);border-radius:5px;overflow:hidden}
+  th,td{text-align:left;padding:9px 13px;border-bottom:1px solid rgba(216,169,67,.1);vertical-align:top}
+  th{font-family:'IBM Plex Mono',monospace;color:var(--gold);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase}
+  td b{color:var(--ink)}
+  .tblwrap{overflow-x:auto}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+  .card{border:1px solid var(--line);background:var(--panel);border-radius:5px;padding:14px 16px}
+  .card .k{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;color:var(--cyan);text-transform:uppercase;margin-bottom:5px}
+  .card p{font-size:14px;margin:0}
+
+  /* exploit chain */
+  .chain{display:flex;flex-direction:column;gap:0;margin:18px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel2);padding:8px 10px}
+  .clink{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;padding:12px 8px}
+  .cbadge{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid var(--line);background:#05050a}
+  :root[data-theme="light"] .cbadge{background:#fffdf6}
+  .cbody .ct{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink);letter-spacing:.02em}
+  .cbody .cs{font-size:13px;color:var(--dim);font-style:italic;margin-top:2px}
+  .cbody .cs code{font-style:normal}
+  .carrow{grid-column:1 / -1;justify-self:center;color:var(--red);font-size:16px;line-height:.6;margin:-4px 0}
+
+  /* findings */
+  .finding{border:1px solid var(--line);border-left-width:4px;background:var(--panel);border-radius:6px;padding:15px 17px;margin:14px 0}
+  .finding.crit{border-left-color:var(--crit)}.finding.high{border-left-color:var(--high)}
+  .finding.med{border-left-color:var(--med)}.finding.low{border-left-color:var(--low)}
+  .finding .fh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .sev{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:3px;border:1px solid;font-weight:600}
+  .sev.crit{color:var(--crit);border-color:var(--crit);background:rgba(229,72,77,.1)}
+  .sev.high{color:var(--high);border-color:var(--high);background:rgba(245,165,36,.1)}
+  .sev.med{color:var(--med);border-color:var(--med);background:rgba(84,184,201,.1)}
+  .sev.low{color:var(--low);border-color:var(--low);background:rgba(127,170,90,.1)}
+  .finding .ft{font-family:'Cinzel',serif;font-weight:600;font-size:17px;color:var(--ink)}
+  .finding p{font-size:14px;margin:.5em 0}
+  .finding .loc{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);margin-top:6px}
+
+  .note-card{border:1px solid var(--cyan);background:linear-gradient(180deg,rgba(84,184,201,.08),transparent);border-radius:5px;padding:15px 17px;margin:16px 0}
+  .note-card h4{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin-bottom:6px}
+  .note-card p{font-size:14px;color:#cdc6b2;font-style:italic;margin:0}
+  .note-card.warn{border-color:var(--gold)}.note-card.warn h4{color:var(--gold)}
+
+  .checklist{list-style:none;margin:14px 0;display:flex;flex-direction:column;gap:9px}
+  .checklist li{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;border:1px solid var(--line);background:var(--panel);border-radius:5px;padding:11px 13px;font-size:14.5px;color:#ddd6c4}
+  .checklist li::before{content:'✓';font-family:'IBM Plex Mono',monospace;color:var(--green);font-weight:600;font-size:15px;line-height:1.3}
+  .checklist b{color:var(--gold2)}
+
+  footer{border-top:1px solid var(--line);padding:24px 0 14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--dim);line-height:1.8}
+  footer b{color:var(--gold)}
+
+  :root[data-theme="light"]{
+    --bg:#ece0c6;--bg2:#e0d2b2;--ink:#2c2317;--dim:#6a5f45;
+    --gold:#9a6f14;--gold2:#7d5410;--red:#b32a1a;--cyan:#1d6c7d;--green:#4d7730;--violet:#69479c;--rose:#a13068;
+    --line:rgba(90,60,15,.30);--panel:rgba(255,251,242,.7);--panel2:rgba(255,251,242,.92);
+    --crit:#c0392b;--high:#a86404;--med:#1d6c7d;--low:#4d7730;
+  }
+  :root[data-theme="light"] body{background:
+    radial-gradient(1100px 560px at 84% -8%, rgba(179,42,26,.07), transparent 60%),
+    radial-gradient(900px 480px at 6% 108%, rgba(29,108,125,.06), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(90,60,15,.03) 0 1px, transparent 1px 46px),
+    repeating-linear-gradient(90deg, rgba(90,60,15,.03) 0 1px, transparent 1px 46px), var(--bg);}
+  :root[data-theme="light"] nav.top{background:rgba(236,224,198,.93)}
+  :root[data-theme="light"] h1{background:linear-gradient(180deg,#5a3d0a,#8a5a12 55%,#a8791a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  :root[data-theme="light"] p{color:#3a3020}
+  :root[data-theme="light"] .navbtn:hover{background:rgba(154,111,20,.14)}
+
+  @media (max-width:700px){ .clink{grid-template-columns:36px 1fr} .step{grid-template-columns:34px 1fr} }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="brand">OPHIS v12 <span>· RE Report</span></div>
+  <div class="links">
+    <a href="#summary" data-go="summary">Summary</a>
+    <a href="#method" data-go="method">Method</a>
+    <a href="#anatomy" data-go="anatomy">Anatomy</a>
+    <a href="#delta" data-go="delta">v9→v12</a>
+    <a href="#chain" data-go="chain">Exploit Chain</a>
+    <a href="#findings" data-go="findings">Findings</a>
+    <a href="#harden" data-go="harden">Hardening</a>
+    <a href="OPHIS.html" target="_blank" rel="noopener" style="color:var(--gold2)">↗ v9 Codex</a>
+    <a href="PSYFR1.html" target="_blank" rel="noopener" style="color:var(--gold2)">↗ PSYFR Engine</a>
+  </div>
+  <div class="navctl">
+    <div class="tsize" role="group" aria-label="Text size">
+      <button id="tsDown" class="navbtn" type="button" aria-label="Decrease text size" title="Smaller">A−</button>
+      <button id="tsReset" class="navbtn" type="button" aria-label="Reset text size" title="Default">A</button>
+      <button id="tsUp" class="navbtn" type="button" aria-label="Increase text size" title="Larger">A+</button>
+    </div>
+    <button id="themeBtn" class="navbtn" type="button" aria-label="Toggle light or dark theme" aria-pressed="false">☾ Dark</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">Reverse-Engineering Report · Successor to the v9 Codex</div>
+  <h1>The serpent,<br>fully uncoiled.</h1>
+  <div class="tagline">from shipped .exe → Electron main process → a verified exploit chain</div>
+  <p class="sub">
+    Where the v9 pass could only say “the renderer <em>implies</em> <code>nodeIntegration:true</code> but we never read <code>preload.js</code>,”
+    this pass cracks the 100&nbsp;MB portable binary, extracts the Electron <b>main process</b>, and turns that inference into a
+    confirmed finding — a malicious <code>.oph</code> file that reaches host code execution.
+  </p>
+  <div class="verdict">
+    <b>Verdict.</b> Un-obfuscated Electron&nbsp;39 app. A crafted <code>.oph</code> preset can achieve <b>renderer code execution</b> and,
+    through an unvalidated file-write IPC, <b>code execution on the host</b>. The sign-in gate is still a self-described “fake security camera.”
+  </div>
+  <div class="hero-stats">
+    <div class="hs"><div class="n">100<span style="font-size:12px;color:var(--dim)">&nbsp;MB</span></div><div class="l">Portable .exe</div></div>
+    <div class="hs"><div class="n">39.2.4</div><div class="l">Electron · ia32</div></div>
+    <div class="hs"><div class="n">32.5<span style="font-size:12px;color:var(--dim)">&nbsp;MB</span></div><div class="l">app.asar</div></div>
+    <div class="hs"><div class="n">24</div><div class="l">src modules</div></div>
+    <div class="hs"><div class="n">2</div><div class="l">Critical</div></div>
+    <div class="hs"><div class="n">5</div><div class="l">Findings</div></div>
+  </div>
+</header>
+
+<!-- SUMMARY -->
+<section id="summary">
+  <div class="sec-no">§1 · Executive Summary</div>
+  <h2>What this is, and what we found</h2>
+  <p class="lead">Ophis (branded <b>PSYFR</b>, shipped as <b>Ophis v12</b>) is an offline <b>date-projection / cycle-prediction</b> tool
+  — Gann-style cycle work in astronomical dress. You give it two anchor dates (<b class="c">X-Dates</b>); it counts the days
+  between them (<b class="c">Y</b>), runs a table of little formulas that transform Y into offsets, and projects
+  <b class="g">Z-Dates</b> that it scores against resonance number-sets and eclipse tables.</p>
+  <p>The engine itself is legitimate and interesting. The <b>security posture is not</b>. Because the whole app is
+  un-obfuscated and ships its own source, a full white-box read was possible — and it exposes a clean, verifiable path from
+  “open a shared preset file” to “attacker runs code on your machine.” The rest of this report is the reproducible method,
+  the anatomy, the v9→v12 delta, and the five findings ranked by severity — plus exactly how to build the hardened version.</p>
+  <div class="cards">
+    <div class="card"><div class="k">Critical ×2</div><p><code>new Function()</code> over file-controlled formulas → renderer exec; <code>nodeIntegration:true</code> + unvalidated file-write IPC → host exec.</p></div>
+    <div class="card"><div class="k">High ×1</div><p>Sign-in is client-side theatre — 5 hard-coded SHA-512 hashes shipped in config; re-enabling it crashes init.</p></div>
+    <div class="card"><div class="k">Med / Low</div><p><code>executeJavaScript</code> built by string concat; headless CLI log-forging from file-derived strings.</p></div>
+  </div>
+</section>
+
+<!-- METHOD -->
+<section id="method">
+  <div class="sec-no">§2 · Method</div>
+  <h2>From <code>.exe</code> to readable source, step by step</h2>
+  <p class="lead">The reproducible spine of the paper. Note the discipline: <b>identify the container from bytes before running anything.</b></p>
+  <div class="steps">
+    <div class="step"><div><h4>Triage — read bytes, don't execute</h4><p><code>MZ</code> header → Windows PE. Machine field <code>0x14C</code> → <b>32-bit</b>. String scan finds <code>Nullsoft</code> at offset 81276 → <b>NSIS</b>. <code>package.json</code> → <code>win.target: "portable"</code>. No <code>app.asar</code> string in the clear → payload is <b>compressed</b>.</p></div></div>
+    <div class="step"><div><h4>Recognise the NSIS payload as a 7z stream</h4><p>electron-builder’s NSIS package embeds a 7z archive. A standalone extractor reads it directly — no admin install, no detonation.</p></div></div>
+    <div class="step"><div><h4>Extract <code>app.asar</code>, then unpack it</h4><p>Pull the app bundle out of the 7z, then use Electron’s own <code>asar</code> tool to expand its tar-like format into a normal file tree.</p></div></div>
+    <div class="step"><div><h4>Read the three files v9 never had</h4><p><code>main.js</code> (Electron main process), <code>preload.js</code> (the <code>electronBridge</code> definition), and the <b>real</b> <code>ophis.html</code> bootstrap — the files that convert every “inferred” caveat into a verified one.</p></div></div>
+  </div>
+  <pre><code><span class="cm"># standalone extractor — no admin, no running the app</span>
+npm install 7zip-bin
+ZA=node_modules/7zip-bin/win/x64/7za.exe
+
+<span class="cm"># the NSIS .exe IS a 7z container — list, then extract the app bundle</span>
+"$ZA" l Ophis_v12_Windows.exe        <span class="cm"># → resources\app.asar (32,524,448 bytes)</span>
+"$ZA" e Ophis_v12_Windows.exe "resources/app.asar" -o./extracted
+
+<span class="cm"># unpack the asar → full source tree + main.js + preload.js + ophis.html</span>
+npx asar extract extracted/app.asar extracted/unpacked_full</code></pre>
+  <div class="note-card"><h4>Naming trap</h4><p>The <code>OPHIS.html</code> in this folder is <b>not</b> the bootstrap — it’s the v9 Field Guide (byte-identical to <code>Ophis_v9_Explained.html</code>). The real loader <code>ophis.html</code> lives <b>inside</b> the asar. Every §5 citation refers to that internal file.</p></div>
+</section>
+
+<!-- ANATOMY -->
+<section id="anatomy">
+  <div class="sec-no">§3 · Anatomy</div>
+  <h2>What the package actually contains</h2>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Layer</th><th>What</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><b>Outer</b></td><td>NSIS portable stub (32-bit PE)</td><td>Self-extracts to <code>%TEMP%</code> and runs <code>Ophis.exe</code></td></tr>
+      <tr><td><b>Runtime</b></td><td>Electron <b>39.2.4</b> · Chromium + Node · ia32</td><td><code>Ophis.exe</code> 210 MB unpacked; <code>ffmpeg.dll</code>, ICU, 56 locale paks</td></tr>
+      <tr><td><b>App</b></td><td><code>resources/app.asar</code> (32.5 MB)</td><td>Uncompressed archive; <code>"main": "main.js"</code></td></tr>
+      <tr><td><b>Renderer</b></td><td><code>ophis.html</code> + 24 <code>src/*.js</code> + <code>lib/*</code></td><td>Hand-rolled serial <code>&lt;script&gt;</code> loader with a cache-buster</td></tr>
+    </tbody>
+  </table></div>
+  <p>The bootstrap injects first-party modules in strict order, appending <code>?v=&lt;rand&gt;</code> every launch
+  (<code>ophis.html:549–550</code>) — dev-style loading shipped to production. The <b>CSP</b> (<code>ophis.html:72</code>)
+  sets <code>script-src 'self' 'unsafe-inline' 'unsafe-eval'</code> — it <b>explicitly permits</b> the <code>new&nbsp;Function()</code>
+  engine, so it provides no mitigation. <b>Un-obfuscated throughout:</b> real names, comments, TODOs, even <code>debugger;</code> left in.</p>
+</section>
+
+<!-- DELTA -->
+<section id="delta">
+  <div class="sec-no">§4 · The v9 → v12 Delta</div>
+  <h2>What changed since the last pass</h2>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Area</th><th>v9</th><th>v12</th></tr></thead>
+    <tbody>
+      <tr><td><b>Headless / CLI</b></td><td>—</td><td><b>New.</b> <code>--headless</code>, <code>--output-path</code>, … runs windowless, writes files (<code>main.js:490–529</code>)</td></tr>
+      <tr><td><b>Console→CLI bridge</b></td><td>—</td><td><b>New</b> <code>ophis_logging.js</code> pipes <code>console.*</code> → <code>logToCli</code></td></tr>
+      <tr><td><b>T-Dates</b></td><td>—</td><td><b>New</b> second input-date type</td></tr>
+      <tr><td><b>File validation</b></td><td>single strict path</td><td><b>3 modes</b>; GUI defaults to <b class="r">LOOSE</b> (most permissive)</td></tr>
+      <tr><td><b>Default ops</b></td><td>15</td><td><b>16</b> — adds <code>X2+YxOPH_HEP</code>, enabled by default</td></tr>
+      <tr><td><b>Astronomy lib</b></td><td>commented out</td><td><b>Loaded &amp; live</b> (<code>ophis.html:39</code>)</td></tr>
+      <tr><td><b>Sign-in gate</b></td><td>disabled, sha512 commented out</td><td><b>Unchanged</b> — still both</td></tr>
+    </tbody>
+  </table></div>
+  <p>Net: v12 = v9 + headless CLI + T-Dates + a 16th default op + a validation-mode system whose GUI default (LOOSE) <b>widens</b>
+  the attack surface. Core security posture otherwise unchanged — and marginally worse because hostile files are now more likely to be processed.</p>
+</section>
+
+<!-- CHAIN -->
+<section id="chain">
+  <div class="sec-no">§5 · The Verified Exploit Chain</div>
+  <h2>From “open a shared preset” to host compromise</h2>
+  <p class="lead">Every step is cited to extracted source. This chain was <b>inferred</b> in v9; with <code>main.js</code> and
+  <code>preload.js</code> in hand it is now <b>confirmed</b>.</p>
+  <div class="chain">
+    <div class="clink"><div class="cbadge">📄</div><div class="cbody"><div class="ct">Victim opens a malicious <code>.oph</code> preset</div><div class="cs">The <code>.oph</code> extension is registered to the app; <code>open-file</code> / second-instance handlers auto-load it (<code>main.js:304–346, 532–548</code>).</div></div></div>
+    <div class="carrow">▼</div>
+    <div class="clink"><div class="cbadge">🧮</div><div class="cbody"><div class="ct">Operation string reaches <code>new Function("Y", …)</code></div><div class="cs">GUI default <b class="r">LOOSE</b> accepts the file; every enabled op is compiled. <code>ophis_model__validation.js:158</code></div></div></div>
+    <div class="carrow">▼</div>
+    <div class="clink"><div class="cbadge">⚡</div><div class="cbody"><div class="ct">Renderer code execution</div><div class="cs">math.js validated a <b>stripped</b> string; <code>new Function</code> compiles the <b>un-stripped</b> body. Validator ≠ executor.</div></div></div>
+    <div class="carrow">▼</div>
+    <div class="clink"><div class="cbadge">🌉</div><div class="cbody"><div class="ct"><code>electronBridge.autoSaveToFile(path, data)</code></div><div class="cs">Exposed to the renderer by <code>preload.js:4</code>; forwarded over IPC to the main process.</div></div></div>
+    <div class="carrow">▼</div>
+    <div class="clink"><div class="cbadge">💾</div><div class="cbody"><div class="ct"><code>fs.mkdirSync(recursive)</code> + <code>fs.writeFile</code> — no path check</div><div class="cs">Main process trusts both arguments. Write anywhere the user can write. <code>main.js:267–283</code></div></div></div>
+    <div class="carrow">▼</div>
+    <div class="clink"><div class="cbadge" style="border-color:var(--crit)">☠</div><div class="cbody"><div class="ct" style="color:var(--crit)">Payload dropped into the Startup folder → code exec at next login</div><div class="cs">Renderer execution escalated to <b>persistent host compromise</b> — independent of the contextIsolation nuance.</div></div></div>
+  </div>
+  <div class="note-card warn"><h4>Threat model</h4><p>This is an offline, single-user tool — the realistic attacker is a <b>malicious preset file</b> shared in the community (“seed this <code>.oph</code>”), double-clicked by a victim. Under that model, the two Critical findings chain to full host compromise from opening a shared file, which is exactly how these presets circulate.</p></div>
+</section>
+
+<!-- FINDINGS -->
+<section id="findings">
+  <div class="sec-no">§6 · Findings</div>
+  <h2>Ranked by severity</h2>
+
+  <div class="finding crit">
+    <div class="fh"><span class="sev crit">Critical</span><span class="ft">#1 · <code>new Function()</code> over <code>.oph</code>-controlled strings</span></div>
+    <p>The engine compiles every operation string loaded from a file to a native function. Reachable on <b>file open / recalc</b>
+    with no UI interaction and no sign-in. The <code>math.js</code> “validation” is bypassable because it inspects a
+    <b>stripped</b> skeleton (prefix removed, <code>oph_*</code> names deleted, <code>Y→10</code>) while <code>new Function</code>
+    compiles the <b>un-stripped</b> body — validator and executor never see the same code. Import does <b>no</b> content validation of the string, and the v12 GUI default <b class="r">LOOSE</b> auto-repairs hostile files rather than rejecting them.</p>
+    <div class="loc">ophis_model__validation.js:158 · strip pass :104–121 · import :620–645 · default mode ophis_main.js:29</div>
+  </div>
+
+  <div class="finding crit">
+    <div class="fh"><span class="sev crit">Critical</span><span class="ft">#2 · <code>nodeIntegration:true</code> confirmed + unvalidated file-write IPC</span></div>
+    <p>v9 could only infer this. <code>main.js:367</code> sets <code>nodeIntegration:true</code>. <code>contextIsolation</code> is
+    left unset (defaults <code>true</code> in Electron 39), so the page talks to Node through the <code>contextBridge</code>
+    <code>electronBridge</code> API — the real Node boundary. And one bridge method, <code>autoSaveToFile(path, contents)</code>,
+    lands in a main-process handler that does <code>fs.mkdirSync(recursive)</code> + <code>fs.writeFile</code> with
+    <b>no path validation</b>. Any renderer code can write arbitrary content to an arbitrary path with the app’s privileges —
+    escalating Finding&nbsp;#1 to persistent host execution. <code>nodeIntegration:true</code> here is also incoherent with
+    isolation-on: it grants the page nothing yet becomes instant full-Node exposure if anyone ever sets <code>contextIsolation:false</code>.</p>
+    <div class="loc">main.js:362–370 (webPreferences) · :113–120 &amp; :267–283 (saveToFile) · preload.js:4</div>
+  </div>
+
+  <div class="finding high">
+    <div class="fh"><span class="sev high">High</span><span class="ft">#3 · Sign-in gate is decorative</span></div>
+    <p>Disabled by flag (author’s comment: <em>“a false sense of security… like a fake security camera”</em>). When on, it does a
+    <b>client-side</b> compare of <code>sha512(input)</code> against <b>5 hard-coded, unsalted, single-round SHA-512 digests
+    shipped in <code>ophis_config.js</code></b> — offline-crackable and bypassable by editing the flag. Latent crash: <code>sha512.min.js</code>
+    is commented out of the bootstrap, so re-enabling the flag alone throws <code>ReferenceError</code> in init.</p>
+    <div class="loc">ophis_config.js:291, 5–11 · ophis_utils.js:664–666 · ophis.html:67</div>
+  </div>
+
+  <div class="finding med">
+    <div class="fh"><span class="sev med">Medium</span><span class="ft">#4 · <code>executeJavaScript</code> string-building with a 2-char escaper</span></div>
+    <p>The main process pushes file data into the renderer by <b>concatenating JS</b> and calling <code>executeJavaScript</code>,
+    with an escaper that only handles <code>\</code> and <code>"</code>. The obvious break is closed on modern V8 (JSON payload,
+    quotes escaped), but it’s fragile hand-rolled escaping on a privileged sink — any future change reopens injection.
+    Prefer structured argument passing or an <code>ipcRenderer</code> data channel.</p>
+    <div class="loc">main.js:338, 299, 540 · escapeString :26–33</div>
+  </div>
+
+  <div class="finding low">
+    <div class="fh"><span class="sev low">Low</span><span class="ft">#5 · Headless CLI log forging</span></div>
+    <p>File-derived strings (event names, paths, error text) reach the CLI stream unsanitised via
+    <code>console.* → logToCli → console.log</code>, so a crafted <code>.oph</code> can inject fake
+    <code>OPH_ERROR:</code> lines, newlines, or terminal escape sequences into whatever consumes headless output.
+    Log-integrity / terminal-injection, not code execution.</p>
+    <div class="loc">ophis_logging.js · main.js:201–203 · ophis_view__export.js:91,125</div>
+  </div>
+</section>
+
+<!-- HARDEN -->
+<section id="harden">
+  <div class="sec-no">§7 · Building the Hardened Version</div>
+  <h2>Concrete fixes for “our own modified build”</h2>
+  <p class="lead">Paste-ready recommendations. These are proposed, not yet applied to your files — say the word and I’ll implement and verify each.</p>
+  <ul class="checklist">
+    <li><b>Kill the eval sink.</b> Replace <code>new Function</code> with a ~60-line shunting-yard evaluator that accepts only numbers, <code>Y</code>, the 4 constants, the <code>oph_*</code> functions, and <code>+ − * / ( )</code> — making validator and executor the same code.</li>
+    <li><b>Lock down webPreferences:</b> <code>nodeIntegration:false</code>, <code>contextIsolation:true</code> (explicit), <code>sandbox:true</code>, keep the preload.</li>
+    <li><b>Validate every IPC path.</b> Confine <code>autoSaveToFile</code> writes to an allowed directory; reject absolute paths and <code>..</code> traversal; prefer routing saves through <code>dialog.showSaveDialog</code> like <code>saveFileAs</code> already does.</li>
+    <li><b>Tighten the CSP.</b> Drop <code>'unsafe-eval'</code> (possible once the parser lands) and move inline handlers out to drop <code>'unsafe-inline'</code>.</li>
+    <li><b>HTML-escape user text in the rewrites.</b> One <code>esc()</code> helper on every <code>innerHTML</code> interpolation of the anchor <code>label</code> / notes (<code>PSYFR1.html:960, 981</code>).</li>
+    <li><b>De-dupe the twins.</b> <code>PSYFR1.html</code> ≡ <code>Natori-On-PSYFR-Main-UI.html</code>; keep one as source of truth, generate the other.</li>
+  </ul>
+  <div class="note-card"><h4>Portfolio angle</h4><p>The rewrites (PSYFR / Natori) are already a cohesive, dependency-free, offline single-file UI — genuinely portfolio-grade. Fixing their own <code>new Function</code> + label-<code>innerHTML</code> smells makes the story land: <em>“I found these bug classes in the target, then made sure not to ship them myself.”</em> Commit the un-obfuscated <code>src/</code>, this report, a <code>METHOD.md</code> from §2, and a <code>SECURITY.md</code> from §6 — and keep the 100 MB <code>.exe</code> out of git.</p></div>
+</section>
+
+<footer>
+  <b>Ophis v12 · Reverse-Engineering Report &amp; Security Analysis.</b> Successor to the v9 Codex. Authorised white-box study of the owner’s own software.
+  All claims cite extracted source; the Electron main-process files (<b>main.js</b>, <b>preload.js</b>, real <b>ophis.html</b>) were recovered from inside the shipped <code>.exe</code> per §2 and were not examined in the v9 pass.
+  Self-contained page — nothing leaves it but the web-font request.
+</footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+document.querySelectorAll('[data-go]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const el=$(a.dataset.go);if(el)el.scrollIntoView({behavior:'smooth'});}));
+const _root=document.documentElement;
+function applyTheme(t){_root.setAttribute('data-theme',t);const b=$('themeBtn');b.textContent=t==='light'?'☀ Light':'☾ Dark';b.setAttribute('aria-pressed',t==='light'?'true':'false');try{localStorage.setItem('ophion-theme',t);}catch(e){}}
+function applyZoom(z){_root.style.setProperty('--zoom',z);try{localStorage.setItem('ophion-zoom',String(z));}catch(e){}}
+let _zoom=1;try{const z=parseFloat(localStorage.getItem('ophion-zoom'));if(z>=0.8&&z<=1.5)_zoom=z;}catch(e){}
+let _theme=null;try{_theme=localStorage.getItem('ophion-theme');}catch(e){}
+if(_theme!=='light'&&_theme!=='dark')_theme=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';
+applyTheme(_theme);applyZoom(_zoom);
+$('themeBtn').onclick=()=>applyTheme(_root.getAttribute('data-theme')==='light'?'dark':'light');
+$('tsUp').onclick=()=>{_zoom=Math.min(1.5,Math.round((_zoom+0.1)*10)/10);applyZoom(_zoom);};
+$('tsDown').onclick=()=>{_zoom=Math.max(0.8,Math.round((_zoom-0.1)*10)/10);applyZoom(_zoom);};
+$('tsReset').onclick=()=>{_zoom=1;applyZoom(_zoom);};
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "name": "Ophis",
+  "//": "If setting version for a release candidate, it must appear like '10.0.0-rc1' with proper 3-part semver. Otherwise can be simple 2-part like '10.0'.", 
+  "version": "12.0.0",
+  "description": "A cross-platform desktop app for performing date sequence predicitive analytics based on the work of Jason Breshears of Archaix.",
+  "main": "main.js",
+  "author": {
+    "name": "Ophis"
+  },
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "39.2.4",
+    "electron-builder": "26.0.12"
+  },
+  "build": {
+    "fileAssociations": [{
+      "ext": "oph",
+      "name": "Ophis File",
+      "role": "Editor"
+    }
+  ],
+  "nsis": {
+    "perMachine": true
+  },
+  "appId": "com.ophis",
+  "win": {
+    "target": "portable"
+  },
+  "mac": {
+    "target": {
+      "target": "default",
+      "arch": [
+        "universal"
+      ]
+    }
+  },
+  "linux": {
+    "target": "AppImage",
+    "artifactName": "ophis.AppImage",
+    "category": "Utility",
+    "icon": "build/icons"
+  },
+  "portable": {
+    "unicode": false,
+    "artifactName": "ophis.exe"
+  },
+  "directories":{
+    "buildResources":"build_resources",
+    "output":"../../temp_release_folder"
+  },
+  "files": [
+    "**/*",
+    "!**/*.ts",
+    "!*.map",
+    "!package.json",
+    "!package-lock.json"
+  ]
+}
+}

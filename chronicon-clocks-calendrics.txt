@@ -1,0 +1,1161 @@
+https://hollywood-rogue-ai-ventures.w3spaces.com/a-Chronicon-Time-Engine-Clock-System.html
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Chronicon Calendrics & Clocks Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#08080d;--ink:#ece5d2;--dim:#938c77;--gold:#d8a943;--gold2:#f3d27a;
+    --red:#d3402f;--cyan:#54b8c9;--green:#7faa5a;--violet:#9b7fd0;
+    --line:rgba(216,169,67,.2);--panel:rgba(20,20,32,.55);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:
+      radial-gradient(1100px 560px at 82% -8%, rgba(211,64,47,.09), transparent 60%),
+      radial-gradient(900px 480px at 8% 108%, rgba(84,184,201,.07), transparent 60%),
+      var(--bg);
+    color:var(--ink);font-family:'EB Garamond',serif;line-height:1.68;font-size:18px;
+  }
+  .wrap{max-width:780px;margin:0 auto;padding:clamp(16px,3vw,40px)}
+  nav{position:sticky;top:0;z-index:40;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;
+      background:rgba(8,8,13,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:11px clamp(16px,3vw,40px)}
+  nav .brand{font-family:'Cinzel',serif;font-weight:800;color:var(--gold2);font-size:14px;letter-spacing:.03em}
+  nav .brand span{color:var(--red)}
+  nav .links{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap}
+  nav a{color:var(--dim);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
+  nav a:hover{color:var(--gold2)}
+
+  header{text-align:center;padding:clamp(44px,9vw,92px) 0 clamp(20px,4vw,44px)}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.46em;color:var(--gold);text-transform:uppercase}
+  h1{font-family:'Cinzel',serif;font-weight:800;font-size:clamp(38px,9vw,80px);line-height:.94;margin:.2em 0;
+     background:linear-gradient(180deg,#fff,var(--gold2) 52%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+  h1 em{font-style:normal;-webkit-text-fill-color:var(--red);color:var(--red)}
+  .tagline{font-family:'Cinzel',serif;color:var(--dim);letter-spacing:.18em;text-transform:uppercase;font-size:12px;margin-top:6px}
+  .ded{font-style:italic;color:var(--dim);max-width:56ch;margin:22px auto 0;font-size:17px}
+  .ded b{color:var(--ink);font-style:normal}
+
+  section{padding:clamp(30px,5vw,56px) 0;border-top:1px solid var(--line)}
+  .sec-no{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.36em;color:var(--red);text-transform:uppercase}
+  h2{font-family:'Cinzel',serif;font-weight:600;font-size:clamp(25px,4.6vw,40px);margin:.14em 0 .5em;color:var(--gold2);line-height:1.06}
+  h3{font-family:'Cinzel',serif;font-weight:600;font-size:20px;color:var(--ink);margin:1.4em 0 .3em}
+  p{margin:0 0 1.05em;color:#ddd6c4}
+  p .hl{color:var(--gold2);font-weight:500}
+  .lead{font-size:20px;color:var(--ink)}
+  .lead b{color:var(--gold2)}
+  em.t{color:var(--cyan);font-style:italic}
+  ul{margin:0 0 1.1em 1.1em;color:#ddd6c4}
+  li{margin:.3em 0}
+  blockquote{border-left:3px solid var(--red);margin:1.3em 0;padding:4px 0 4px 20px;font-family:'Cinzel',serif;
+    font-size:clamp(17px,3vw,23px);color:var(--ink);font-weight:400;line-height:1.42}
+  blockquote b{color:var(--gold2)}
+
+  .renders{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:24px 0}
+  .render{border:1px solid var(--line);background:var(--panel);border-radius:4px;overflow:hidden}
+  .render svg{display:block;width:100%;height:auto}
+  .render .cap{padding:11px 14px 13px;border-top:1px solid var(--line)}
+  .render .ph{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent,var(--gold))}
+  .render .am{font-family:'Cinzel',serif;font-size:18px;color:var(--ink);margin:3px 0 1px}
+  .render .am small{font-size:.62em;color:var(--dim);font-family:'IBM Plex Mono',monospace}
+  .render .note{font-size:13px;color:var(--dim);font-style:italic;line-height:1.4}
+  .r1{--accent:var(--gold)} .r2{--accent:var(--gold2)} .r3{--accent:var(--red)} .r4{--accent:var(--cyan)}
+
+  table{width:100%;border-collapse:collapse;font-size:14.5px;margin:18px 0;background:var(--panel);border:1px solid var(--line)}
+  caption{caption-side:top;text-align:left;padding:12px 14px;font-family:'Cinzel',serif;color:var(--gold2);font-size:15px;border-bottom:1px solid var(--line)}
+  th,td{text-align:left;padding:9px 14px;border-bottom:1px solid rgba(216,169,67,.1);vertical-align:top}
+  th{font-family:'IBM Plex Mono',monospace;color:var(--gold);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase}
+  td.mono,.mono{font-family:'IBM Plex Mono',monospace;font-size:13px}
+  td .sp{color:var(--cyan)} td .ti{color:var(--gold2)}
+  .tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.1em;padding:2px 6px;border-radius:3px;border:1px solid;text-transform:uppercase;margin-left:2px}
+  .tag.exact{color:var(--green);border-color:var(--green)} .tag.approx{color:var(--gold);border-color:var(--gold)} .tag.poetic{color:var(--violet);border-color:var(--violet)}
+
+  .star{margin:24px 0;border:1px solid var(--cyan);background:linear-gradient(180deg,rgba(84,184,201,.09),transparent);border-radius:4px;padding:22px 24px}
+  .star h3{margin-top:0;color:var(--cyan);font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase}
+  .star .big{font-family:'Cinzel',serif;font-size:clamp(40px,9vw,68px);color:var(--cyan);line-height:1;margin:6px 0}
+  .star .eq{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--dim);line-height:1.9;margin-top:8px}
+  .star .eq b{color:var(--ink)}
+
+  .scribe{margin:22px 0;border-left:3px solid var(--gold);padding:4px 0 4px 18px}
+  .scribe h4{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+  .scribe p{font-style:italic;font-size:16px}
+
+  .slot{margin:22px 0;border:1px dashed var(--violet);border-radius:4px;padding:20px 22px;background:rgba(155,127,208,.05)}
+  .slot h4{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--violet);margin-bottom:8px}
+  .slot p{font-style:italic;color:var(--dim);margin:0}
+
+  .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+  .ncard{border:1px solid var(--line);background:var(--panel);border-radius:4px;padding:16px}
+  .ncard .n{font-family:'Cinzel',serif;font-weight:800;font-size:34px;color:var(--c,var(--gold2));line-height:1}
+  .ncard .t{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--c,var(--gold));margin:7px 0 5px}
+  .ncard p{font-size:13px;color:var(--dim);margin:0;font-style:italic;line-height:1.45}
+  .a{--c:var(--red)} .b{--c:var(--cyan)} .c{--c:var(--violet)} .d{--c:var(--green)}
+
+  .cta{display:inline-flex;gap:9px;align-items:center;margin-top:8px;border:1px solid var(--gold);color:var(--gold2);
+       text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.08em;padding:11px 18px;border-radius:2px}
+  .cta:hover{background:var(--gold);color:#100c02}
+  footer{border-top:1px solid var(--line);padding:28px 0 16px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dim);line-height:1.85}
+  footer b{color:var(--gold)} footer a{color:var(--cyan)}
+  @media print{nav{display:none}body{background:#fff;color:#111}h1,h2{color:#111;-webkit-text-fill-color:#111}}
+
+  .fsbtn{display:none;margin-left:12px;background:transparent;border:1px solid var(--gold);color:var(--gold2);
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    padding:6px 11px;border-radius:3px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .fsbtn:hover{background:var(--gold);color:#100c02}
+  .fshint{display:none;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--dim);
+    margin:14px auto 0;border:1px solid var(--line);border-radius:999px;padding:6px 14px;max-width:max-content}
+  .fshint b{color:var(--gold2)}
+  :fullscreen .wrap, :-webkit-full-screen .wrap{padding-top:8px}
+
+  .engine-top{padding:clamp(10px,2vw,20px) clamp(10px,3vw,40px) 0}
+  .engine-top .eframe{max-width:1180px;margin:0 auto;border:1px solid var(--line);border-radius:5px;overflow:hidden;background:#07070c;box-shadow:0 0 40px -10px rgba(211,64,47,.25)}
+  .engine-top iframe{width:100%;border:0;display:block;min-height:1400px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">CHRONICON <span>· Clocks &amp; Calendrics Engine</span></div>
+  <div class="links">
+    <a href="#instrument">Instrument</a><a href="#stone">The Stone</a><a href="#petrie">Petrie ↔ Breshears</a>
+    <a href="#longcount">5138</a><a href="#numbers">Numbers</a><a href="#engine">Engine</a><a href="#video">Convergence</a><a href="#breshears">Breshears</a>
+  </div>
+  <button id="fsBtn" class="fsbtn" type="button">⛶ Full screen</button>
+</nav>
+<div id="engine" class="engine-top">
+  <div class="eframe"><iframe id="engineFrame" title="The Chronicon Calendrics & Clocks Engine — the six-clock instrument"
+        style="width:100%;border:0;display:block;min-height:1400px" scrolling="no"
+        srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+<title>CHRONICON · Calendrics Engine</title>
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+<link href=&quot;https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&amp;family=EB+Garamond:ital@0;1&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+  :root{
+    --bg:#07070c;
+    --bg2:#0d0d18;
+    --ink:#e9e2cf;
+    --dim:#8a8470;
+    --gold:#d8a943;
+    --gold2:#f3d27a;
+    --red:#d3402f;
+    --cyan:#54b8c9;
+    --green:#7faa5a;
+    --violet:#9b7fd0;
+    --line:rgba(216,169,67,.22);
+    --panel:rgba(20,20,32,.62);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:'EB Garamond',serif}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(211,64,47,.10), transparent 60%),
+      radial-gradient(900px 500px at 10% 110%, rgba(84,184,201,.08), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(216,169,67,.025) 0 1px, transparent 1px 42px),
+      repeating-linear-gradient(90deg, rgba(216,169,67,.025) 0 1px, transparent 1px 42px),
+      var(--bg);
+    padding:clamp(14px,3vw,40px);
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  /* HEADER */
+  header{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(216,169,67,.06), transparent);
+    padding:clamp(18px,3vw,30px);
+    position:relative;
+    overflow:hidden;
+  }
+  header::before{
+    content:&quot;&quot;;position:absolute;inset:0;
+    background:radial-gradient(500px 200px at 50% -40%, rgba(243,210,122,.18), transparent 70%);
+    pointer-events:none;
+  }
+  .kicker{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.42em;color:var(--gold);text-transform:uppercase}
+  h1{font-family:'Cinzel',serif;font-weight:800;font-size:clamp(28px,6vw,58px);line-height:.98;letter-spacing:.02em;margin:.18em 0 .12em;
+     background:linear-gradient(180deg,#fff,var(--gold2) 55%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{font-style:italic;color:var(--dim);font-size:clamp(14px,2.2vw,18px);max-width:64ch}
+  .sub b{color:var(--ink);font-style:normal}
+
+  /* CONTROL DECK */
+  .deck{
+    margin-top:18px;border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(3px);
+    padding:16px clamp(14px,2.5vw,22px);
+  }
+  .deck-row{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:flex-end}
+  .ctl{display:flex;flex-direction:column;gap:5px}
+  .ctl label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase}
+  input[type=&quot;number&quot;],select{
+    background:#05050a;border:1px solid var(--line);color:var(--ink);font-family:'IBM Plex Mono',monospace;
+    font-size:15px;padding:8px 10px;border-radius:2px;min-width:88px;
+  }
+  select{min-width:230px;max-width:78vw}
+  .era-toggle{display:flex;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+  .era-toggle button{background:#05050a;color:var(--dim);border:0;font-family:'IBM Plex Mono',monospace;font-size:13px;padding:8px 12px;cursor:pointer}
+  .era-toggle button.on{background:var(--gold);color:#100c02;font-weight:600}
+  .slider-wrap{flex:1 1 100%;display:flex;flex-direction:column;gap:6px;margin-top:6px}
+  input[type=&quot;range&quot;]{width:100%;accent-color:var(--red);height:4px;cursor:ew-resize}
+  .scale{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:var(--dim);letter-spacing:.1em}
+  .jump{display:flex;gap:8px;flex-wrap:wrap}
+  .jump button{background:transparent;border:1px solid var(--line);color:var(--gold2);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:7px 11px;cursor:pointer;border-radius:2px;transition:.15s}
+  .jump button:hover{background:var(--gold);color:#100c02}
+  .nowbtn{border-color:var(--red);color:#ff9d8f}
+  .nowbtn:hover{background:var(--red);color:#fff}
+
+  /* MOMENT BAR */
+  .moment{margin-top:18px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;border-left:3px solid var(--red);padding:10px 16px;background:linear-gradient(90deg,rgba(211,64,47,.10),transparent)}
+  .moment .y{font-family:'Cinzel',serif;font-weight:800;font-size:clamp(24px,5vw,40px);color:var(--gold2)}
+  .moment .tag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim)}
+  .moment .tag b{color:var(--cyan)}
+  .flags{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+  .flag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;padding:4px 9px;border:1px solid;border-radius:999px;opacity:.32;transition:.2s}
+  .flag.on{opacity:1;box-shadow:0 0 14px -2px currentColor}
+  .f138{color:var(--red);border-color:var(--red)}
+  .f19{color:var(--cyan);border-color:var(--cyan)}
+  .fpal{color:var(--gold2);border-color:var(--gold2)}
+
+  /* CLOCK GRID */
+  .grid{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px}
+  .clock{border:1px solid var(--line);background:var(--panel);padding:16px 16px 14px;position:relative;overflow:hidden;border-radius:3px}
+  .clock::after{content:&quot;&quot;;position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,var(--accent),transparent 70%);opacity:.14}
+  .clock .name{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent)}
+  .clock .big{font-family:'Cinzel',serif;font-weight:600;font-size:clamp(26px,4vw,34px);margin:6px 0 2px;color:var(--ink);line-height:1}
+  .clock .big small{font-size:.42em;color:var(--dim);font-family:'IBM Plex Mono',monospace;letter-spacing:.05em}
+  .clock .meta{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--dim);line-height:1.7}
+  .clock .meta b{color:var(--ink);font-weight:500}
+  .bar{height:5px;background:#05050a;border:1px solid var(--line);border-radius:99px;margin-top:9px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--accent);box-shadow:0 0 10px -1px var(--accent)}
+  .c-am{--accent:var(--gold)} .c-cat{--accent:#c98a52}
+  .c-phx{--accent:var(--red)} .c-nem{--accent:var(--violet)}
+  .c-ner{--accent:var(--green)} .c-may{--accent:var(--cyan)}
+
+  /* MOON */
+  .moonrow{margin-top:14px;display:grid;grid-template-columns:170px 1fr;gap:16px;border:1px solid var(--line);background:var(--panel);padding:16px;border-radius:3px;align-items:center}
+  @media(max-width:560px){.moonrow{grid-template-columns:1fr;justify-items:center;text-align:center}}
+  .moonart{position:relative;width:150px;height:150px}
+  #moonsvg{filter:drop-shadow(0 0 22px rgba(120,150,200,.28))}
+  .moonmeta .name{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;color:var(--cyan);text-transform:uppercase}
+  .moonmeta .phase{font-family:'Cinzel',serif;font-size:clamp(22px,4vw,30px);margin:4px 0;color:var(--gold2)}
+  .moonmeta .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 18px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim);margin-top:6px}
+  .moonmeta .grid2 b{color:var(--ink);font-weight:500}
+  .met{margin-top:8px;font-style:italic;color:var(--dim);font-size:13px}
+  .met b{color:var(--cyan);font-style:normal}
+
+  /* EVENT TABLE */
+  .tablewrap{margin-top:22px;border:1px solid var(--line);background:var(--panel)}
+  .twhead{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;gap:8px}
+  .twhead h2{font-family:'Cinzel',serif;font-weight:600;font-size:16px;letter-spacing:.12em;color:var(--gold2)}
+  .filt{display:flex;gap:6px;flex-wrap:wrap}
+  .filt button{background:transparent;border:1px solid var(--line);color:var(--dim);font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 9px;cursor:pointer;border-radius:2px}
+  .filt button.on{color:#100c02;font-weight:600}
+  .filt button[data-k=&quot;phx&quot;].on{background:var(--red);border-color:var(--red)}
+  .filt button[data-k=&quot;nem&quot;].on{background:var(--violet);border-color:var(--violet)}
+  .filt button[data-k=&quot;ner&quot;].on{background:var(--green);border-color:var(--green)}
+  .filt button[data-k=&quot;may&quot;].on{background:var(--cyan);border-color:var(--cyan);color:#04141a}
+  .filt button[data-k=&quot;all&quot;].on{background:var(--gold);border-color:var(--gold)}
+  .scroll{max-height:430px;overflow:auto}
+  table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:12.5px}
+  th,td{text-align:left;padding:8px 12px;border-bottom:1px solid rgba(216,169,67,.10);white-space:nowrap}
+  th{position:sticky;top:0;background:#0b0b14;color:var(--gold);font-size:10px;letter-spacing:.16em;text-transform:uppercase;z-index:2}
+  td.ev{white-space:normal;font-family:'EB Garamond',serif;font-size:14px;color:var(--ink);min-width:240px}
+  tr.row{cursor:pointer;transition:.12s}
+  tr.row:hover{background:rgba(216,169,67,.07)}
+  tr.row td:first-child{color:var(--gold2);font-weight:600}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .d-phx{background:var(--red)} .d-nem{background:var(--violet)} .d-ner{background:var(--green)} .d-may{background:var(--cyan)} .d-key{background:var(--gold)} .d-note{background:#4a4a55}
+  .pal{color:var(--gold2)}
+
+  /* NUMEROLOGY */
+  .nums{margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+  .ncard{border:1px solid var(--line);background:var(--panel);padding:16px;border-radius:3px}
+  .ncard h3{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:8px}
+  .ncard p{font-size:14.5px;color:var(--ink);line-height:1.55}
+  .ncard .eq{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--cyan);display:block;margin-top:7px;line-height:1.8}
+  .ncard .eq span{color:var(--dim)}
+
+  footer{margin-top:26px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--dim);line-height:1.7;border-top:1px solid var(--line);padding-top:14px;letter-spacing:.04em}
+  footer b{color:var(--gold)}
+  a{color:var(--cyan)}
+
+  .fsbtn{display:none;margin-left:12px;background:transparent;border:1px solid var(--gold);color:var(--gold2);
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    padding:6px 11px;border-radius:3px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .fsbtn:hover{background:var(--gold);color:#100c02}
+  .fshint{display:none;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--dim);
+    margin:14px auto 0;border:1px solid var(--line);border-radius:999px;padding:6px 14px;max-width:max-content}
+  .fshint b{color:var(--gold2)}
+  :fullscreen .wrap, :-webkit-full-screen .wrap{padding-top:8px}
+</style>
+</head>
+<body>
+<div class=&quot;wrap&quot;>
+
+  <header>
+    <div class=&quot;kicker&quot;>Archaix · Composite Chronology · 5239 BCE → 2178 CE</div>
+    <h1>The Chronicon Engine</h1>
+    <p class=&quot;sub&quot;>Six synchronized clocks turning on one shaft of time — <b>Annus Mundi</b>, the <b>Phoenix</b> (138 yr), the <b>Nemesis X Object</b> (792 yr), the <b>Anunnaki NER</b> (600 yr), the <b>Mayan Long-Count</b>, and a <b>Metonic moon</b> (19 yr) you can wind back past 2843 BC. Move the dial; every wheel re-reads the same moment.</p>
+  </header>
+
+  <!-- CONTROL DECK -->
+  <div class=&quot;deck&quot;>
+    <div class=&quot;deck-row&quot;>
+      <div class=&quot;ctl&quot;>
+        <label>Year</label>
+        <input type=&quot;number&quot; id=&quot;yearIn&quot; min=&quot;1&quot; max=&quot;9999&quot; value=&quot;2026&quot;>
+      </div>
+      <div class=&quot;ctl&quot;>
+        <label>Era</label>
+        <div class=&quot;era-toggle&quot; id=&quot;eraTog&quot;>
+          <button data-era=&quot;bc&quot;>BC</button>
+          <button data-era=&quot;ad&quot; class=&quot;on&quot;>CE</button>
+        </div>
+      </div>
+      <div class=&quot;ctl&quot;>
+        <label>Month</label>
+        <input type=&quot;number&quot; id=&quot;monIn&quot; min=&quot;1&quot; max=&quot;12&quot; value=&quot;5&quot;>
+      </div>
+      <div class=&quot;ctl&quot;>
+        <label>Day</label>
+        <input type=&quot;number&quot; id=&quot;dayIn&quot; min=&quot;1&quot; max=&quot;31&quot; value=&quot;30&quot;>
+      </div>
+      <div class=&quot;ctl&quot; style=&quot;flex:1 1 260px&quot;>
+        <label>Leap to a documented event</label>
+        <select id=&quot;evSel&quot;></select>
+      </div>
+      <div class=&quot;jump&quot;>
+        <button class=&quot;nowbtn&quot; id=&quot;nowBtn&quot;>◉ TODAY 5/30/2026</button>
+        <button data-y=&quot;2040&quot; data-e=&quot;ad&quot;>→ 2040 Phoenix</button>
+        <button data-y=&quot;2046&quot; data-e=&quot;ad&quot;>→ 2046 Nemesis</button>
+        <button data-y=&quot;2178&quot; data-e=&quot;ad&quot;>→ 2178 Collapse</button>
+      </div>
+    </div>
+    <div class=&quot;slider-wrap&quot;>
+      <input type=&quot;range&quot; id=&quot;slider&quot; min=&quot;-2842&quot; max=&quot;2178&quot; value=&quot;2026&quot; step=&quot;1&quot;>
+      <div class=&quot;scale&quot;><span>2843 BC</span><span>1656 (Flood 2239 BC)</span><span>1 CE</span><span>TODAY</span><span>2178 CE</span></div>
+    </div>
+  </div>
+
+  <!-- MOMENT -->
+  <div class=&quot;moment&quot;>
+    <span class=&quot;y&quot; id=&quot;mY&quot;>2026 CE</span>
+    <span class=&quot;tag&quot;>Annus Mundi <b id=&quot;mAM&quot;>5920</b></span>
+    <span class=&quot;tag&quot;>since Nemesis Cataclysm <b id=&quot;mCat&quot;>7264 yr</b></span>
+    <span class=&quot;tag&quot; id=&quot;mEv&quot;></span>
+    <div class=&quot;flags&quot;>
+      <span class=&quot;flag f138&quot; id=&quot;flag138&quot;>138 NODE</span>
+      <span class=&quot;flag f19&quot; id=&quot;flag19&quot;>19 · METONIC</span>
+      <span class=&quot;flag fpal&quot; id=&quot;flagPal&quot;>PALINDROME</span>
+    </div>
+  </div>
+
+  <!-- CLOCKS -->
+  <div class=&quot;grid&quot;>
+    <div class=&quot;clock c-am&quot;>
+      <div class=&quot;name&quot;>Annus Mundi · since 3895 BC</div>
+      <div class=&quot;big&quot; id=&quot;amBig&quot;>5920<small> AM</small></div>
+      <div class=&quot;meta&quot; id=&quot;amMeta&quot;></div>
+    </div>
+
+    <div class=&quot;clock c-cat&quot;>
+      <div class=&quot;name&quot;>Cataclysm Era · since 5239 BC</div>
+      <div class=&quot;big&quot; id=&quot;catBig&quot;>7264<small> yr</small></div>
+      <div class=&quot;meta&quot; id=&quot;catMeta&quot;></div>
+    </div>
+
+    <div class=&quot;clock c-phx&quot;>
+      <div class=&quot;name&quot;>Phoenix · Sky Dragon · 138 yr</div>
+      <div class=&quot;big&quot; id=&quot;phxBig&quot;></div>
+      <div class=&quot;meta&quot; id=&quot;phxMeta&quot;></div>
+      <div class=&quot;bar&quot;><i id=&quot;phxBar&quot;></i></div>
+    </div>
+
+    <div class=&quot;clock c-nem&quot;>
+      <div class=&quot;name&quot;>Nemesis X Object · 792 yr</div>
+      <div class=&quot;big&quot; id=&quot;nemBig&quot;></div>
+      <div class=&quot;meta&quot; id=&quot;nemMeta&quot;></div>
+      <div class=&quot;bar&quot;><i id=&quot;nemBar&quot;></i></div>
+    </div>
+
+    <div class=&quot;clock c-ner&quot;>
+      <div class=&quot;name&quot;>Anunnaki NER · 600 yr</div>
+      <div class=&quot;big&quot; id=&quot;nerBig&quot;></div>
+      <div class=&quot;meta&quot; id=&quot;nerMeta&quot;></div>
+      <div class=&quot;bar&quot;><i id=&quot;nerBar&quot;></i></div>
+    </div>
+
+    <div class=&quot;clock c-may&quot;>
+      <div class=&quot;name&quot;>Mayan Long-Count · 13 baktun</div>
+      <div class=&quot;big&quot; id=&quot;mayBig&quot;></div>
+      <div class=&quot;meta&quot; id=&quot;mayMeta&quot;></div>
+      <div class=&quot;bar&quot;><i id=&quot;mayBar&quot;></i></div>
+    </div>
+  </div>
+
+  <!-- MOON -->
+  <div class=&quot;moonrow&quot;>
+    <div class=&quot;moonart&quot;>
+      <svg id=&quot;moonsvg&quot; viewBox=&quot;0 0 150 150&quot; width=&quot;150&quot; height=&quot;150&quot;>
+        <defs>
+          <radialGradient id=&quot;mg&quot; cx=&quot;38%&quot; cy=&quot;34%&quot; r=&quot;75%&quot;>
+            <stop offset=&quot;0%&quot; stop-color=&quot;#fbf7e8&quot;/><stop offset=&quot;62%&quot; stop-color=&quot;#d9d2bd&quot;/><stop offset=&quot;100%&quot; stop-color=&quot;#9c9686&quot;/>
+          </radialGradient>
+          <clipPath id=&quot;disc&quot;><circle cx=&quot;75&quot; cy=&quot;75&quot; r=&quot;62&quot;/></clipPath>
+        </defs>
+        <circle cx=&quot;75&quot; cy=&quot;75&quot; r=&quot;62&quot; fill=&quot;#0a0a12&quot; stroke=&quot;rgba(120,140,180,.35)&quot; stroke-width=&quot;1&quot;/>
+        <g clip-path=&quot;url(#disc)&quot;>
+          <circle id=&quot;lit&quot; cx=&quot;75&quot; cy=&quot;75&quot; r=&quot;62&quot; fill=&quot;url(#mg)&quot;/>
+          <ellipse id=&quot;term&quot; cx=&quot;75&quot; cy=&quot;75&quot; rx=&quot;62&quot; ry=&quot;62&quot; fill=&quot;#0a0a12&quot;/>
+          <circle cx=&quot;56&quot; cy=&quot;58&quot; r=&quot;9&quot; fill=&quot;rgba(90,90,100,.18)&quot;/>
+          <circle cx=&quot;92&quot; cy=&quot;82&quot; r=&quot;12&quot; fill=&quot;rgba(90,90,100,.15)&quot;/>
+          <circle cx=&quot;70&quot; cy=&quot;100&quot; r=&quot;7&quot; fill=&quot;rgba(90,90,100,.16)&quot;/>
+        </g>
+      </svg>
+    </div>
+    <div class=&quot;moonmeta&quot;>
+      <div class=&quot;name&quot;>Lunar Clock · Metonic recursion (19 yr = 235 moons)</div>
+      <div class=&quot;phase&quot; id=&quot;moonPhase&quot;>Waxing Crescent</div>
+      <div class=&quot;grid2&quot;>
+        <div>Moon age <b id=&quot;moonAge&quot;>—</b></div>
+        <div>Illumination <b id=&quot;moonIllum&quot;>—</b></div>
+        <div>Lunation # <b id=&quot;moonLun&quot;>—</b></div>
+        <div>Moons from today <b id=&quot;moonBack&quot;>—</b></div>
+      </div>
+      <div class=&quot;met&quot;>Metonic cycle <b id=&quot;metCyc&quot;>—</b> counting back from 30 May 2026 · same phase recurs every <b>19</b> years.</div>
+    </div>
+  </div>
+
+  <!-- EVENT TABLE -->
+  <div class=&quot;tablewrap&quot;>
+    <div class=&quot;twhead&quot;>
+      <h2>The 300-Event Ledger</h2>
+      <div class=&quot;filt&quot; id=&quot;filt&quot;>
+        <button data-k=&quot;all&quot; class=&quot;on&quot;>ALL</button>
+        <button data-k=&quot;phx&quot;>PHOENIX</button>
+        <button data-k=&quot;nem&quot;>NEMESIS</button>
+        <button data-k=&quot;ner&quot;>NER 600</button>
+        <button data-k=&quot;may&quot;>BAKTUN</button>
+      </div>
+    </div>
+    <div class=&quot;scroll&quot;>
+      <table>
+        <thead><tr><th>Year</th><th>AM</th><th>Phx</th><th>Nem</th><th>Bak</th><th>Event</th></tr></thead>
+        <tbody id=&quot;tbody&quot;></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- NUMEROLOGY -->
+  <div class=&quot;nums&quot;>
+    <div class=&quot;ncard&quot;>
+      <h3>The 138 lattice</h3>
+      <p>Every Phoenix node sits on a strict 138-year grid. The chart's own sub-counts are just nested multiples — the wheel is recursive.</p>
+      <span class=&quot;eq&quot;>138 × 3 = 414 <span>&quot;cursed time&quot;</span><br>138 × 4 = 552 <span>&quot;Phoenix cycles&quot;</span><br>138 × 46 = 6348 <span>4309 BC → 2040 CE</span></span>
+    </div>
+    <div class=&quot;ncard&quot;>
+      <h3>The 19 of the moon</h3>
+      <p>The Metonic cycle is exactly 19 years — 235 lunations — after which the moon returns to the same phase on the same date. It is the natural gear for the lunar clock.</p>
+      <span class=&quot;eq&quot;>19 yr ≈ 235 synodic months<br>2040 − 2026 = 14 <span>to Phoenix</span><br>2046 − 2026 = 20 <span>to Nemesis</span></span>
+    </div>
+    <div class=&quot;ncard&quot;>
+      <h3>Palindrome watch</h3>
+      <p>The dial flags <span class=&quot;pal&quot;>mirror-years</span> in either era and in the Annus Mundi count — fold the number on itself and it reads the same both ways.</p>
+      <span class=&quot;eq&quot; id=&quot;palLine&quot;>nearest AM palindrome: —</span>
+    </div>
+  </div>
+
+  <footer>
+    Source data: <b>Archaix 2.0 Composite Chronology</b>, Doomsday Chronology &amp;amp; the 337 Archaix Charts (Jason Breshears / Archaix.com). This engine is a worldbuilding / study instrument that renders that thesis as living calendrics — it does not assert the model as established science. Moon phases use a continuous synodic model (29.530589 d) from a J2000 new-moon epoch; deep-past phases are cycle-true rather than historically observed. <b>You Are Here:</b> 30 May 2026 CE = AM 5920 = 7264 yr after the Nemesis Cataclysm.
+  </footer>
+</div>
+
+<script>
+/* ---------- TIME MODEL ----------
+   astronomical year: 1 BC = 0, 2 BC = -1 ... so BC year B -> 1-B ; CE year Y -> Y
+   Annus Mundi: AM = astro + 3894   (2022 CE -> 5916 ; 2239 BC -> 1656 ; today 2026 -> 5920)
+*/
+const SYN = 29.530588853;
+const NEWMOON_J2000 = 2451550.1;            // 2000-01-06 18:14 UT new moon
+const TODAY = {y:2026, m:5, d:30};
+function astroFrom(yearAbs, era){ return era==='bc' ? (1-yearAbs) : yearAbs; }
+function fmtYear(astro){ return astro<=0 ? (1-astro)+&quot; BC&quot; : astro+&quot; CE&quot;; }
+function jdn(astroYear, m, d){           // proleptic Gregorian Julian Day Number
+  const a = Math.floor((14-m)/12);
+  const y = astroYear + 4800 - a;
+  const mm = m + 12*a - 3;
+  return d + Math.floor((153*mm+2)/5) + 365*y + Math.floor(y/4) - Math.floor(y/100) + Math.floor(y/400) - 32045;
+}
+const TODAY_JD = jdn(2026,5,30);
+function isPalindrome(n){ const s=String(Math.abs(n)); return s.length>1 &amp;&amp; s===s.split('').reverse().join(''); }
+function mod(n,m){ return ((n%m)+m)%m; }
+
+/* ---------- CYCLE GRIDS (astronomical years) ---------- */
+const PHX = {mod:108, step:138, base:-4308};            // 4309 BC = node 1
+const NEM_ENTER = {mod:462, step:792};                  // enters inner system; 60 yr inner
+const NER = {mod:162, step:600, base:-5238};            // 5239 BC start
+const MAY_NODES = [-3112,-2712,-2312,-1912,-1512,-1112,-712,-318,76,470,864,1258,1652,2046]; // baktun boundaries
+
+/* ---------- EVENT LEDGER (astro year, kind, palindrome auto) ---------- */
+// kinds: key, phx, nem, ner, may, note
+const E = [
+ [-5238,'key','Nemesis Cataclysm — Nemesis implodes; Earth, Luna, Phoenix, Nemesis X &amp; Electra hurled toward Sol'],
+ [-4638,'ner','Earth captured in orbit around Sol — exactly 600 yr after the Cataclysm'],
+ [-4308,'phx','Phoenix named (Trimorphic Protennoia); 930-yr Adamu civilization destroyed, dust hides the sun'],
+ [-4038,'key','Capture of Luna — the Capture Flood; Moon arrives from the dead Nemesis system'],
+ [-3894,'phx','Lithospheric displacement, 30° poleshift — New Heavens &amp; New Earth; YEAR ONE of the Ancient calendar'],
+ [-3438,'nem','Gihon Flood — a third of mankind dies; ENKI arrives with the Anunna; Nemesis X Passover'],
+ [-3372,'note','Olmec calendar begins'],
+ [-3112,'may','Impact in North America — Maya Long-Count 0.0.0.0.0 begins the countdown'],
+ [-3102,'note','Vedic Kali Yuga calendar begun'],
+ [-2908,'note','Enoch vanishes into the sky'],
+ [-2838,'key','Noah born'],
+ [-2814,'note','Great Pyramid of Giza built at Achuzan, where Enoch vanished'],
+ [-2712,'may','Mayan baktun (144,000 days) ends &amp; begins'],
+ [-2652,'phx','Sitchin\u2019s major disaster recorded in Near East texts'],
+ [-2646,'nem','Nemesis X Object departs Sol — begins 732 yr away; Anunna Exodus / 408-yr Shock Period'],
+ [-2312,'may','Mayan baktun ends &amp; begins'],
+ [-2238,'key','THE GREAT FLOOD — May, Annus Mundi 1656; Vapor Canopy collapse, Birth of the Sun'],
+ [-1962,'phx','Temporary poleshift, quakes, bodies of water moved'],
+ [-1914,'nem','Nemesis X returns — Tiamat passes, blackness swallows the stars (32nd yr of Nimrod)'],
+ [-1912,'may','Mayan baktun ends &amp; begins'],
+ [-1854,'nem','60th year of Nemesis inner transit — Sumer vanishes, Akkad rises'],
+ [-1848,'note','Sodom &amp; Gomorrah, Mohenjo-daro destroyed in fallout'],
+ [-1686,'phx','The Ogygian Flood — 25-yr darkness &amp; famine, Heliolithic empire collapses'],
+ [-1638,'note','Jacob (Israel) dies in Egypt'],
+ [-1548,'phx','Three suns shone, sun dimmed, red sky, tsunamis'],
+ [-1512,'may','Mayan baktun ends &amp; begins'],
+ [-1410,'phx','Temporary poleshift; new star; sky bloody red; Israel born / Conquest of Canaan'],
+ [-1272,'phx','Atreus predicts sun-darkening; sky bloody red (Seneca, Euripides, Mursilis II)'],
+ [-1134,'phx','Cataclysm — Mediterranean Dark Age begins, Linear B collapses'],
+ [-1122,'nem','Nemesis X returned — China records an attack on the sun, Shang collapse'],
+ [-1112,'may','Mayan baktun ends &amp; begins'],
+ [-1038,'note','David, giant-slayer &amp; future King of Israel, born'],
+ [-996,'phx','Large meteorite impact, North America (Badlands)'],
+ [-858,'phx','Phoenix symbol on Assyrian relief of King Jehu'],
+ [-720,'phx','Kingdom of Israel falls to Assyria; sun &amp; moon darkened, flames in sky'],
+ [-712,'may','713 BC — flux-tube blast vaporizes 185,000 Assyrians; orbit 360→365.25 d; baktun reset'],
+ [-582,'phx','Thales predicts the darkening of the sun, in May'],
+ [-444,'phx','deJonge\u2019s comet disaster, widespread fires'],
+ [-438,'ner','Parthenon / Titanomachy commemorated — the War of the Giants, the gods'],
+ [-330,'nem','Nemesis X returns — Moon dims, sky blood-red; Alexander takes Babylon'],
+ [-318,'may','Mayan baktun ends &amp; begins'],
+ [-306,'phx','Oera Lindh text records disasters across Europe'],
+ [-270,'nem','Nemesis X totally eclipses Venus on its way out (recorded by the Ptolemies)'],
+ [-30,'phx','31 BC — continental quake Aegean→Judea during Battle of Actium; sky dragon over Egypt'],
+ [76,'may','Mayan baktun ends &amp; begins'],
+ [162,'ner','Pandemic afflicts China 11 yr, spreads to Rome 16 yr; Han Dynasty falls'],
+ [246,'phx','Bloody sword in the sky, rain of blood (old Briton annal)'],
+ [384,'phx','Bloody pillar in the sky (Lycosthenes, Chronicon)'],
+ [462,'nem','Nemesis X enters inner system; Statue of Zeus destroyed'],
+ [470,'may','Mayan baktun ends &amp; begins'],
+ [522,'phx','ONLY year Phoenix &amp; Nemesis X are in the inner system together — &quot;celestial war of monsters,&quot; Dark Ages begin'],
+ [762,'ner','6000th year of the NER chronology; Kairite rift, 1st Abbasid year, Maya conclave at Copan'],
+ [798,'phx','Quakes, dark sun, flooding in Mayan cities'],
+ [864,'may','Foundation-of-Time reset — 144,000-day baktun completes; the Maya themselves disappear'],
+ [1212,'phx','Mass human vanishings; quakes in the Middle East'],
+ [1254,'nem','Nemesis X returns — 7th Crusade fails; England–Scotland war lasts the exact 60-yr transit'],
+ [1258,'may','Mayan baktun ends &amp; begins'],
+ [1314,'nem','60th yr of transit — plague fogs, black darkness over Europe; Black Death follows'],
+ [1362,'ner','Norse-Goth expedition of King Magnus surveys North America (Kensington Stone)'],
+ [1488,'note','Mother Shipton born — prophesies the 2040 return of the Sky Dragon'],
+ [1626,'phx','Chinese record sun-darkening, meteoritic rain'],
+ [1652,'may','Mayan baktun ends &amp; begins'],
+ [1764,'phx','Astronomer Hoffman watches a dark object cross 1/5 of the sun, seen by millions'],
+ [1902,'phx','Unknown star, quakes, red rains — Charles Fort\u2019s &quot;other Dark Age&quot;; Tuxtla Statuette found'],
+ [1962,'ner','Close Encounters of the 4th Kind begin; Mars/Moon bases claimed; NER node'],
+ [2040,'key','15/16 MAY — Phoenix darkens the sun; lithospheric displacement; 6th Seal, Black Sun, Fenris'],
+ [2046,'key','Nemesis X returns — &quot;Time collapses,&quot; 16-hr days; Mayan 13.0.0.0.0'],
+ [2106,'nem','Nemesis X exits the system — Annus Mundi 6000'],
+ [2178,'key','Simulation Collapse — 138 yr after the 2040 reset; exodus into the Real universe']
+];
+
+/* ---------- DOM ---------- */
+const $ = id => document.getElementById(id);
+const yearIn=$('yearIn'), monIn=$('monIn'), dayIn=$('dayIn'), slider=$('slider'), evSel=$('evSel');
+let era = 'ad';
+
+/* populate event dropdown */
+(function(){
+  const opt=document.createElement('option'); opt.value=''; opt.textContent='— select a documented moment —'; evSel.appendChild(opt);
+  E.forEach((e,i)=>{ if(e[1]==='note')return; const o=document.createElement('option');o.value=i;
+    o.textContent=fmtYear(e[0]).padEnd(8,' ')+' · '+e[2].slice(0,52); evSel.appendChild(o); });
+})();
+
+/* build table */
+const tbody=$('tbody');
+function buildTable(filter='all'){
+  tbody.innerHTML='';
+  E.forEach((e,i)=>{
+    const [a,kind,txt]=e;
+    if(filter!=='all' &amp;&amp; kind!==filter &amp;&amp; !(filter==='all')) { if(kind!==filter) return; }
+    const tr=document.createElement('tr'); tr.className='row'; tr.dataset.i=i;
+    const am=a+3894;
+    const dotc = {key:'d-key',phx:'d-phx',nem:'d-nem',ner:'d-ner',may:'d-may',note:'d-note'}[kind];
+    const palY = isPalindrome(a<=0?(1-a):a);
+    const phxOn = mod(a,138)===108 ? '●' : '·';
+    const nemOn = (mod(a-462,792)>=0 &amp;&amp; mod(a-462,792)<60) ? '◆' : '·';
+    const mayOn = MAY_NODES.includes(a) ? '▲' : '·';
+    tr.innerHTML = `<td><span class=&quot;dot ${dotc}&quot;></span>${fmtYear(a)}${palY?' <span class=&quot;pal&quot;>⮌</span>':''}</td>
+      <td>${am}${isPalindrome(am)?' <span class=&quot;pal&quot;>⮌</span>':''}</td>
+      <td style=&quot;color:var(--red)&quot;>${phxOn}</td>
+      <td style=&quot;color:var(--violet)&quot;>${nemOn}</td>
+      <td style=&quot;color:var(--cyan)&quot;>${mayOn}</td>
+      <td class=&quot;ev&quot;>${txt}</td>`;
+    tr.addEventListener('click',()=>setFromAstro(a, 5, 1, true));
+    tbody.appendChild(tr);
+  });
+}
+$('filt').addEventListener('click',ev=>{
+  if(ev.target.tagName!=='BUTTON')return;
+  [...ev.target.parentNode.children].forEach(b=>b.classList.remove('on'));
+  ev.target.classList.add('on');
+  buildTable(ev.target.dataset.k);
+});
+
+/* ---------- CORE RENDER ---------- */
+function render(){
+  const astro = era==='bc' ? (1-Math.abs(+yearIn.value||1)) : (+yearIn.value||1);
+  const m = Math.min(12,Math.max(1,+monIn.value||1));
+  const d = Math.min(31,Math.max(1,+dayIn.value||1));
+  slider.value = Math.min(2178,Math.max(-2842,astro));
+
+  /* Moment */
+  $('mY').textContent = fmtYear(astro);
+  const am = astro+3894, cat = astro+5238;
+  $('mAM').textContent = am;
+  $('mCat').textContent = cat+' yr';
+
+  const ev = E.find(e=>e[0]===astro);
+  $('mEv').innerHTML = ev ? '⟶ <b style=&quot;color:var(--gold2)&quot;>'+ev[2]+'</b>' : '';
+
+  /* Flags */
+  $('flag138').classList.toggle('on', mod(astro,138)===108);
+  $('flag19').classList.toggle('on', mod(2026-astro,19)===0);
+  const palHit = isPalindrome(astro<=0?(1-astro):astro) || isPalindrome(am);
+  $('flagPal').classList.toggle('on', palHit);
+
+  /* Annus Mundi */
+  $('amBig').innerHTML = am+'<small> AM</small>';
+  $('amMeta').innerHTML = `Flood node <b>AM 1656</b> · ${am>=6000?'past':'<b>'+(6000-am)+'</b> to'} <b>AM 6000</b> (2106 CE)<br>${isPalindrome(am)?'⮌ palindromic Annus Mundi year':'next palindrome AM '+nextPal(am)}`;
+
+  /* Cataclysm era */
+  $('catBig').innerHTML = cat+'<small> yr</small>';
+  $('catMeta').innerHTML = `7-cycle Nemesis frame = <b>5544 yr</b> (792×7)<br>${cat} yr into the human chronology`;
+
+  /* PHOENIX */
+  const pPrev = astro - mod(astro-108,138);
+  const pNext = pPrev + 138;
+  const pInto = astro - pPrev, pTo = pNext - astro;
+  const pIdx = Math.round((pPrev-PHX.base)/138)+1;
+  $('phxBig').innerHTML = (pTo===0||pInto===0)?'NODE<small> · visitation</small>':pTo+'<small> yr to node</small>';
+  $('phxMeta').innerHTML = `last visit <b>${fmtYear(pPrev)}</b> · next <b>${fmtYear(pNext)}</b><br>node <b>#${pIdx}</b> of the 6348-yr record · ${pInto} yr in`;
+  $('phxBar').style.width = (pInto/138*100)+'%';
+
+  /* NEMESIS — enter inner ≡462 mod792, inner for 60 yr */
+  const offset = mod(astro-462,792);
+  const inner = offset<60;
+  const enterPrev = astro - offset;
+  const enterNext = enterPrev + 792;
+  let nemTxt, nemBar, nemMeta;
+  if(inner){
+    nemTxt = (60-offset)+'<small> yr · INSIDE</small>';
+    nemMeta = `in inner system — entered <b>${fmtYear(enterPrev)}</b>, exits <b>${fmtYear(enterPrev+60)}</b><br>60-yr transit, ${offset} yr elapsed`;
+    nemBar = offset/60*100;
+  } else {
+    const outTo = enterNext - astro;
+    nemTxt = outTo+'<small> yr to return</small>';
+    nemMeta = `outside Sol (732-yr arc) · last exit <b>${fmtYear(enterPrev+60)}</b><br>returns <b>${fmtYear(enterNext)}</b>`;
+    nemBar = (astro-(enterPrev+60))/732*100;
+  }
+  $('nemBig').innerHTML = nemTxt; $('nemMeta').innerHTML = nemMeta; $('nemBar').style.width = Math.max(0,Math.min(100,nemBar))+'%';
+
+  /* NER 600 */
+  const nerOff = mod(astro-162, 600);
+  const nerStart = astro - nerOff;
+  const nerNum = Math.floor((astro - NER.base)/600)+1;
+  $('nerBig').innerHTML = 'PERIOD '+nerNum;
+  $('nerMeta').innerHTML = `epoch began <b>${fmtYear(nerStart)}</b> · <b>${600-nerOff}</b> yr to next (${fmtYear(nerStart+600)})<br>each 600-yr NER = ten 60-yr decans`;
+  $('nerBar').style.width = (nerOff/600*100)+'%';
+
+  /* MAYAN baktun */
+  let bi = 0;
+  for(let k=0;k<MAY_NODES.length-1;k++){ if(astro>=MAY_NODES[k] &amp;&amp; astro<MAY_NODES[k+1]){bi=k;break;} if(astro>=MAY_NODES[MAY_NODES.length-1])bi=MAY_NODES.length-1; if(astro<MAY_NODES[0])bi=-1; }
+  if(bi<0){ $('mayBig').innerHTML='PRE-COUNT'; $('mayMeta').innerHTML='before 0.0.0.0.0 (3113 BC)'; $('mayBar').style.width='0%'; }
+  else{
+    const bStart=MAY_NODES[bi], bEnd=MAY_NODES[bi+1]||2046, span=bEnd-bStart;
+    const into=astro-bStart;
+    $('mayBig').innerHTML = 'BAKTUN '+(bi+1)+'<small>/13</small>';
+    $('mayMeta').innerHTML = `${fmtYear(bStart)} → ${fmtYear(bEnd)} (${span} yr / 144,000 d)<br><b>${bEnd-astro}</b> yr to ${bi+1===13?'13.0.0.0.0 — Time collapses':'next baktun'}`;
+    $('mayBar').style.width = (into/span*100)+'%';
+  }
+
+  /* MOON */
+  renderMoon(astro,m,d);
+
+  /* palindrome card */
+  $('palLine').innerHTML = `nearest AM palindrome: <span style=&quot;color:var(--gold2)&quot;>${nextPal(am)}</span> &amp;nbsp;|&amp;nbsp; this year ${palHit?'<span style=&quot;color:var(--gold2)&quot;>IS a mirror ⮌</span>':'is not'}`;
+}
+
+function nextPal(n){ let x=n; for(let i=0;i<5000;i++){ if(isPalindrome(x))return x; x++; } return '—'; }
+
+function renderMoon(astro,m,d){
+  const J = jdn(astro,m,d);
+  let age = mod(J - NEWMOON_J2000, SYN);
+  const frac = age/SYN;                          // 0=new .5=full
+  const illum = (1-Math.cos(2*Math.PI*frac))/2;
+  const names=['New Moon','Waxing Crescent','First Quarter','Waxing Gibbous','Full Moon','Waning Gibbous','Last Quarter','Waning Crescent'];
+  const idx = Math.floor(mod(frac+1/16,1)*8);
+  $('moonPhase').textContent = names[idx];
+  $('moonAge').textContent = age.toFixed(1)+' d';
+  $('moonIllum').textContent = Math.round(illum*100)+'%';
+
+  const lun = Math.round((J - 2423436.40347)/SYN);   // Brown lunation number
+  $('moonLun').textContent = lun;
+  const back = Math.round((TODAY_JD - J)/SYN);
+  $('moonBack').textContent = back<0 ? Math.abs(back)+' ahead' : back.toLocaleString();
+  const met = Math.floor((2026-astro)/19);
+  $('metCyc').textContent = (2026-astro)>=0 ? met+' back' : Math.abs(met)+' ahead';
+
+  /* draw terminator: ellipse rx scaled by cos, side by waxing/waning */
+  const term=$('term'), lit=$('lit');
+  const waxing = frac<0.5;
+  const k = Math.cos(2*Math.PI*frac);    // +1 new ... -1 full
+  // lit base fills disc; term is a dark ellipse occluding part
+  lit.setAttribute('fill','url(#mg)');
+  term.setAttribute('rx', Math.abs(k)*62);
+  term.setAttribute('ry',62);
+  // position of dark mask: when waxing, dark on left receding; we approximate
+  if(frac<0.5){ // waxing: lit grows from right
+    term.setAttribute('fill', k>0 ? '#0a0a12' : 'url(#mg)');
+    // simpler: use two-circle method below
+  }
+  drawPhase(frac);
+}
+/* robust phase via masked overlay */
+function drawPhase(frac){
+  const lit=$('lit'), term=$('term');
+  const illumSide = frac<0.5 ? 'right':'left';
+  const f = frac; // 0..1
+  // x offset of terminator ellipse center
+  const k = Math.cos(2*Math.PI*f); // 1 at new, -1 at full
+  lit.setAttribute('fill','url(#mg)');
+  // dark overlay ellipse
+  term.setAttribute('ry',62);
+  term.setAttribute('rx',Math.abs(k)*62);
+  let cx=75;
+  if(f<0.25){ term.setAttribute('fill','#0a0a12'); cx=75 - (62-Math.abs(k)*62)/1; cx=75-(62 - Math.abs(k)*62); /*placeholder*/ }
+  // Use clean approach: full bright disc, then dark cap on one side
+  term.setAttribute('fill','#0a0a12');
+  if(f<=0.5){ // waxing: dark on LEFT
+    if(f<0.25){ // crescent: dark covers most, bright sliver right -> overlay big dark with bright ellipse? do dark left half + dark ellipse
+      lit.setAttribute('fill','#0a0a12'); // base dark
+      // bright shown via term acting as bright? swap
+    }
+  }
+}
+
+/* --- Simpler, correct moon shading: two stacked layers --- */
+function shadeMoon(frac){
+  const lit=$('lit'), term=$('term');
+  const R=62, C=75;
+  // illuminated fraction &amp; limb
+  const phase = frac; // 0 new ->0.5 full ->1 new
+  const lightFromRight = phase < 0.5;
+  // base layer = dark
+  lit.setAttribute('fill','#0a0a12');
+  // we will instead set lit = bright full disc, term = dark ellipse that carves shadow
+  lit.setAttribute('fill','url(#mg)');
+  const cosv = Math.cos(2*Math.PI*phase); // 1..-1
+  term.setAttribute('ry',R);
+  term.setAttribute('rx',Math.abs(cosv)*R);
+  term.setAttribute('cx',C);
+  term.setAttribute('cy',C);
+  term.setAttribute('fill', phase<0.5 ? '#0a0a12' : '#0a0a12');
+}
+</script>
+<script>
+/* ===== Clean moon renderer (overrides messy attempts above) ===== */
+function moonShade(frac){
+  const svg=document.getElementById('moonsvg');
+  const lit=document.getElementById('lit');
+  const term=document.getElementById('term');
+  const R=62, C=75;
+  lit.setAttribute('fill','url(#mg)');           // bright full disc underneath
+  const cosv=Math.cos(2*Math.PI*frac);           // +1 new, 0 quarter, -1 full
+  term.setAttribute('cy',C);
+  term.setAttribute('ry',R);
+  term.setAttribute('rx',Math.abs(cosv)*R);
+  term.setAttribute('cx',C);
+  // Two-tone: when |illum|<.5 dark covers center forming crescent; when >.5 bright crescent on dark
+  if(frac<0.5){            // waxing — light on right
+    if(frac<0.25){ term.setAttribute('fill','#0a0a12'); }   // crescent: carve dark, shift left
+    else{ term.setAttribute('fill','url(#mg)'); }
+  } else {                 // waning — light on left
+    if(frac>0.75){ term.setAttribute('fill','#0a0a12'); }
+    else{ term.setAttribute('fill','url(#mg)'); }
+  }
+}
+</script>
+<script>
+/* ===== FINAL, verified moon geometry using SVG path crescent ===== */
+(function(){
+  const litEl=document.getElementById('lit');
+  const termEl=document.getElementById('term');
+  const svg=document.getElementById('moonsvg');
+  // remove ellipse-based term; build a path we control
+  termEl.setAttribute('rx','0');
+  const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('clip-path','url(#disc)');
+  svg.querySelector('g').appendChild(path);
+  window.__drawMoon=function(frac){
+    const R=62,C=75;
+    litEl.setAttribute('fill','url(#mg)');
+    termEl.setAttribute('rx','0'); // hide old
+    // terminator is a half-ellipse; build dark shadow shape
+    const x = Math.cos(2*Math.PI*frac); // 1 new ... -1 full
+    const rx = Math.abs(x)*R;
+    const waxing = frac<0.5;
+    // Shadow path: outer semicircle (dark side limb) + inner ellipse arc (terminator)
+    // dark side is left when waxing, right when waning
+    let large = R, p='';
+    const top=`${C},${C-R}`, bot=`${C},${C+R}`;
+    // outer arc sweep direction picks which limb
+    const darkLeft = waxing;
+    const outerSweep = darkLeft?0:1;
+    // terminator bulges toward dark side when crescent (illum<50), toward bright when gibbous
+    const crescent = (frac<0.25)||(frac>0.75);
+    let innerSweep;
+    if(darkLeft){ innerSweep = crescent?0:1; } else { innerSweep = crescent?1:0; }
+    p=`M ${top} A ${R} ${R} 0 0 ${outerSweep} ${bot} A ${rx} ${R} 0 0 ${innerSweep} ${top} Z`;
+    path.setAttribute('d',p);
+    path.setAttribute('fill','#0a0a12');
+    path.setAttribute('opacity', (Math.abs(frac-0)<0.02||Math.abs(frac-1)<0.02)?1:1);
+  };
+})();
+</script>
+<script>
+/* hook real moon draw into renderMoon */
+const _origRenderMoon = renderMoon;
+renderMoon = function(astro,m,d){
+  const J = jdn(astro,m,d);
+  let age = mod(J - NEWMOON_J2000, SYN);
+  const frac = age/SYN;
+  const illum = (1-Math.cos(2*Math.PI*frac))/2;
+  const names=['New Moon','Waxing Crescent','First Quarter','Waxing Gibbous','Full Moon','Waning Gibbous','Last Quarter','Waning Crescent'];
+  const idx = Math.floor(mod(frac+1/16,1)*8)%8;
+  document.getElementById('moonPhase').textContent = names[idx];
+  document.getElementById('moonAge').textContent = age.toFixed(1)+' d';
+  document.getElementById('moonIllum').textContent = Math.round(illum*100)+'%';
+  document.getElementById('moonLun').textContent = Math.round((J-2423436.40347)/SYN);
+  const back = Math.round((TODAY_JD - J)/SYN);
+  document.getElementById('moonBack').textContent = back<0?(Math.abs(back)+' ahead'):back.toLocaleString();
+  const yd = 2026-astro;
+  document.getElementById('metCyc').textContent = yd>=0?(Math.floor(yd/19)+' back'):(Math.abs(Math.floor(yd/19))+' ahead');
+  window.__drawMoon(frac);
+};
+</script>
+<script>
+/* ---------- WIRING ---------- */
+function setFromAstro(astro, m=5, d=1, scroll=false){
+  if(astro<=0){ era='bc'; setEraButtons(); yearIn.value=1-astro; }
+  else{ era='ad'; setEraButtons(); yearIn.value=astro; }
+  monIn.value=m; dayIn.value=d; render();
+  if(scroll) document.querySelector('.grid').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function setEraButtons(){ document.querySelectorAll('#eraTog button').forEach(b=>b.classList.toggle('on',b.dataset.era===era)); }
+
+document.getElementById('eraTog').addEventListener('click',e=>{
+  if(e.target.tagName!=='BUTTON')return; era=e.target.dataset.era; setEraButtons(); render();
+});
+[yearIn,monIn,dayIn].forEach(el=>el.addEventListener('input',render));
+slider.addEventListener('input',()=>{ const a=+slider.value; setFromAstro(a, +monIn.value||5, +dayIn.value||1); });
+evSel.addEventListener('change',()=>{ if(evSel.value==='')return; const a=E[+evSel.value][0]; setFromAstro(a,5,1,true); });
+document.getElementById('nowBtn').addEventListener('click',()=>setFromAstro(2026,5,30));
+document.querySelectorAll('.jump button[data-y]').forEach(b=>b.addEventListener('click',()=>{
+  const y=+b.dataset.y, e=b.dataset.e; setFromAstro(e==='bc'?(1-y):y,5,15);
+}));
+
+/* live doomsday countdown ticking on the moment bar tag */
+function liveTick(){
+  const t = new Date('2040-05-15T00:00:00Z') - new Date();
+  if(t>0){ const yrs=t/3.15576e10; /* could display */ }
+  requestAnimationFrame(()=>setTimeout(liveTick,1000));
+}
+buildTable('all');
+setEraButtons();
+render();
+</script>
+<script>
+(function(){var f=document.getElementById('engineFrame');function fit(){try{var d=f.contentWindow.document;var h=Math.max(d.body.scrollHeight,d.documentElement.scrollHeight);if(h>200)f.style.height=(h+20)+'px';}catch(e){}}f.addEventListener('load',function(){fit();setTimeout(fit,400);setTimeout(fit,1200);});window.addEventListener('resize',fit);})();
+</script>
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('fsBtn'), hint=document.getElementById('fsHint');
+  function supported(){return !!(document.fullscreenEnabled||document.webkitFullscreenEnabled);}
+  function active(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
+  function enter(){try{var fn=root.requestFullscreen||root.webkitRequestFullscreen;if(fn){var p=fn.call(root);if(p&&p.catch)p.catch(function(){});}}catch(e){}}
+  function exit(){try{var fn=document.exitFullscreen||document.webkitExitFullscreen;if(fn)fn.call(document);}catch(e){}}
+  function sync(){if(btn)btn.textContent=active()?'⤢ Exit full screen':'⛶ Full screen';if(active()&&hint)hint.style.display='none';}
+  if(supported()){
+    if(btn){btn.style.display='';btn.addEventListener('click',function(){active()?exit():enter();});}
+    if(hint)hint.style.display='';
+    document.addEventListener('fullscreenchange',sync);
+    document.addEventListener('webkitfullscreenchange',sync);
+    if(window.matchMedia&&matchMedia('(pointer:fine)').matches){
+      var armed=true;
+      document.addEventListener('click',function(e){
+        if(!armed||active())return;
+        if(e.target.closest&&e.target.closest('a,button,input,select,textarea,label,iframe'))return;
+        armed=false;enter();
+      });
+    }
+    sync();
+  }
+})();
+</script>
+</body>
+</html>
+"></iframe></div>
+</div>
+
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">A Reader's Dossier · prepared for Archaix.com</div>
+    <h1>CHRONICON</h1>
+    <div class="tagline" style="font-size:15px;color:var(--gold2);letter-spacing:.24em;margin-top:10px">· Clocks &amp; Calendrics Engine ·</div>
+    <div class="fshint" id="fsHint">⛶ &nbsp;Press <b>F11</b> or tap <b>Full screen</b> to fill the desktop</div>
+    <p class="ded">For Jason Breshears — chief cornerstone of this study. Everything we built around the Chronicon, gathered into one readable account: the six-clock instrument, the Great Pyramid set on the Annus Mundi count, and a fresh comparison of Flinders Petrie's stone against your calendar.</p>
+  </header>
+
+  <!-- I -->
+  <section id="instrument" style="border-top:0">
+    <div class="sec-no">I · The Instrument</div>
+    <h2>Six clocks on one shaft of time</h2>
+    <p class="lead">We built a single dial that turns every Chronicon period at once. Move it to any year and all six wheels re-read the same moment.</p>
+    <ul>
+      <li><b>Annus Mundi</b> — the Ancient World count from 3895 BC. Today, 30 May 2026, is <span class="hl">AM 5920</span>.</li>
+      <li><b>Phoenix / Sky Dragon</b> — the strict <span class="hl">138-year</span> lattice. We sit 14 years short of the 2040 visitation.</li>
+      <li><b>Nemesis X Object</b> — <span class="hl">792 years</span>, sixty inside Sol and seven-hundred-thirty-two without. It is currently outside; 20 years to the 2046 return.</li>
+      <li><b>Anunnaki NER</b> — the <span class="hl">600-year</span> epochs; 762 CE falls exactly on the 6000th NER year, as your work has it.</li>
+      <li><b>Mayan Long-Count</b> — the thirteen baktuns, closing at 13.0.0.0.0 in 2046.</li>
+      <li><b>The Moon</b> — drawn on the Metonic <span class="hl">19-year</span> cycle (235 lunations), woundable back beyond 2843 BC.</li>
+    </ul>
+    <p>Every anchor lands clean. 2022 CE returns AM 5916; the Great Flood returns AM 1656; the moon reads near-full for the night of 30 May 2026, as it truly was. The same twenty years separate us from the 2046 Nemesis return and from the close of the Long-Count — the wheels agree with one another.</p>
+  </section>
+
+  <!-- II -->
+  <section id="stone">
+    <div class="sec-no">II · The Stone in Annus Mundi</div>
+    <h2>The Great Pyramid, on our dates</h2>
+    <p class="lead">Not a fourth-dynasty tomb. On the Chronicon clock the monument is older, drowned, and risen — and its numbers fold on themselves.</p>
+    <blockquote>Raised over <b>90 years</b>, completed in <b>Annus Mundi 1080</b> — begun exactly <b>666 years</b> before the Great Flood, as the Gnostic texts, the Apocrypha and the Book of Enoch are read in the Chronicon. It stood, then lay <b>340 years</b> beneath the waters, and rose again.</blockquote>
+    <p>The first stone is set in <span class="hl">AM 990 (2905 BC)</span>; after a ninety-year raising it is capped in <span class="hl">AM 1080 (2815 BC)</span> — the very year Archaix already gives the pyramid finished at Achuzan, the place where Enoch vanished. It stands 576 years, goes under at the Flood of <span class="hl">AM 1656 (2239 BC)</span>, and rises again in <span class="hl">AM 1996 (1899 BC)</span> — the year your own chronology assigns to Babel and the founding of Akkad.</p>
+
+    <div class="renders" id="renderHost"></div>
+
+    <div class="scribe">
+      <h4>One correction, for the record</h4>
+      <p>The draft set the first stone at 2839 BC — but that is <b style="color:var(--ink);font-style:normal">Noah's</b> year (AM 1056), which is exactly <b style="color:var(--green);font-style:normal">600</b> years before the Flood. For the 90-year raising, the AM 1080 capstone, and the 666 to hold together at once, commencement must be AM 990 / 2905 BC. So Noah's 600 and the Stone's 666 stand side by side — six and sixty-six years from the same waters.</p>
+    </div>
+  </section>
+
+  <!-- III · PETRIE -->
+  <section id="petrie">
+    <div class="sec-no">III · Petrie ↔ Breshears</div>
+    <h2>The surveyor's stone and the chronologist's calendar</h2>
+    <p class="lead">Sir Flinders Petrie measured the monument in <b>space</b> — inches, cubits, angles. The Chronicon reads it in <b>time</b> — years, cycles, resets. Laid side by side, the two measures keep touching the same numbers.</p>
+    <p>Petrie surveyed Giza across two winters and published <em class="t">The Pyramids and Temples of Gizeh</em> in 1883 — still the reference survey, taken before the casing and corners suffered more loss. His core figures: a mean base side of <span class="mono">9068.8 in (230.35 m)</span>, an original vertical height of <span class="mono">146.71 m</span>, and a royal cubit of <span class="mono">20.62 in</span>. From these the monument's whole-number skeleton appears — <span class="mono">440</span> cubits on a side, <span class="mono">280</span> high.</p>
+
+    <div class="star">
+      <h3>The synchronicity that opens the door</h3>
+      <p style="margin:0;color:#ddd6c4">Petrie's original height, in plain inches, is —</p>
+      <div class="big">5776 in</div>
+      <p style="margin:0;color:#ddd6c4">He completed his survey in <b style="color:var(--cyan)">1882</b>. On the Annus Mundi count, 1882 CE is —</p>
+      <div class="big" style="font-size:clamp(32px,7vw,52px)">Annus Mundi 5776</div>
+      <div class="eq">1882 + 3894 = <b>5776</b> &nbsp;·&nbsp; and 5776 = <b>76²</b><br>the height of the stone in inches = the Annus-Mundi year he measured it</div>
+      <p style="margin:.8em 0 0;font-style:italic;color:var(--dim)">A coincidence of unit and offset, not a claim of design — but exactly the kind of mirror this work was built to notice.</p>
+    </div>
+
+    <table>
+      <caption>Where the stone (space) meets the calendar (time)</caption>
+      <thead><tr><th>Petrie / the monument</th><th>Chronicon / Breshears</th><th>The touch</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="mono"><span class="sp">Height 5776 in</span> (146.71 m)</td>
+          <td class="mono"><span class="ti">AM 5776 = 1882 CE</span>, his survey</td>
+          <td>height-in-inches = the AM year measured <span class="tag poetic">synchronic</span></td>
+        </tr>
+        <tr>
+          <td class="mono"><span class="sp">~203 masonry courses</span></td>
+          <td class="mono"><span class="ti">"203 levels of blocks"</span> (your chart)</td>
+          <td>same count in stone and in chart <span class="tag approx">≈ (201–210)</span></td>
+        </tr>
+        <tr>
+          <td class="mono"><span class="sp">Base 9068.8 in = 440 cubits</span></td>
+          <td class="mono"><span class="ti">440 encodes 12.368 moons/yr</span></td>
+          <td>235 moons ÷ <b>19</b> yr = 12.368 — the Metonic gear of our moon clock <span class="tag approx">≈</span></td>
+        </tr>
+        <tr>
+          <td class="mono"><span class="sp">Square circuit × 43,200 → Earth meridian</span></td>
+          <td class="mono"><span class="ti">432,000 sky-turnings</span> to the Flood</td>
+          <td>shared <b>432</b> root — space vs time <span class="tag poetic">harmonic</span></td>
+        </tr>
+        <tr>
+          <td class="mono"><span class="sp">Moon's radius = 1080 mi</span></td>
+          <td class="mono"><span class="ti">AM 1080</span> = the capstone year</td>
+          <td>the lunar number marks completion <span class="tag poetic">harmonic</span></td>
+        </tr>
+        <tr>
+          <td class="mono"><span class="sp">280 : 440 = 7 : 11</span></td>
+          <td class="mono"><span class="ti">792 = 60 + 732; 138; 600</span></td>
+          <td>both are ratio-locked repositories — circle squared in stone, cycles squared in time <span class="tag poetic">structural</span></td>
+        </tr>
+        <tr>
+          <td class="mono"><span class="sp">Perimeter ÷ 2·height ≈ π</span></td>
+          <td class="mono"><span class="ti">864,000 d = Foundation of Time</span></td>
+          <td>a universal constant encoded — one of space, one of time <span class="tag poetic">structural</span></td>
+        </tr>
+        <tr>
+          <td class="mono"><span class="sp">Slope ≈ 51°51′</span> (seked 5½)</td>
+          <td class="mono">—</td>
+          <td>the geometric signature of the build <span class="tag exact">measured</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="mono" style="font-size:13px;color:var(--dim)">Tags: <span class="tag exact">measured</span> empirical &nbsp; <span class="tag approx">≈</span> close / count-dependent &nbsp; <span class="tag poetic">harmonic / synchronic</span> a resonance we observe, not a causal claim.</p>
+    <p>The thesis writes itself in your own language: the pyramid is a <span class="hl">repository of measure</span>. Petrie proved it holds the measure of the Earth and the circle. The Chronicon proposes it also holds the measure of <em>time</em> — the same stone read on a second axis. The base that carries 12.368 moons a year is the base that gives us the Metonic <b>19</b>; the circuit that scales by 432 is the circuit behind the 432,000 turnings; and the lunar 1080 that crowns the canon is the Annus Mundi year the capstone was set.</p>
+  </section>
+
+  <!-- IV -->
+  <section id="longcount">
+    <div class="sec-no">IV · Confirmed</div>
+    <h2>The Mayan Long-Count reads 5138 today</h2>
+    <p class="lead">The count opened with the impact of <b>3113 BC</b>. Today — 2026 CE — is its <span class="hl">5,138th year</span>; it closes at 13.0.0.0.0 in 2046, leaving exactly twenty.</p>
+    <div class="star" style="border-color:var(--gold)">
+      <h3 style="color:var(--gold)">Long-Count year, now</h3>
+      <div class="big" style="color:var(--gold2)">5,138</div>
+      <div class="eq">3113 BC → 2026 CE = 3112 + 2026 = <b>5138</b> ✓<br>3113 BC → 2046 CE = 5158 (full count) &nbsp;·&nbsp; 5158 − 5138 = <b>20 yr left</b><br>— in step with baktun-13 on the Engine</div>
+    </div>
+  </section>
+
+  <!-- V -->
+  <section id="numbers">
+    <div class="sec-no">V · The numbers that fold</div>
+    <h2>19, 138, and the mirrors</h2>
+    <div class="nums">
+      <div class="ncard a"><div class="n">666</div><div class="t">A perfect palindrome</div><p>First stone (AM 990) to the Flood (AM 1656). Reads the same from either shore.</p></div>
+      <div class="ncard b"><div class="n">1080</div><div class="t">Capstone = Moon's radius</div><p>AM 1080, and the Moon's radius in miles, and 3 × 360.</p></div>
+      <div class="ncard c"><div class="n">138</div><div class="t">The Phoenix lattice</div><p>×3 = 414, ×4 = 552, ×46 = 6348 — the world the Stone rose inside.</p></div>
+      <div class="ncard d"><div class="n">19</div><div class="t">The Metonic moon</div><p>235 lunations to the year — and the same 12.368 hidden in the 440-cubit base.</p></div>
+    </div>
+  </section>
+
+  <!-- VI · VIDEO SLOT -->
+  <section id="video">
+    <div class="sec-no">VI · The Convergence</div>
+    <h2>Anatomy of a Convergence — Petrie &amp; Breshears</h2>
+    <p class="lead">The broadcast that names what we built: it took <b style="color:var(--gold2)">both</b> men — the surveyor to measure the stone, the chronologist to read its time.</p>
+    <p>In <em class="t">Anatomy of a Convergence: It Took Petrie &amp; Breshears</em> (15 May 2026), the Great Pyramid is presented not as a tomb but as chronotecture — architecture raised to encode time. An anciently advanced people of the 4th and 3rd millennium BCE built it knowing this experience is a controlled Construct, and set the "calendars" into the edifice as exact rectilinear measurements. Features found in no other pyramid — the Grand Gallery, the upper chambers — mark it as singular, and it was engineered to outlast millennia for a purpose held back until the Final Generation.</p>
+    <p>The oldest Coptic traditions, the pseudepigraphical texts and the Arabic scholars converge on one claim: the monument records the past, the present and the future. The video calls it the <b style="color:var(--gold2)">"chronotecture of Civilization X."</b> That is exactly the seam our comparison sits on — Petrie proved the stone holds the measure of the Earth; Breshears proposes it also holds the measure of time.</p>
+    <p class="small"><a class="inl" href="https://www.youtube.com/watch?v=c9ulxcCUZBY">▶ Watch — Anatomy of a Convergence (Super Cool Stuff · 5:03)</a></p>
+  </section>
+
+  <section id="breshears">
+    <div class="sec-no">VII · The cornerstone</div>
+    <h2>Who is Jason Breshears?</h2>
+    <p class="lead">More on the man whose work this whole instrument turns upon.</p>
+    <p>Jason Breshears is a researcher of antiquities, the occult and ancient chronological systems, writing at <b>Archaix.com</b> — a name he unfolds as <em>Advanced Research of Chronological History of Artificial Intelligence X</em>. The corpus is the fruit of roughly <b>a quarter-century</b> of data-mining: more than <b>fifteen books</b> with bibliographies citing sources centuries old, some two hundred articles, two-hundred-plus podcasts, and well over a thousand recorded videos. Newcomers to the work are called <em>Baby Phoenixes</em>.</p>
+    <p>It was Breshears who named the recurring planetary destroyer the <b style="color:var(--red)">Phoenix</b>, and who demonstrated its <b>138-year</b> cadence of resets — vanished populations, emptied cities, mudfloods, volcanic resurfacing and red-dust fallout — woven through recorded history. His most load-bearing correction concerns the Sumerian <b>SHAR</b>: long mistaken for a "year," it originally meant a single <em>day</em> — a <b style="color:var(--cyan)">turning of the stars</b>. That one move collapses the Anunna reigns from hundreds of thousands of years into mere centuries — and is why the charts speak of <b>432,000 sky-turnings</b>, not years, the same 432 that Petrie's stone carries in space.</p>
+    <h3>Selected works</h3>
+    <ul>
+      <li><b>Chronicon</b> — the master chronological corpus this dossier draws upon.</li>
+      <li><b>Anunnaki Homeworld</b> — orbital history and the 2046 return of the intruder world.</li>
+      <li><b>Nostradamus and the Planets of Apocalypse</b> — the case for 2040 and 2046, set beside Mother Shipton.</li>
+      <li>and fiction under the same cosmology — the <em>Oraclon Chronicles</em> and the <em>Dagothar</em> tales.</li>
+    </ul>
+    <p class="small">Presented as Breshears' thesis and bibliography, attributed to his work — not asserted here as established history.</p>
+  </section>
+
+  <!-- ENGINE -->
+
+  <footer>
+    <b>The Chronicon Calendrics &amp; Clocks Engine.</b> A worldbuilding &amp; study companion to the Archaix thesis of <b>Jason Breshears</b> (Archaix.com): the Chronicon, the Doomsday Chronology, and the 337 Archaix Charts. The Annus Mundi dating and the calendrical readings are the thesis of that work and are presented as such, not as established archaeology. Survey figures are from W. M. Flinders Petrie, <em>The Pyramids and Temples of Gizeh</em> (1883): mean base 9068.8 in / 230.3475 m (440 royal cubits), height 146.71 m (5776 in), cubit 20.62 in, slope ≈51°51′; later survey context from Cole (1925) and Lehner. The 432/43,200 and lunation derivations follow the harmonic-canon literature. AM = 3895 − (BC year). <b>You Are Here:</b> 30 May 2026 CE = AM 5920 = Mayan Long-Count year 5138.
+  </footer>
+
+</div>
+
+<script>
+function pyramid({build=1,water=0,mood='canopy'}){
+  const W=600,H=400,baseY=320,apexFull=72,cx=300,half=178;
+  const ay=baseY-build*(baseY-apexFull),flat=build<0.999,lx=cx-half,rx=cx+half,th=flat?half*(1-build):0;
+  let sky='',orb='',dust='',ground='';
+  if(mood==='construction'){sky=`<rect width='${W}' height='${H}' fill='#0b0a10'/><rect width='${W}' height='${H}' fill='url(#canopy)' opacity='.5'/>`;orb=`<circle cx='470' cy='96' r='34' fill='#f3e0a8' opacity='.55'/><circle cx='470' cy='96' r='60' fill='#f3e0a8' opacity='.12'/>`;ground=`<rect x='0' y='${baseY}' width='${W}' height='${H-baseY}' fill='#15110a'/>`;}
+  else if(mood==='canopy'){sky=`<rect width='${W}' height='${H}' fill='#0a0a12'/><rect width='${W}' height='${H}' fill='url(#canopy)' opacity='.7'/>`;orb=`<circle cx='300' cy='86' r='40' fill='#fff7e0' opacity='.5'/><circle cx='300' cy='86' r='78' fill='#fff7e0' opacity='.13'/>`;ground=`<rect x='0' y='${baseY}' width='${W}' height='${H-baseY}' fill='#16120b'/>`;}
+  else if(mood==='flood'){sky=`<rect width='${W}' height='${H}' fill='#0a060a'/><rect width='${W}' height='${H}' fill='url(#storm)' opacity='.85'/>`;orb=`<circle cx='300' cy='80' r='30' fill='#a83426' opacity='.55'/><circle cx='300' cy='80' r='66' fill='#a83426' opacity='.14'/>`;dust=`<g opacity='.5'>${Array.from({length:22},(_,i)=>{const x=(i*53+17)%W,y=(i*37)%190;return `<line x1='${x}' y1='${y}' x2='${x+6}' y2='${y+22}' stroke='#c0533f' stroke-width='1'/>`}).join('')}</g>`;}
+  else{sky=`<rect width='${W}' height='${H}' fill='#0a0a10'/><rect width='${W}' height='${H}' fill='url(#dawn)' opacity='.8'/>`;orb=`<circle cx='430' cy='84' r='36' fill='#f3d27a' opacity='.6'/><circle cx='430' cy='84' r='74' fill='#f3d27a' opacity='.16'/><g opacity='.5'>${[0,1,2,3,4].map(i=>`<line x1='430' y1='84' x2='${(430+Math.cos(i*1.2-1.2)*120).toFixed(1)}' y2='${(84+Math.sin(i*1.2-1.2)*120).toFixed(1)}' stroke='#f3d27a' stroke-width='1'/>`).join('')}</g>`;ground=`<rect x='0' y='${baseY}' width='${W}' height='${H-baseY}' fill='#14110a'/>`;}
+  let body=flat?`M ${lx} ${baseY} L ${cx-th} ${ay.toFixed(1)} L ${cx+th} ${ay.toFixed(1)} L ${rx} ${baseY} Z`:`M ${lx} ${baseY} L ${cx} ${apexFull} L ${rx} ${baseY} Z`;
+  const leftFace=flat?`M ${lx} ${baseY} L ${cx-th} ${ay.toFixed(1)} L ${cx} ${ay.toFixed(1)} L ${cx} ${baseY} Z`:`M ${lx} ${baseY} L ${cx} ${apexFull} L ${cx} ${baseY} Z`;
+  const rightFace=flat?`M ${rx} ${baseY} L ${cx+th} ${ay.toFixed(1)} L ${cx} ${ay.toFixed(1)} L ${cx} ${baseY} Z`:`M ${rx} ${baseY} L ${cx} ${apexFull} L ${cx} ${baseY} Z`;
+  let courses='';const top=flat?ay:apexFull;
+  for(let y=baseY-12;y>top+6;y-=13){const f=(baseY-y)/(baseY-apexFull),hw=half*(1-f);courses+=`<line x1='${(cx-hw).toFixed(1)}' y1='${y}' x2='${(cx+hw).toFixed(1)}' y2='${y}' stroke='#000' stroke-opacity='.18'/>`;}
+  const cap=(build>=0.999&&mood==='canopy')?`<polygon points='${cx},${apexFull} ${cx-16},${apexFull+26} ${cx+16},${apexFull+26}' fill='#f3d27a'/><circle cx='${cx}' cy='${apexFull}' r='30' fill='#f3d27a' opacity='.35'/><circle cx='${cx}' cy='${apexFull}' r='60' fill='#f3d27a' opacity='.12'/>`:'';
+  const ramp=mood==='construction'?`<polygon points='${rx} ${baseY} ${rx+92} ${baseY} ${cx+th} ${ay.toFixed(1)}' fill='#241c10' stroke='#3a2e18'/>`:'';
+  let waterEl='';
+  if(water>0){const wy=(baseY-water*(baseY-apexFull));const pts=Array.from({length:13},(_,i)=>`Q ${i*50+25} ${(wy-6).toFixed(1)} ${i*50+50} ${wy.toFixed(1)}`).join(' ');waterEl=`<path d='M 0 ${wy.toFixed(1)} ${pts} L ${W} ${H} L 0 ${H} Z' fill='url(#water)' opacity='.82'/><path d='M 0 ${wy.toFixed(1)} ${pts}' fill='none' stroke='#9fd6e2' stroke-opacity='.4' stroke-width='1.5'/>`;}
+  return `<svg viewBox='0 0 ${W} ${H}' xmlns='http://www.w3.org/2000/svg' role='img'><defs>
+    <radialGradient id='canopy' cx='50%' cy='12%' r='90%'><stop offset='0%' stop-color='#d9cba0' stop-opacity='.5'/><stop offset='55%' stop-color='#3a3a4a' stop-opacity='.2'/><stop offset='100%' stop-color='#07070c' stop-opacity='0'/></radialGradient>
+    <linearGradient id='storm' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='#3a0f14'/><stop offset='60%' stop-color='#160a14'/><stop offset='100%' stop-color='#07060a'/></linearGradient>
+    <radialGradient id='dawn' cx='72%' cy='18%' r='90%'><stop offset='0%' stop-color='#e9c97a' stop-opacity='.5'/><stop offset='50%' stop-color='#2a2333' stop-opacity='.2'/><stop offset='100%' stop-color='#07070c' stop-opacity='0'/></radialGradient>
+    <linearGradient id='faceL' x1='0' y1='0' x2='1' y2='0'><stop offset='0%' stop-color='#cdb17a'/><stop offset='100%' stop-color='#a98f55'/></linearGradient>
+    <linearGradient id='faceR' x1='0' y1='0' x2='1' y2='0'><stop offset='0%' stop-color='#7d663b'/><stop offset='100%' stop-color='#5c4a2b'/></linearGradient>
+    <linearGradient id='water' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='#2f7c8c'/><stop offset='100%' stop-color='#0c2730'/></linearGradient></defs>
+    ${sky}${orb}${dust}${ground}<path d='${leftFace}' fill='url(#faceL)'/><path d='${rightFace}' fill='url(#faceR)'/><path d='${body}' fill='none' stroke='#1a140c' stroke-width='1.5'/>${courses}${ramp}${cap}${waterEl}</svg>`;
+}
+const scenes=[
+  {cls:'r1',mood:'construction',build:0.62,water:0,ph:'Commenced · the raising begins',am:'AM 990',bc:'2905 BC',note:'666 years before the Flood'},
+  {cls:'r2',mood:'canopy',build:1,water:0,ph:'Completed · capstone set',am:'AM 1080',bc:'2815 BC',note:'after a 90-year raising · the Vapor-Canopy world'},
+  {cls:'r3',mood:'flood',build:1,water:0.8,ph:'Submerged · the Great Flood',am:'AM 1656',bc:'2239 BC',note:'the Canopy collapses; the world goes under'},
+  {cls:'r4',mood:'emerge',build:1,water:0.14,ph:'Re-emerged · the waters recede',am:'AM 1996',bc:'1899 BC',note:'after 340 years beneath — the year of Babel & Akkad'},
+];
+document.getElementById('renderHost').innerHTML=scenes.map(s=>`<figure class='render ${s.cls}'>${pyramid(s)}<figcaption class='cap'><div class='ph'>${s.ph}</div><div class='am'>${s.am} <small>· ${s.bc}</small></div><div class='note'>${s.note}</div></figcaption></figure>`).join('');
+</script>
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('fsBtn'), hint=document.getElementById('fsHint');
+  function supported(){return !!(document.fullscreenEnabled||document.webkitFullscreenEnabled);}
+  function active(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
+  function enter(){try{var fn=root.requestFullscreen||root.webkitRequestFullscreen;if(fn){var p=fn.call(root);if(p&&p.catch)p.catch(function(){});}}catch(e){}}
+  function exit(){try{var fn=document.exitFullscreen||document.webkitExitFullscreen;if(fn)fn.call(document);}catch(e){}}
+  function sync(){if(btn)btn.textContent=active()?'⤢ Exit full screen':'⛶ Full screen';if(active()&&hint)hint.style.display='none';}
+  if(supported()){
+    if(btn){btn.style.display='';btn.addEventListener('click',function(){active()?exit():enter();});}
+    if(hint)hint.style.display='';
+    document.addEventListener('fullscreenchange',sync);
+    document.addEventListener('webkitfullscreenchange',sync);
+    if(window.matchMedia&&matchMedia('(pointer:fine)').matches){
+      var armed=true;
+      document.addEventListener('click',function(e){
+        if(!armed||active())return;
+        if(e.target.closest&&e.target.closest('a,button,input,select,textarea,label,iframe'))return;
+        armed=false;enter();
+      });
+    }
+    sync();
+  }
+})();
+</script>
+</body>
+</html>
+
