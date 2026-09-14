@@ -28,14 +28,38 @@ malicious .oph  →  operation string hits new Function()  →  renderer code ex
 
 | Path | What |
 |---|---|
+| [`web/`](web/) | **The rebuild.** The whole engine as a browser app — same arithmetic, same `.oph` files, no Electron and no `new Function()`. Open [`web/index.html`](web/index.html). |
 | [`Ophis_v12_ReverseEngineering_Report.md`](Ophis_v12_ReverseEngineering_Report.md) | **The paper.** Full method, anatomy, v9→v12 delta, ranked findings, hardening, appendix. |
 | [`Ophis_v12_ReverseEngineering_Report.html`](Ophis_v12_ReverseEngineering_Report.html) | The report as a polished, self-contained page (portfolio format). |
 | [`Ophis_v12_Hardened_Engine_Lab.html`](Ophis_v12_Hardened_Engine_Lab.html) | **Proof-of-fix.** A sandboxed parser replacing `new Function()`; self-verifies parity + injection resistance in-browser. |
 | [`METHOD.md`](METHOD.md) | Reproducible `.exe` → source extraction (NSIS → 7z → asar). |
 | [`SECURITY.md`](SECURITY.md) | Findings, threat model, remediation status. |
 | `src/`, `lib/`, `img/` | The un-obfuscated renderer (24 first-party modules + third-party libs). |
-| `PSYFR1.html`, `NatoriOphis.html`, … | Single-file browser rewrites of the engine (the portfolio UI). |
+| `PSYFR1.html`, `NatoriOphis.html`, … | Earlier single-file browser experiments, kept for lineage. |
 | `Ophis_v9_*` | The prior v9 report + field guides, kept for lineage. |
+
+## The rebuild
+
+[`web/`](web/) is the finished article: the v12 engine rewritten as plain
+HTML/CSS/JS, with a UI built for the job. No build step, no dependencies, no
+network — open `web/index.html`.
+
+It is checked against the original rather than assumed equal to it. The
+extracted renderer loads headless into Node, so both engines can be run over the
+same events and compared field by field:
+
+```bash
+node web/tests/unit.node.js                        # 78 behaviour tests
+node web/tests/parity.node.js                      # differential vs. the original engine
+node web/tests/parity.node.js --fuzz 1500 --quiet  # plus 1500 random events
+```
+
+All pass, including sunset-based HH:MM scope, with one named divergence: the
+rewrite parses formulas instead of compiling them, so it accepts a formula the
+original's stripped-string validator wrongly rejects — and refuses every
+injection payload the original would execute. Detail in
+[`web/docs/PARITY.md`](web/docs/PARITY.md); the algorithm itself is written up
+in [`web/docs/ENGINE.md`](web/docs/ENGINE.md).
 
 ## Reproduce the extraction
 

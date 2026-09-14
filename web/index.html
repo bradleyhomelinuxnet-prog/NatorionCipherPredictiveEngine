@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ophis Web · date projection engine</title>
+<meta name="description" content="Browser rebuild of the Ophis v12 (PSYFR) date-projection engine. Offline, no network, no eval.">
+
+<!-- No remote origins at all: every byte is served from this folder or ../lib. -->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self' file:; style-src 'self' file:; img-src 'self' file: data:; font-src 'self' file:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">&#9737;</span>
+    <span class="brand-text">
+      <b>OPHIS</b><span class="brand-sub">web · v12 engine</span>
+    </span>
+  </div>
+
+  <div id="event-bar" class="event-bar"></div>
+
+  <div id="toolbar" class="toolbar">
+    <button class="btn" data-action="open" data-tip="Open a .oph file &middot; Ctrl+O">Open</button>
+    <button class="btn" data-action="save" data-tip="Save every event as .oph &middot; Ctrl+S">Save</button>
+    <button class="btn" data-action="csv" data-tip="Export the current output as CSV">CSV</button>
+    <button class="btn ghost" data-action="new" data-tip="Start a new session">New</button>
+    <button class="icon-btn" data-action="theme" data-tip="Light / dark">&#9681;</button>
+    <button class="icon-btn" data-action="about" data-tip="What this is and how it scores">?</button>
+  </div>
+</header>
+
+<div id="statusbar" class="statusbar"></div>
+
+<main class="layout">
+
+  <aside class="rail rail-left">
+    <section id="panel-xdates" class="panel"></section>
+    <section id="panel-intervals" class="panel"></section>
+    <section id="panel-tdates" class="panel collapsed-ok"></section>
+    <section id="panel-event" class="panel"></section>
+  </aside>
+
+  <section class="center">
+    <section class="panel panel-chart">
+      <header class="panel-head">
+        <h2>Timeline</h2>
+        <span class="spacer"></span>
+        <span class="panel-note">wheel to zoom &middot; drag to pan &middot; double-click to fit</span>
+      </header>
+      <div class="chart-wrap">
+        <canvas id="chart-canvas" aria-label="Timeline of X-Dates and projected Z-Dates"></canvas>
+      </div>
+      <div id="chart-options" class="chart-options"></div>
+      <div class="chart-legend">
+        <span class="legend-item"><i class="swatch x"></i>X-Date</span>
+        <span class="legend-item"><i class="swatch low"></i>1&ndash;2 hits</span>
+        <span class="legend-item"><i class="swatch three"></i>3 hits</span>
+        <span class="legend-item"><i class="swatch four"></i>4 hits</span>
+        <span class="legend-item"><i class="swatch five"></i>5+ hits</span>
+        <span class="legend-item"><i class="swatch ring"></i>MSRF match</span>
+        <span class="legend-item">stem height = score</span>
+      </div>
+    </section>
+
+    <section id="panel-output" class="panel panel-output"></section>
+    <section id="panel-detail" class="panel panel-detail"></section>
+  </section>
+
+  <aside class="rail rail-right">
+    <section id="panel-operations" class="panel"></section>
+    <section id="panel-filters" class="panel"></section>
+  </aside>
+
+</main>
+
+<footer class="appfoot">
+  <span>Offline by construction &mdash; no network requests, no eval, no filesystem writes.</span>
+  <span class="spacer"></span>
+  <span>Ophis is a worldbuilding &amp; study instrument after the Archaix thesis of Jason Breshears, presented as that thesis rather than as established science.</span>
+</footer>
+
+<input type="file" id="file-input" accept=".oph,application/json,text/plain" hidden>
+<div id="tooltip" class="tooltip" role="tooltip"></div>
+<div id="toast" class="toast"></div>
+<div id="modal" class="modal"></div>
+
+<!-- Optional data and astronomy, shared with the desktop build. The app checks
+     for each and degrades with a message if one is missing. -->
+<script src="../lib/astronomy.browser.min.js" defer></script>
+<script src="../lib/tz_lookup_oss.js" defer></script>
+<script src="../lib/solar_eclipses_processed.js" defer></script>
+<script src="../lib/lunar_eclipses_processed.js" defer></script>
+
+<!-- The application itself. Order matters: each file uses the ones above it. -->
+<script src="js/ophis.constants.js" defer></script>
+<script src="js/ophis.expr.js" defer></script>
+<script src="js/ophis.time.js" defer></script>
+<script src="js/ophis.engine.js" defer></script>
+<script src="js/ophis.file.js" defer></script>
+<script src="js/ophis.store.js" defer></script>
+<script src="js/ui.dom.js" defer></script>
+<script src="js/ui.panels.js" defer></script>
+<script src="js/ui.output.js" defer></script>
+<script src="js/ui.chart.js" defer></script>
+<script src="js/app.js" defer></script>
+
+</body>
+</html>
