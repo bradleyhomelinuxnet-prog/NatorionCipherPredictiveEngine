@@ -8,17 +8,19 @@
      node natorion/tests/browser.js --shots out/    # also save screenshots
      node natorion/tests/browser.js --headed        # watch it run
 
-   Needs Playwright: `npm i -D playwright && npx playwright install chromium`
-   (inside natorion/), or a global install. Exit code 0 when every check passes. */
+   Needs Playwright: `npm i -D playwright && npx playwright install --with-deps chromium`
+   (inside natorion/; --with-deps fetches Chromium's system libraries on Linux),
+   or a global install. Exit code 0 when every check passes. */
 "use strict";
 const fs = require("fs"), os = require("os"), path = require("path"), url = require("url");
 const { execSync } = require("child_process");
 
 const APP = path.resolve(__dirname, "..");
-const REPO = path.resolve(APP, "..");
 const PAGE = url.pathToFileURL(path.join(APP, "index.html")).href;
 const argv = process.argv.slice(2);
-const SHOTS = argv.includes("--shots") ? path.resolve(argv[argv.indexOf("--shots") + 1] || "shots") : null;
+const shotsAt = argv.findIndex(a => a === "--shots" || a.startsWith("--shots="));
+const shotsVal = shotsAt < 0 ? null : argv[shotsAt].includes("=") ? argv[shotsAt].split("=")[1] : (argv[shotsAt + 1] && !argv[shotsAt + 1].startsWith("--") ? argv[shotsAt + 1] : "shots");
+const SHOTS = shotsVal == null ? null : path.resolve(shotsVal);
 const HEADED = argv.includes("--headed");
 
 /* ------------------------------------------------------ playwright -- */
@@ -26,7 +28,7 @@ function loadPlaywright() {
   const tries = [() => require("playwright"), () => require(path.join(APP, "node_modules", "playwright"))];
   tries.push(() => require(path.join(execSync("npm root -g", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim(), "playwright")));
   for (const t of tries) { try { return t(); } catch (e) { /* next */ } }
-  console.error("Playwright is not installed. In natorion/: npm i -D playwright && npx playwright install chromium");
+  console.error("Playwright is not installed. In natorion/: npm i -D playwright && npx playwright install --with-deps chromium");
   process.exit(2);
 }
 const { chromium } = loadPlaywright();
@@ -44,14 +46,22 @@ async function shot(page, name, opts) {
   await page.screenshot(Object.assign({ path: path.join(SHOTS, name + ".png") }, opts || {}));
 }
 
-// Page errors fail the run; a font request that cannot reach Google Fonts does not.
+// Page errors fail the run. Requests to Google Fonts are cut off before they
+// leave the browser, so a network that silently drops them cannot stall the
+// run, and their failure is the one console error that is ignored. A missing
+// local file still counts.
+const FONT_HOSTS = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//;
+async function prepare(ctx) {
+  await ctx.route(FONT_HOSTS, r => r.abort());
+  // Start the browser's clock on the date the checks assume; time still moves on from there.
+  if (ctx.clock && ctx.clock.install) await ctx.clock.install({ time: new Date("2026-09-23T12:00:00") });
+}
 function watchErrors(page, bucket) {
   page.on("pageerror", e => bucket.push("pageerror: " + e.message));
   page.on("console", m => {
     if (m.type() !== "error") return;
-    const t = m.text();
-    if (/fonts\.(googleapis|gstatic)|ERR_CERT|ERR_NAME_NOT_RESOLVED|ERR_INTERNET_DISCONNECTED|Failed to load resource/.test(t)) return;
-    bucket.push("console: " + t);
+    if (FONT_HOSTS.test((m.location() && m.location().url) || "")) return;
+    bucket.push("console: " + m.text() + " @ " + ((m.location() && m.location().url) || ""));
   });
   page.on("dialog", d => d.accept());
 }
@@ -75,12 +85,20 @@ async function main() {
   try {
     /* ============================================== desktop, dark theme */
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, colorScheme: "dark", acceptDownloads: true });
+    await prepare(ctx);
     const page = await ctx.newPage();
     watchErrors(page, errors);
     await page.goto(PAGE);
     await settle(page);
 
     console.log("first open");
+    // Pin "today" (Files → Settings) so filters and marks do not drift as the calendar moves on.
+    await go(page, "files");
+    await page.fill("#todayOverride", "2026-09-23");
+    await page.dispatchEvent("#todayOverride", "change");
+    await go(page, "cipher");
+    await settle(page);
+    check("today can be pinned in Settings", (await page.evaluate(() => new Date(NC.store.nowMs()).getMonth())) === 8);
     const rows0 = await page.$$eval("#resultsBody tr[data-key]", r => r.length);
     check("the demo event projects Z-Dates", rows0 > 0, rows0);
     check("the status line counts Y-pairs", /15\s*Y-pairs/.test(await text(page, "#status")), await text(page, "#status"));
@@ -106,19 +124,40 @@ async function main() {
     await page.keyboard.press("Escape");
     check("Escape closes the drawer", !(await page.$("#detailDialog[open]")));
 
-    console.log("opening a v12 file");
-    let sample = path.join(REPO, "test-file-bradley-rogue-dates.oph");
-    if (!fs.existsSync(sample)) {
-      sample = path.join(tmp, "sample.oph");
-      fs.writeFileSync(sample, JSON.stringify({ app_version: "12", iso_events: [
-        { name: "Event 1", x_dates: [{ date: "07/04/2026" }, { date: "08/20/2026" }, { date: "03/09/2027" }] },
-        { name: "Event 2", x_dates: [{ date: "01/01/2027" }, { date: "02/02/2027" }] }] }));
+    console.log("a known projection (the manual's worked example)");
+    await page.click("#xPasteBtn");
+    await page.fill("#pasteDates", "07/04/2026, 08/20/2026");
+    await page.click("#pasteOk");
+    await settle(page);
+    const golden = await page.$$eval("#resultsBody tr[data-key]", rows => {
+      const r = rows.find(x => x.querySelector("td.date").textContent.startsWith("11/04/2026"));
+      return r ? { score: r.querySelector("td.score").textContent, hits: r.querySelector("td.hits").textContent.trim(), msrf: Array.from(r.querySelectorAll("td .pill.normal, td .pill.important, td .pill.vortex")).map(p => p.textContent).join("|"), key: r.dataset.key } : null;
+    });
+    check("X1 07/04/2026 + X2 08/20/2026 project 11/04/2026", !!golden, "row missing");
+    check("… scoring 1.5 with 2 hits and MSRF 76", !!golden && golden.score === "1.5" && golden.hits === "2" && golden.msrf === "76", JSON.stringify(golden));
+    if (golden) {
+      await page.click(`#resultsBody tr[data-key="${golden.key}"]`);
+      await page.waitForSelector("#detailDialog[open]");
+      const d = await text(page, "#detailBody");
+      check("… and its derivation shows Y = 47 and the ×1.5 multiplier", /Y = 47/.test(d) && /× 1\.5/.test(d), d.slice(0, 200));
+      await page.keyboard.press("Escape");
     }
+
+    console.log("opening Ophis files");
+    const FIX = path.join(__dirname, "fixtures");
     await go(page, "files");
-    await page.setInputFiles("#fileInput", sample);
-    await page.waitForFunction(() => /Opened/.test(document.getElementById("importReport").textContent), null, { timeout: 10000 });
-    const names = await page.$$eval("#eventSelect option", o => o.map(x => x.textContent));
-    check("a .oph file with two events opens", names.length === 3 && names[2] === "+ New event", names.join(" | "));
+    await page.setInputFiles("#fileInput", path.join(FIX, "two-events-v9.oph"));
+    await page.waitForFunction(() => /Opened 2 events/.test(document.getElementById("importReport").textContent), null, { timeout: 10000 });
+    let names = await page.$$eval("#eventSelect option", o => o.map(x => x.textContent));
+    check("a v9-era file with two events replaces the document", names.length === 3 && names[2] === "+ New event", names.join(" | "));
+    await page.click('#openHowSeg button[data-v="append"]');
+    await page.setInputFiles("#fileInput", path.join(FIX, "six-anchors-v12.oph"));
+    await page.waitForFunction(() => /Opened 1 event/.test(document.getElementById("importReport").textContent), null, { timeout: 10000 });
+    names = await page.$$eval("#eventSelect option", o => o.map(x => x.textContent));
+    check("a v12 file can be added after them", names.length === 4 && names[2] === "Six anchors", names.join(" | "));
+    check("the added event is the open one", (await page.evaluate(() => NC.store.state.current)) === 2);
+    await page.click('#openHowSeg button[data-v="replace"]');
+    await page.selectOption("#eventSelect", "0");
     await go(page, "cipher");
     await settle(page);
     check("the opened event projects", (await page.$$eval("#resultsBody tr[data-key]", r => r.length)) > 0);
@@ -176,6 +215,9 @@ async function main() {
     check("the calendar wall has nineteen calendars", (await page.$$eval("#chWall .cal", c => c.length)) === 19);
     check("no raw ERA suffix on the wall", !/ERA\d/.test(await text(page, "#chWall")));
     check("the living clocks tick", /\d\d:\d\d:\d\d/.test(await text(page, "#clocks")));
+    check("the Dossier draws the four Stone renders", (await page.$$eval("#renderHost figure svg", f => f.length)) === 4);
+    check("the Dossier's live numbers are filled in", (await page.$eval('[data-live="amToday"]', n => n.textContent)) === String(new Date().getFullYear() + 3894));
+    check("the Dossier's eight chapters are present", (await page.$$eval("#dossier details.chapter", d => d.length)) === 8);
     await page.click('#ledgerSeg button[data-k="phx"]');
     const kinds = await page.$$eval("#ledgerBody .dot", d => d.map(x => x.className));
     check("the ledger filters to Phoenix rows", kinds.length > 0 && kinds.every(k => /d-phx/.test(k)), kinds.length);
@@ -183,7 +225,7 @@ async function main() {
 
     console.log("exports");
     await go(page, "files");
-    for (const [id, test] of [["#saveOph", s => JSON.parse(s).iso_events.length === 2], ["#saveCsv", s => /^\ufeff?Rank,Z-Date/.test(s)], ["#saveSheet", s => /<Workbook/.test(s)]]) {
+    for (const [id, test] of [["#saveOph", s => JSON.parse(s).iso_events.length === 3], ["#saveCsv", s => /^\ufeff?Rank,Z-Date/.test(s)], ["#saveSheet", s => /<Workbook/.test(s)]]) {
       const [dl] = await Promise.all([page.waitForEvent("download"), page.click(id)]);
       const out = path.join(tmp, dl.suggestedFilename());
       await dl.saveAs(out);
@@ -234,6 +276,7 @@ async function main() {
     /* =================================================== phone width */
     console.log("phone");
     const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, colorScheme: "dark", deviceScaleFactor: 2, hasTouch: true, isMobile: true });
+    await prepare(phone);
     const mp = await phone.newPage();
     watchErrors(mp, errors);
     for (const s of ["cipher", "operations", "chronicon", "files", "guide"]) {
@@ -248,7 +291,8 @@ async function main() {
     check("no page errors in the whole run", errors.length === 0, errors.join("\n"));
   } finally {
     await browser.close();
-    fs.rmSync(tmp, { recursive: true, force: true });
+    try { fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); }
+    catch (e) { console.warn("could not remove " + tmp + ": " + e.code); }
   }
   console.log(`\n${pass} passed, ${fail} failed` + (SHOTS ? ` · screenshots in ${SHOTS}` : ""));
   if (fail) console.log("failed: " + failures.join("; "));

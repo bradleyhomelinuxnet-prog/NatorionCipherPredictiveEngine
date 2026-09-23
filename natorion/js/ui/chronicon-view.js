@@ -172,7 +172,7 @@
 
   function active(on) {
     clearInterval(ticker);
-    if (on) { tick(); ticker = setInterval(tick, 1000); render(); }
+    if (on) { tick(); ticker = setInterval(tick, 1000); render(); NC.dossier.renderStone(); NC.dossier.renderLive(new Date()); }
   }
 
   function init() {

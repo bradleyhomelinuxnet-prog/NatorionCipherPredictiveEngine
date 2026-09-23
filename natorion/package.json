@@ -8,7 +8,7 @@
     "test:self": "node tests/self-check.js",
     "test:browser": "node tests/browser.js",
     "test:parity": "node tests/parity.js 300",
-    "setup:browser": "npx playwright install chromium"
+    "setup:browser": "npx playwright install --with-deps chromium"
   },
   "devDependencies": {
     "playwright": "^1.56.1"

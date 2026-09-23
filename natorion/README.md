@@ -6,6 +6,8 @@ It rebuilds **Ophis v12** (the Windows desktop app also called PSYFR) as a plain
 
 > The full manual, with every button explained, is in **[MANUAL.md](MANUAL.md)**.
 
+![The Cipher screen: X-Dates on the left, the timeline and ranked Z-Dates on the right](docs/cipher.png)
+
 ---
 
 ## 1. Open it (30 seconds)
@@ -71,11 +73,15 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 |---|---|
 | **Cipher** | Enter dates, see and sort the projections. The main screen. |
 | **Operations** | See or edit the sixteen formulas, add the ten "extras", test a formula. |
-| **Chronicon** | Look at any day in history on every calendar and cycle. Send a day to your X-Dates, or open a Z-Date here. |
+| **Chronicon** | Look at any day in history on every calendar and cycle. Read the Dossier — the written chapters on the Stone, Petrie ↔ Breshears and the 138-faced year. Send a day to your X-Dates, or open a Z-Date here. |
 | **Files** | Open, save, export, manage several events, copy settings between them. |
 | **Guide** | The short version of how the scoring works. |
 
 ---
+
+![Click any Z-Date to see how it was derived](docs/derivation.png)
+
+![The Chronicon: living clocks, the long cycles, the moon, the calendar wall](docs/chronicon.png)
 
 ## 6. Common problems
 
@@ -93,14 +99,14 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 ## 7. For the technical folks
 
 - Pure front end: `index.html` + `css/` + `js/`. No build step, no server, no framework. Works from `file://`.
-- The engine re-derives the Ophis v12 source in this repo (`../src`). **`tests/parity.js`** runs the original v12 code and this engine side by side on the sample files and randomly generated events, comparing every Z-Date, score, hit count, MSRF match and contributing operation. Last runs: **1,003 of 1,003** identical (seed 138) and **402 of 403** (seed 19). The one difference is an HH:MM case in Kazakhstan, which changed time zone in 2024. v12 ships 2023 zone data; the browser's is current. The instants and scores still match.
+- The engine re-derives the Ophis v12 source in this repo (`../src`). **`tests/parity.js`** runs the original v12 code and this engine side by side on the sample files and on randomly generated events — Days and HH:MM scope, T-Dates, every filter, disabled and unreadable dates, both scoring systems, all five sorts, extra and duplicate operations, "today" placed inside the date range — comparing every Z-Date, score, hit count, MSRF match and contributing operation. Last runs: **1,003 of 1,003** identical (seed 138) and **403 of 403** (seed 19). The one known class of difference is time-zone *data*: v12 ships 2023 zone rules, the browser's are current, so a place whose rules changed since (Kazakhstan moved to UTC+5 in 2024) shows local times an hour apart in HH:MM scope while the instants and scores still match.
 - **`tests/self-check.js`** runs 34 checks without the original source.
-- **`tests/browser.js`** drives the real app in headless Chromium: every screen, opening a v12 file, pasting dates, editing operations, the Chronicon bridge, the three exports, HH:MM scope, persistence across a reload, the timeline, and phone width with no sideways scrolling. It fails on any script error.
+- **`tests/browser.js`** drives the real app in headless Chromium: every screen, a known projection with a known score, opening v9 and v12 files, pasting dates, editing operations, the Chronicon bridge and Dossier, the three exports, HH:MM scope, persistence across a reload, the timeline, and phone width with no sideways scrolling. It fails on any script error. Mutation-tested: of 16 deliberate breaks to the app, it catches 15; the sixteenth is a CSS rule that other rules already make redundant.
 - Formulas are parsed by a small grammar. They are never executed as code, which closes the code-execution hole in v12's shared `.oph` files. Nothing from a file is ever inserted into the page as HTML.
 
 ```bash
 cd natorion
-npm install && npm run setup:browser   # once: Playwright + Chromium, for the browser test only
+npm install && npm run setup:browser   # once: Playwright + Chromium (with system libraries), for the browser test only
 npm test                               # self-check + browser test
 npm run test:parity                    # original v12 vs rebuild (needs ../src and ../lib)
 node tests/browser.js --shots shots/   # browser test, saving a screenshot of every step

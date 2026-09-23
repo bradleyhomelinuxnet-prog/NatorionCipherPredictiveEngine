@@ -373,6 +373,8 @@ Under the dial:
 
 **The bridge.** **Use as X-Date** adds the dial's day to your current event. From any Z-Date's derivation, **Open in Chronicon** comes the other way.
 
+**The Dossier.** Below the ledger sit the eight written chapters of the Chronicon, kept as written: the Instrument; the Stone in Annus Mundi, with the four renders of the Great Pyramid commenced, capped, drowned and re-emerged; Petrie ↔ Breshears, with the table where the surveyor's measures meet the calendar; the Sigil in the Odometer (5138, the 138-faced year); the numbers that fold; the Convergence; the cornerstone (who Jason Breshears is); and the Anunna reckoning and the calendar wall. Click a chapter's title to open it. The figures that depend on today — AM of today, years to 2040 and 2046, the days left in the 138-faced year — are live.
+
 > The Chronicon presents the Archaix thesis of Jason Breshears as a study and worldbuilding instrument, not as established history. The Egyptian, Maya, French Republican and Chinese readings are arithmetic approximations; the others come from your browser's own calendar tables.
 
 ---

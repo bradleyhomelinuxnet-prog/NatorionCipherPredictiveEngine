@@ -83,14 +83,30 @@ function randomEvent(R, hh) {
   if (R() < 0.2) ops.push({ equation: "X2+oph_flip(oph_round(Y/3))", weight: 1, enabled: true });
   if (R() < 0.1) ops.push({ equation: ops[0].equation, weight: 1, enabled: true });   // duplicate: must be ignored
   const sorts = ["SORT_TYPE__DATE", "SORT_TYPE__SCORE", "SORT_TYPE__MSRF", "SORT_TYPE__HIT_COUNT", "SORT_TYPE__OPERATIONS"];
+  // Edge shapes v12 special-cases: a disabled first date (the "first pair"
+  // minimum then applies to a later pair), two dates a day apart, and an
+  // unreadable date that loose loading must drop.
+  if (R() < 0.15) x[0].enabled = false;
+  if (R() < 0.15 && x.length > 2) { const d = new Date(Date.UTC(+x[0].date.slice(6), +x[0].date.slice(0, 2) - 1, +x[0].date.slice(3, 5)) + 864e5); x.splice(1, 0, { date: pad(d.getUTCMonth() + 1) + "/" + pad(d.getUTCDate()) + "/" + d.getUTCFullYear(), time: "00:00", enabled: true }); }
+  if (R() < 0.1) x.splice(Math.floor(R() * x.length), 0, { date: "02/30/2027", time: "00:00", enabled: true });
+  // T-Dates (Days scope only: in HH:MM, Natorion deliberately reads them at
+  // the event's location where v12 used the computer's own zone).
+  const tds = [];
+  if (!hh && R() < 0.3) {
+    const last = x[x.length - 1], base = Date.UTC(+last.date.slice(6), +last.date.slice(0, 2) - 1, +last.date.slice(3, 5));
+    for (let k = 0; k < 1 + Math.floor(R() * 3); k++) { const d = new Date(base + Math.floor(R() * 900) * 864e5); tds.push({ date: pad(d.getUTCMonth() + 1) + "/" + pad(d.getUTCDate()) + "/" + d.getUTCFullYear(), enabled: R() > 0.2 }); }
+  }
   const ev = {
-    name: "R", x_dates: x, scope: hh ? "EVENT_SCOPE__HH_MM" : "EVENT_SCOPE__DAYS",
+    name: "R", x_dates: x, t_dates: tds, scope: hh ? "EVENT_SCOPE__HH_MM" : "EVENT_SCOPE__DAYS",
     lat: hh ? Math.round((R() * 110 - 55) * 10) / 10 : 0, long: hh ? Math.round((R() * 340 - 170) * 10) / 10 : 0,
     operations: ops, scoring_system: R() < 0.15 ? "SCORING_SYSTEM__LTE_V7" : "SCORING_SYSTEM__GTE_V8",
     z_date_sort_type: sorts[Math.floor(R() * sorts.length)],
     iso_event_filter_before_current_date: R() < 0.5, iso_event_filter_before_last_x_date: R() < 0.7,
-    iso_event_filter_beyond_max_days_value: [2559, 400, 90][Math.floor(R() * 3)],
-    iso_event_filter_min_hit_count: R() < 0.2, iso_event_filter_min_score: R() < 0.2, iso_event_filter_msrf_match: R() < 0.2,
+    iso_event_filter_on_last_x_date: R() < 0.7, iso_event_filter_on_current_date: R() < 0.3,
+    iso_event_filter_beyond_max_days: R() < 0.8, iso_event_filter_beyond_max_days_value: [2559, 400, 90][Math.floor(R() * 3)],
+    iso_event_filter_min_hit_count: R() < 0.2, iso_event_filter_min_hit_count_value: 1 + Math.floor(R() * 4),
+    iso_event_filter_min_score: R() < 0.2, iso_event_filter_min_score_value: [0.5, 1, 1.5, 2, 3][Math.floor(R() * 5)],
+    iso_event_filter_msrf_match: R() < 0.2,
     day_scope_start_time_in_millis: !hh && R() < 0.15 ? 3600000 * Math.floor(R() * 24) : 0
   };
   return JSON.stringify({ app_version: "12", iso_events: [ev] });
@@ -101,12 +117,19 @@ const count = parseInt(process.argv[2] || "300", 10), seed = parseInt(process.ar
 if (new Date(0).getTimezoneOffset() !== 0) console.warn("warning: run with TZ=UTC for a like-for-like 'today'.");
 const original = loadOriginal(), natorion = loadNatorion(), R = rng(seed);
 const NOW = Date.UTC(2026, 8, 23, 12, 0);
+// Every fifth random case also runs with "today" moved inside its own date
+// range, so the on-today / before-today filters actually bite.
 const cases = ["test-bradley.oph", "test-file-bradley-rogue-dates.oph", "7-4-26-8-20-26-3-9-27-3-16-27-8-19-27-4-1-28.oph"].map(f => ({ name: f, json: fs.readFileSync(path.join(REPO, f), "utf8") }));
-for (let i = 0; i < count; i++) cases.push({ name: "random#" + i + (i % 5 === 4 ? " (HH:MM)" : ""), json: randomEvent(R, i % 5 === 4) });
+for (let i = 0; i < count; i++) {
+  const json = randomEvent(R, i % 5 === 4), c = { name: "random#" + i + (i % 5 === 4 ? " (HH:MM)" : ""), json: json };
+  if (i % 5 === 2) { const xs = JSON.parse(json).iso_events[0].x_dates, d = xs[xs.length - 1].date; c.now = Date.UTC(+d.slice(6), +d.slice(0, 2) - 1, +d.slice(3, 5)) + Math.floor(R() * 200) * 864e5 + 7 * 3600000; c.name += " (today inside)"; }
+  cases.push(c);
+}
 
 let pass = 0, fail = 0, zTotal = 0;
 for (const c of cases) {
-  const a = JSON.stringify(original(c.json, NOW)), b = JSON.stringify(natorion(c.json, NOW));
+  const now = c.now || NOW;
+  const a = JSON.stringify(original(c.json, now)), b = JSON.stringify(natorion(c.json, now));
   if (a === b) { pass++; zTotal += (a.match(/\],\[/g) || []).length; continue; }
   fail++;
   if (fail <= 5) {
