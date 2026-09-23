@@ -4,6 +4,8 @@
 > **Natorion Cipher** is the finished, front-end-only rebuild of the Ophis engine, joined to the Chronicon clocks and calendars. Use it on the site above, or open `natorion/index.html` in any browser; there is no install and no server. The landing page is `index.html`; `.github/workflows/pages.yml` publishes it, the app and the report to GitHub Pages on every push to `main`, and `tests.yml` runs the three test suites on every push.
 > Start with **[natorion/README.md](natorion/README.md)** (two-minute quick start), then **[natorion/MANUAL.md](natorion/MANUAL.md)** (the full user manual).
 > The rebuild is checked against the original v12 code by `natorion/tests/parity.js`.
+>
+> **The original, in a browser: [`ophis/`](ophis/)** · live at […/NatorionCipherPredictiveEngine/ophis/](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/ophis/) — the v12 `.exe`'s own renderer, copied byte-for-byte out of `app.asar`, with Electron replaced by a small browser bridge ([ophis/README.md](ophis/README.md)). It behaves exactly like the desktop app, including its `new Function()` evaluator — so open only `.oph` files you trust. The bridge cannot write to arbitrary paths; it saves only to files you pick.
 
 A white-box reverse-engineering study of **Ophis v12**, an offline Electron date-projection / cycle-prediction tool, taken apart as an educational study of `.exe` packaging and Electron attack surface — then rebuilt more safely.
 

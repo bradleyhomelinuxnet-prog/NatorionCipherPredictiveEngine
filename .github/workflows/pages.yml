@@ -28,6 +28,7 @@ jobs:
           cp index.html site/
           cp Ophis_v12_ReverseEngineering_Report.html site/ 2>/dev/null || true
           cp -R natorion site/natorion
+          cp -R ophis site/ophis
           rm -rf site/natorion/node_modules site/natorion/tests site/natorion/package.json
           touch site/.nojekyll
           find site -type f | wc -l
