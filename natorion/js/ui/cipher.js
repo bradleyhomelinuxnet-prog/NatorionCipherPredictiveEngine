@@ -286,7 +286,9 @@
     }
   }
   var lastChartEventKey = null;
-  function chartKey() { var e = ev(); return S.state.current + "|" + JSON.stringify(e.x_dates) + "|" + e.scope; }
+  // The view is kept across recalculations unless the anchors, the scope or
+  // the place change — then the timeline refits.
+  function chartKey() { var e = ev(); return S.state.current + "|" + JSON.stringify(e.x_dates) + "|" + e.scope + "|" + (e.scope === C.SCOPE.HH_MM ? e.lat + "," + e.long : ""); }
 
   function select(key, open) {
     S.state.selectedKey = key;

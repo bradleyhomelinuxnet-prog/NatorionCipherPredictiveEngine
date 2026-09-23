@@ -105,13 +105,15 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 - Pure front end: `index.html` + `css/` + `js/`. No build step, no server, no framework. Works from `file://`.
 - The engine re-derives the Ophis v12 source in this repo (`../src`). **`tests/parity.js`** runs the original v12 code and this engine side by side on the sample files and on randomly generated events — Days and HH:MM scope, T-Dates, every filter, disabled and unreadable dates, both scoring systems, all five sorts, extra and duplicate operations, "today" placed inside the date range — comparing every Z-Date, score, hit count, MSRF match and contributing operation. Last runs: **1,003 of 1,003** identical (seed 138) and **403 of 403** (seed 19). The one known class of difference is time-zone *data*: v12 ships 2023 zone rules, the browser's are current, so a place whose rules changed since (Kazakhstan moved to UTC+5 in 2024) shows local times an hour apart in HH:MM scope while the instants and scores still match.
 - **`tests/self-check.js`** runs 34 checks without the original source.
-- **`tests/browser.js`** drives the real app in headless Chromium: every screen, a known projection with a known score, opening v9 and v12 files, pasting dates, editing operations, the Chronicon bridge and Dossier, the three exports, HH:MM scope, persistence across a reload, the timeline, and phone width with no sideways scrolling. It fails on any script error. Mutation-tested: of 16 deliberate breaks to the app, it catches 15; the sixteenth is a CSS rule that other rules already make redundant.
+- **`tests/browser.js`** drives the real app in headless Chromium: every screen, a known projection with a known score, opening v9 and v12 files, pasting dates, editing operations, the Chronicon bridge and Dossier, the three exports, HH:MM scope, persistence across a reload, the timeline, and phone width with no sideways scrolling. It fails on any script error and on any unexpected dialog. 64 checks.
+- **`tests/mutants.js`** proves the browser test can fail: it breaks the app in 30 deliberate ways (a save that drops every X-Date, a CSV with no rows, a frozen clock, a chart that draws nothing, sunsets at midnight, a parser that lets names through …) and runs the browser test against each. It catches 29; the thirtieth is a CSS rule that other rules already make redundant.
 - Formulas are parsed by a small grammar. They are never executed as code, which closes the code-execution hole in v12's shared `.oph` files. Nothing from a file is ever inserted into the page as HTML.
 
 ```bash
 cd natorion
 npm install && npm run setup:browser   # once: Playwright + Chromium (with system libraries), for the browser test only
 npm test                               # self-check + browser test
+npm run test:mutants                   # can the browser test fail? (30 deliberate breaks)
 npm run test:parity                    # original v12 vs rebuild (needs ../src and ../lib)
 node tests/browser.js --shots shots/   # browser test, saving a screenshot of every step
 ```

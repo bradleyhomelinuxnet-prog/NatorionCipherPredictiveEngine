@@ -63,7 +63,7 @@ function watchErrors(page, bucket) {
     if (FONT_HOSTS.test((m.location() && m.location().url) || "")) return;
     bucket.push("console: " + m.text() + " @ " + ((m.location() && m.location().url) || ""));
   });
-  page.on("dialog", d => d.accept());
+  page.on("dialog", d => { bucket.push("dialog: " + d.type() + " " + d.message()); d.accept(); });
 }
 
 // Wait until the engine has run after the last change: the status line
@@ -93,17 +93,23 @@ async function main() {
 
     console.log("first open");
     // Pin "today" (Files → Settings) so filters and marks do not drift as the calendar moves on.
+    const ymd = () => page.evaluate(() => { const d = new Date(NC.store.nowMs()); return [d.getFullYear(), d.getMonth() + 1, d.getDate()].join("-"); });
     await go(page, "files");
+    await page.fill("#todayOverride", "2030-01-15");
+    await page.dispatchEvent("#todayOverride", "change");
+    await settle(page);
+    check("today can be pinned in Settings", (await ymd()) === "2030-1-15", await ymd());
     await page.fill("#todayOverride", "2026-09-23");
     await page.dispatchEvent("#todayOverride", "change");
     await go(page, "cipher");
     await settle(page);
-    check("today can be pinned in Settings", (await page.evaluate(() => new Date(NC.store.nowMs()).getMonth())) === 8);
+    check("… and moved again", (await ymd()) === "2026-9-23", await ymd());
     const rows0 = await page.$$eval("#resultsBody tr[data-key]", r => r.length);
     check("the demo event projects Z-Dates", rows0 > 0, rows0);
     check("the status line counts Y-pairs", /15\s*Y-pairs/.test(await text(page, "#status")), await text(page, "#status"));
     check("marks render as text, never as [object …]", !/\[object /.test(await text(page, "#resultsBody")));
-    check("the timeline canvas has a size", await page.$eval("#chart", c => c.width > 200 && c.height > 100));
+    const inked = () => page.$eval("#chart", c => { const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i]) n++; return n; });
+    check("the timeline is drawn (inked pixels)", (await inked()) > 5000, await inked());
     await shot(page, "cipher");
 
     for (const s of ["operations", "chronicon", "files", "guide"]) {
@@ -112,7 +118,10 @@ async function main() {
       check("the " + s + " screen opens", visible);
       await shot(page, s);
     }
-    check("the guide lists all three MSRF sets", (await page.$$eval("#msrfSets p", p => p.length)) === 3);
+    check("the guide lists the three MSRF sets with their counts", await page.evaluate(() => {
+      const t = document.getElementById("msrfSets").textContent, n = re => +((re.exec(t) || [])[1] || 0);
+      return n(/Vortex, within 0\.1 \((\d+)\)/) === NC.C.MSRF_VORTEX.length && n(/Important \((\d+)\)/) === NC.C.MSRF_IMPORTANT.length && n(/Normal \((\d+)\)/) === NC.C.MSRF_NORMAL.length && NC.C.MSRF_NORMAL.length > 0;
+    }));
 
     console.log("the derivation drawer");
     await go(page, "cipher");
@@ -160,6 +169,8 @@ async function main() {
     await page.selectOption("#eventSelect", "0");
     await go(page, "cipher");
     await settle(page);
+    check("Event 1 is the open event again", (await page.evaluate(() => NC.store.state.current)) === 0);
+    check("its seven anchors give 21 Y-pairs", /\b21\s*Y-pairs/.test(await text(page, "#status")) && (await page.$$eval("#xList input[type=date]", i => i.length)) === 7, await text(page, "#status"));
     check("the opened event projects", (await page.$$eval("#resultsBody tr[data-key]", r => r.length)) > 0);
 
     console.log("pasting dates");
@@ -175,48 +186,56 @@ async function main() {
     await go(page, "operations");
     const eq = (await page.$$("#opsBody input[type=text]"))[0];
     await eq.fill("X2+alert(document.cookie)");
-    await page.waitForTimeout(450);
+    await page.waitForFunction(() => !document.querySelector("#opsBody .err").hidden, null, { timeout: 5000 });
     const opErr = await page.$eval("#opsBody .err", e => e.textContent);
     check("an equation carrying code is refused", /Unknown name 'alert'/.test(opErr), opErr);
+    check("… and nothing ran", errors.length === 0, errors.join("\n"));
     await eq.fill("X2+oph_round(Y)");
-    await page.waitForTimeout(450);
+    await page.waitForFunction(() => document.querySelector("#opsBody .err").hidden, null, { timeout: 5000 });
     check("fixing it clears the error", await page.$eval("#opsBody .err", e => e.hidden));
     await page.fill("#tryEq", "X1+Y^2"); await page.fill("#tryY", "12");
     check("^ is power in the try-it box", /Z = 144 /.test(await text(page, "#tryOut")), await text(page, "#tryOut"));
-    const before = await text(page, "#opsCount");
+    const counts = async () => { const m = /(\d+) of (\d+)/.exec(await text(page, "#opsCount")); return m ? [+m[1], +m[2]] : [0, 0]; };
+    const before = await counts();
     await page.click("#opsExtras");
-    const after = await text(page, "#opsCount");
-    check("the extras add ten operations", parseInt(after.split(" of ")[1], 10) - parseInt(before.split(" of ")[1], 10) === 10, before + " → " + after);
+    const after = await counts();
+    check("the extras add ten operations, switched on", after[0] - before[0] === 10 && after[1] - before[1] === 10, before + " → " + after);
 
     console.log("sorting and searching");
     await go(page, "cipher");
     await page.selectOption("#sortSel", "SORT_TYPE__SCORE");
     await settle(page);
-    const scores = await page.$$eval("#resultsBody tr[data-key] td.score", t => t.map(x => parseFloat(x.textContent)));
-    check("score sort is highest first", scores.length > 1 && scores.every((s, i) => !i || scores[i - 1] >= s), scores.slice(0, 8).join(","));
+    const ranked = await page.$$eval("#resultsBody tr[data-key]", rows => rows.map(r => ({ s: parseFloat(r.querySelector("td.score").textContent), h: parseInt(r.querySelector("td.hits").textContent, 10), d: NC.store.state.results.byDate.find(t => t.key === r.dataset.key).start })));
+    check("score sort is highest first", ranked.length > 1 && ranked.every((r, i) => !i || ranked[i - 1].s >= r.s), ranked.slice(0, 8).map(r => r.s).join(","));
+    check("… ties fall back to hits, then date", ranked.every((r, i) => { if (!i) return true; const q = ranked[i - 1]; return q.s !== r.s || q.h > r.h || (q.h === r.h && q.d < r.d); }));
     await page.fill("#zSearch", "2028");
-    await page.waitForTimeout(350);
+    await page.waitForFunction(() => / of /.test(document.getElementById("resultCount").textContent), null, { timeout: 5000 });
     const found = await page.$$eval("#resultsBody tr[data-key] td.date", t => t.map(x => x.textContent));
     check("search narrows the table", found.length > 0 && found.every(t => t.includes("2028")), found.length);
     await page.fill("#zSearch", "");
-    await page.waitForTimeout(350);
+    await page.waitForFunction(() => !/ of /.test(document.getElementById("resultCount").textContent), null, { timeout: 5000 });
 
     console.log("the Chronicon bridge");
+    const zDate = (await text(page, "#resultsBody tr[data-key] td.date")).slice(0, 10);   // MM/DD/YYYY
     await page.click("#resultsBody tr[data-key]");
     await page.waitForSelector("#detailDialog[open]");
     await page.click('#detailBody button:has-text("Open in Chronicon")');
     await page.waitForTimeout(300);
     check("a Z-Date opens in the Chronicon", await page.$eval('.screen[data-screen="chronicon"]', n => n.dataset.active === "true"));
+    const dial = await page.evaluate(() => [document.getElementById("chMonth").value, document.getElementById("chDay").value, document.getElementById("chYear").value].map(Number));
+    check("… on the same day", dial.join("/") === zDate.split("/").map(Number).join("/"), zDate + " vs " + dial.join("/"));
     const xBefore = await page.evaluate(() => NC.store.event().x_dates.length);
     await page.click("#chToX");
-    check("Use as X-Date adds an X-Date", (await page.evaluate(() => NC.store.event().x_dates.length)) === xBefore + 1);
+    const xs2 = await page.evaluate(() => NC.store.event().x_dates.map(d => d.date));
+    check("Use as X-Date adds that day as an X-Date", xs2.length === xBefore + 1 && xs2[xs2.length - 1] === zDate, xs2.slice(-1)[0]);
     await page.click('#chJumps button:has-text("2040")');
     check("2040 is a Phoenix node", /NODE/.test(await text(page, "#chCycles")), (await text(page, "#chCycles")).slice(0, 120));
     check("the calendar wall has nineteen calendars", (await page.$$eval("#chWall .cal", c => c.length)) === 19);
     check("no raw ERA suffix on the wall", !/ERA\d/.test(await text(page, "#chWall")));
-    check("the living clocks tick", /\d\d:\d\d:\d\d/.test(await text(page, "#clocks")));
+    const c0 = await text(page, "#clocks");
+    check("the living clocks tick", /\d\d:\d\d:\d\d/.test(c0) && await page.waitForFunction(t => document.getElementById("clocks").textContent.replace(/\s+/g, " ").trim() !== t, c0, { timeout: 3000 }).then(() => true, () => false));
     check("the Dossier draws the four Stone renders", (await page.$$eval("#renderHost figure svg", f => f.length)) === 4);
-    check("the Dossier's live numbers are filled in", (await page.$eval('[data-live="amToday"]', n => n.textContent)) === String(new Date().getFullYear() + 3894));
+    check("the Dossier's live numbers are filled in", await page.$eval('[data-live="amToday"]', n => n.textContent === String(new Date().getFullYear() + 3894)));
     check("the Dossier's eight chapters are present", (await page.$$eval("#dossier details.chapter", d => d.length)) === 8);
     await page.click('#ledgerSeg button[data-k="phx"]');
     const kinds = await page.$$eval("#ledgerBody .dot", d => d.map(x => x.className));
@@ -225,7 +244,11 @@ async function main() {
 
     console.log("exports");
     await go(page, "files");
-    for (const [id, test] of [["#saveOph", s => JSON.parse(s).iso_events.length === 3], ["#saveCsv", s => /^\ufeff?Rank,Z-Date/.test(s)], ["#saveSheet", s => /<Workbook/.test(s)]]) {
+    const shown = await page.evaluate(() => ({ n: NC.store.state.results.sorted.length, first: NC.time.msToDateString(NC.store.state.results.sorted[0].start, NC.store.state.results.zone), dates: NC.store.state.events.map(e => e.x_dates.map(d => d.date)) }));
+    for (const [id, test] of [
+      ["#saveOph", s => { const j = JSON.parse(s); return j.iso_events.length === 3 && JSON.stringify(j.iso_events.map(e => e.x_dates.map(d => d.date))) === JSON.stringify(shown.dates); }],
+      ["#saveCsv", s => { const lines = s.replace(/^\ufeff/, "").split(/\r\n/).filter(Boolean); return /^Rank,Z-Date/.test(lines[0]) && lines.length === shown.n + 1 && lines[1].startsWith("1," + shown.first); }],
+      ["#saveSheet", s => /<Workbook/.test(s) && (s.match(/<Row>/g) || []).length === shown.n + 1]]) {
       const [dl] = await Promise.all([page.waitForEvent("download"), page.click(id)]);
       const out = path.join(tmp, dl.suggestedFilename());
       await dl.saveAs(out);
@@ -241,24 +264,38 @@ async function main() {
     await page.click('#scopeSeg button[data-v="EVENT_SCOPE__HH_MM"]');
     await settle(page);
     check("switching scope shows the location box", await page.$eval("#locBox", n => !n.hidden));
+    const latBefore = await page.evaluate(() => NC.store.event().lat);
     await page.fill("#evLat", "80");
     await page.dispatchEvent("#evLat", "change");
-    check("a polar latitude is refused", /within ±65°/.test(await text(page, "#toasts")));
+    check("a polar latitude is refused", /within ±65°/.test(await text(page, "#toasts")) && (await page.evaluate(() => NC.store.event().lat)) === latBefore && (await page.$eval("#evLat", i => i.getAttribute("aria-invalid"))) === "true");
     const giza = await page.$$eval("#placeSel option", o => (o.find(x => /^Giza/.test(x.textContent)) || {}).value);
     await page.selectOption("#placeSel", giza);
     await settle(page);
     check("Giza reads as Africa/Cairo", (await text(page, "#evZone")) === "Africa/Cairo", await text(page, "#evZone"));
-    check("sunset scope projects windows", /sunset days/.test(await text(page, "#status")) && /→/.test(await text(page, "#resultsBody")), await text(page, "#status"));
+    const win = await text(page, "#resultsBody tr[data-key] td.date");   // "MM/DD/YYYY HH:MM → MM/DD/YYYY HH:MM"
+    const wm = /^(\d\d)\/(\d\d)\/(\d{4}) (\d\d):(\d\d)\s*→\s*(\d\d)\/(\d\d)\/(\d{4}) (\d\d):(\d\d)$/.exec(win);
+    const evening = wm && +wm[4] >= 16 && +wm[4] <= 20, nextDay = wm && (Date.UTC(+wm[8], +wm[6] - 1, +wm[7]) - Date.UTC(+wm[3], +wm[1] - 1, +wm[2])) === 86400000, sameMinute = wm && Math.abs((+wm[9] * 60 + +wm[10]) - (+wm[4] * 60 + +wm[5])) <= 5;
+    check("sunset scope projects sunset-to-sunset windows", /sunset days/.test(await text(page, "#status")) && !!evening && !!nextDay && !!sameMinute, win);
     await shot(page, "cipher-hhmm");
 
     console.log("the timeline");
     await page.evaluate(() => NC.store.change(e => { NC.C.CHART_LAYERS.forEach(f => { e[f.key] = true; }); }, { immediate: true }));
     await settle(page);
     const box = await (await page.$("#chart")).boundingBox();
+    const snap = async () => { await page.mouse.move(box.x - 20, box.y - 20); await page.waitForTimeout(60); return page.$eval("#chart", c => c.toDataURL()); };
+    await page.click("#chartFit");
+    const s0 = await snap();
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.wheel(0, -500);
+    const s1 = await snap();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down(); await page.mouse.move(box.x + box.width / 2 + 140, box.y + box.height / 2, { steps: 5 }); await page.mouse.up();
+    const s2 = await snap();
     await page.dblclick("#chart", { position: { x: 5, y: 5 } });
+    const s3 = await snap();
+    check("the wheel zooms the timeline", s1 !== s0);
+    check("dragging pans it", s2 !== s1);
+    check("double-click fits it back", s3 === s0);
     check("zoom, pan and fit leave the page error-free", errors.length === 0, errors.join("\n"));
     await shot(page, "timeline-layers");
 
@@ -269,7 +306,9 @@ async function main() {
     await settle(page);
     check("events survive a reload", (await page.evaluate(() => NC.store.state.events.length)) === evCount);
     check("the place survives a reload", (await page.inputValue("#evLat")) === "29.98");
-    check("the theme button switches to light", await page.click("#themeBtn").then(() => page.evaluate(() => document.documentElement.dataset.theme === "light")));
+    const bgBefore = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    await page.click("#themeBtn");
+    check("the theme button switches to light, and the page changes", await page.evaluate(b => document.documentElement.dataset.theme === "light" && getComputedStyle(document.body).backgroundColor !== b, bgBefore));
     await shot(page, "light");
     await ctx.close();
 
@@ -282,8 +321,9 @@ async function main() {
     for (const s of ["cipher", "operations", "chronicon", "files", "guide"]) {
       await mp.goto(PAGE + "#" + s);
       if (s === "cipher") await settle(mp); else await mp.waitForTimeout(400);
+      const on = await mp.evaluate(() => (document.querySelector('.screen[data-active="true"]') || {}).dataset.screen);
       const w = await mp.evaluate(() => document.documentElement.scrollWidth);
-      check("no sideways scroll on " + s + " at 390 px", w <= 390, w);
+      check("no sideways scroll on " + s + " at 390 px", on === s && w <= 390, on + " " + w);
       await shot(mp, "phone-" + s);
     }
     await phone.close();

@@ -8,6 +8,7 @@
     "test:self": "node tests/self-check.js",
     "test:browser": "node tests/browser.js",
     "test:parity": "node tests/parity.js 300",
+    "test:mutants": "node tests/mutants.js",
     "setup:browser": "npx playwright install --with-deps chromium"
   },
   "devDependencies": {
