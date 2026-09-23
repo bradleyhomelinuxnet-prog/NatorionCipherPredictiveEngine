@@ -1,7 +1,7 @@
 # Ophis v12 (“PSYFR”) — Reverse-Engineering Case Study
 
-> ## ▶ The app: [`natorion/`](natorion/)
-> **Natorion Cipher** is the finished, front-end-only rebuild of the Ophis engine, joined to the Chronicon clocks and calendars. Open `natorion/index.html` in any browser; there is no install and no server.
+> ## ▶ The app: [`natorion/`](natorion/) · live at [bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/)
+> **Natorion Cipher** is the finished, front-end-only rebuild of the Ophis engine, joined to the Chronicon clocks and calendars. Use it on the site above, or open `natorion/index.html` in any browser; there is no install and no server. The landing page is `index.html`; `.github/workflows/pages.yml` publishes it, the app and the report to GitHub Pages on every push to `main`, and `tests.yml` runs the three test suites on every push.
 > Start with **[natorion/README.md](natorion/README.md)** (two-minute quick start), then **[natorion/MANUAL.md](natorion/MANUAL.md)** (the full user manual).
 > The rebuild is checked against the original v12 code by `natorion/tests/parity.js`.
 

@@ -1,0 +1,26 @@
+# Runs the Natorion test suites on every push and pull request:
+# the stand-alone self-check, the browser test in headless Chromium,
+# and the parity test against the original Ophis v12 source.
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  natorion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Self-check
+        run: node natorion/tests/self-check.js
+      - name: Install Playwright Chromium
+        run: npx --yes playwright@1.56.1 install --with-deps chromium
+      - name: Browser test
+        run: npm --prefix natorion i --no-audit --no-fund playwright@1.56.1 && node natorion/tests/browser.js
+      - name: Parity with the original v12 engine
+        run: node natorion/tests/parity.js 300

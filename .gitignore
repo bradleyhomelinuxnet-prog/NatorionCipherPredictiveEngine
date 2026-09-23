@@ -31,3 +31,7 @@ Musicnotes*.exe
 
 # --- keep: source, reports, rewrites, data ---
 # src/ lib/ img/ *.html *.md *.oph package.json README/METHOD/SECURITY are tracked
+
+# --- Natorion: the staged Pages site and browser-test screenshots ---
+site/
+shots/
