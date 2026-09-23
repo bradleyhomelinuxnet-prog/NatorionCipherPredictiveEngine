@@ -50,6 +50,10 @@ A few words you'll see everywhere:
 
 ## 2. Opening the app
 
+**On the web:** go to [bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/) and click **Open the app**. Your work is kept in that browser, exactly as it is when you run it from a folder.
+
+**From a folder:**
+
 1. Open the **`natorion`** folder.
 2. Double-click **`index.html`**.
 

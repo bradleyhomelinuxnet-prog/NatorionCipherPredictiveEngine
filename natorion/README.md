@@ -12,6 +12,10 @@ It rebuilds **Ophis v12** (the Windows desktop app also called PSYFR) as a plain
 
 ## 1. Open it (30 seconds)
 
+**Easiest:** open **[bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/)** and click **Open the app**.
+
+**Or from a folder:**
+
 1. Find the folder called **`natorion`**.
 2. Double-click **`index.html`**.
 3. It opens in your browser. That's it.
