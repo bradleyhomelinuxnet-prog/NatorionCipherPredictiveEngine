@@ -1,5 +1,10 @@
 # Ophis v12 (“PSYFR”) — Reverse-Engineering Case Study
 
+> ## ▶ The app: [`natorion/`](natorion/)
+> **Natorion Cipher** is the finished, front-end-only rebuild of the Ophis engine, joined to the Chronicon clocks and calendars. Open `natorion/index.html` in any browser; there is no install and no server.
+> Start with **[natorion/README.md](natorion/README.md)** (two-minute quick start), then **[natorion/MANUAL.md](natorion/MANUAL.md)** (the full user manual).
+> The rebuild is checked against the original v12 code by `natorion/tests/parity.js`.
+
 A white-box reverse-engineering study of **Ophis v12**, an offline Electron date-projection / cycle-prediction tool, taken apart as an educational study of `.exe` packaging and Electron attack surface — then rebuilt more safely.
 
 > **Authorization.** This is the owner’s own software, studied with permission for a portfolio write-up. All work is white-box on artifacts in this repo; nothing here targets third-party systems.

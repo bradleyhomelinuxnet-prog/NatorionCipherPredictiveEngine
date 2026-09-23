@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Natorion Cipher</title>
+<meta name="description" content="Natorion Cipher: a front-end rebuild of the Ophis v12 date-projection engine, joined to the Chronicon calendrics and clocks.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%2308080d' stroke='%23d8a943' stroke-width='3'/%3E%3Cpath d='M32 8 L32 56 M14 20 L50 44 M50 20 L14 44' stroke='%23f3d27a' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23d3402f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/natorion.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="brand" aria-label="Natorion Cipher">
+    <svg class="sigil" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28"/><path d="M32 6v52M12 19l40 26M52 19L12 45"/><circle class="core" cx="32" cy="32" r="6"/></svg>
+    <span class="wordmark">NATORI<em>O</em>N <small>Cipher</small></span>
+  </div>
+  <nav class="tabs" id="tabs" aria-label="Screens">
+    <button type="button" data-screen="cipher" aria-current="page">Cipher</button>
+    <button type="button" data-screen="operations">Operations</button>
+    <button type="button" data-screen="chronicon">Chronicon</button>
+    <button type="button" data-screen="files">Files</button>
+    <button type="button" data-screen="guide">Guide</button>
+  </nav>
+  <div class="topbar-tools">
+    <label class="event-pick"><span class="sr">Event</span><select id="eventSelect" title="Switch event"></select></label>
+    <span class="save-state" id="saveState" aria-live="polite">Saved</span>
+    <button type="button" class="icon-btn" id="themeBtn" title="Switch light / dark" aria-label="Switch light or dark theme">◐</button>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============================================================ CIPHER -->
+  <section class="screen" data-screen="cipher" data-active="true" aria-labelledby="h-cipher">
+    <h1 id="h-cipher" class="sr" tabindex="-1">Cipher</h1>
+    <div class="work">
+      <aside class="rail" aria-label="Inputs">
+
+        <div class="panel">
+          <div class="panel-head"><h2>Event</h2></div>
+          <label class="field"><span>Name</span><input id="evName" type="text" maxlength="120" autocomplete="off"></label>
+          <div class="field"><span>Scope</span>
+            <div class="seg" id="scopeSeg" role="radiogroup" aria-label="Scope">
+              <button type="button" role="radio" data-v="EVENT_SCOPE__DAYS">Days</button>
+              <button type="button" role="radio" data-v="EVENT_SCOPE__HH_MM">HH:MM · sunset</button>
+            </div>
+          </div>
+          <div id="locBox" class="loc" hidden>
+            <div class="row2">
+              <label class="field"><span>Latitude</span><input id="evLat" type="number" step="0.1" min="-65" max="65" inputmode="decimal"></label>
+              <label class="field"><span>Longitude</span><input id="evLong" type="number" step="0.1" min="-180" max="180" inputmode="decimal"></label>
+            </div>
+            <div class="row2">
+              <label class="field"><span>Place</span><select id="placeSel"><option value="">Choose a place…</option></select></label>
+              <div class="field"><span>Time zone</span><output id="evZone" class="mono">—</output></div>
+            </div>
+            <p class="hint">In HH:MM scope a day runs sunset to sunset at this place, and each Z-Date is the window between two sunsets.</p>
+          </div>
+          <div id="dayStartBox" class="field"><span>Day begins at (UTC)</span>
+            <input id="evDayStart" type="time" step="60" value="00:00">
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>X-Dates <small>anchors</small></h2>
+            <div class="head-tools">
+              <button type="button" class="ghost" id="xPasteBtn" title="Paste many dates at once">Paste…</button>
+              <button type="button" id="xAddBtn">+ Add</button>
+            </div>
+          </div>
+          <ol class="dates" id="xList"></ol>
+          <p class="hint" id="xHint">Two or more dates, oldest first. Every pair of enabled dates gives one Y.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>T-Dates <small>targets</small></h2>
+            <div class="head-tools"><button type="button" id="tAddBtn">+ Add</button></div>
+          </div>
+          <ol class="dates" id="tList"></ol>
+          <p class="hint">Optional. With any T-Date enabled, only projections landing on a T-Date are shown.</p>
+        </div>
+
+        <details class="panel" id="filterPanel" open>
+          <summary><h2>Filters</h2></summary>
+          <div id="filterList" class="checks"></div>
+        </details>
+
+        <details class="panel">
+          <summary><h2>Timeline layers</h2></summary>
+          <div id="layerList" class="checks cols2"></div>
+        </details>
+
+        <details class="panel">
+          <summary><h2>Notes</h2></summary>
+          <label class="field"><span class="sr">Notes</span><textarea id="evNotes" rows="4" maxlength="20000" placeholder="Anything worth keeping with this event."></textarea></label>
+        </details>
+      </aside>
+
+      <div class="output">
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+
+        <section class="panel chart-panel" id="chartPanel" aria-label="Timeline">
+          <div class="panel-head">
+            <h2>Timeline</h2>
+            <div class="head-tools">
+              <span class="hint small" id="chartHint">Wheel or pinch to zoom · drag to pan · double-click to fit</span>
+              <button type="button" class="ghost" id="chartFit">Fit</button>
+              <button type="button" class="ghost" id="chartPng" title="Save the timeline as a PNG">PNG</button>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chart" role="img" aria-label="Timeline of X-Dates and projected Z-Dates"></canvas><div class="chart-tip" id="chartTip" hidden></div></div>
+        </section>
+
+        <section class="panel results-panel" aria-label="Projections">
+          <div class="panel-head">
+            <h2>Z-Dates <small id="resultCount"></small></h2>
+            <div class="head-tools">
+              <label class="inline"><span>Sort</span>
+                <select id="sortSel">
+                  <option value="SORT_TYPE__DATE">Date</option>
+                  <option value="SORT_TYPE__SCORE">Score</option>
+                  <option value="SORT_TYPE__MSRF">MSRF</option>
+                  <option value="SORT_TYPE__HIT_COUNT">Hits</option>
+                  <option value="SORT_TYPE__OPERATIONS">Operations</option>
+                </select>
+              </label>
+              <input type="search" id="zSearch" placeholder="Find…" aria-label="Find in results" size="10">
+              <button type="button" class="ghost" id="csvBtn">CSV</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="results" id="results">
+              <thead><tr>
+                <th scope="col" class="num">#</th>
+                <th scope="col">Z-Date</th>
+                <th scope="col" class="num" title="Days after the last X-Date">+Days</th>
+                <th scope="col" class="num">Score</th>
+                <th scope="col" class="num">Hits</th>
+                <th scope="col">MSRF</th>
+                <th scope="col">Operations</th>
+                <th scope="col" title="Resonance marks: ⮌ palindromic date, 19 and 138 day counts, moon and eclipse">Marks</th>
+              </tr></thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+          <div class="empty" id="emptyState" hidden></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== OPERATIONS -->
+  <section class="screen" data-screen="operations" aria-labelledby="h-ops">
+    <div class="page">
+      <p class="eyebrow">The functions of Y</p>
+      <h1 id="h-ops" tabindex="-1">Operations</h1>
+      <p class="lede">Each operation turns the day-count <b>Y</b> between two X-Dates into a day-offset <b>Z</b>, added to the earlier anchor (<code>X1+</code>) or the later one (<code>X2+</code>). An alpha operation's hit is worth 1 point, a beta's ½.</p>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>This event's operations <small id="opsCount"></small></h2>
+          <div class="head-tools">
+            <button type="button" class="ghost" id="opsDefaults">Restore the 16 defaults</button>
+            <button type="button" class="ghost" id="opsExtras">Add extras 17–26</button>
+            <button type="button" id="opsAdd">+ Add</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="ops-table">
+            <thead><tr><th scope="col">#</th><th scope="col">On</th><th scope="col">Equation</th><th scope="col">Class</th><th scope="col" class="num" title="Z when Y = 100">Z at Y=100</th><th scope="col"><span class="sr">Actions</span></th></tr></thead>
+            <tbody id="opsBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <h2>Constants</h2>
+          <table class="kv"><tbody>
+            <tr><th><code>OPH_PI</code></th><td>3.14</td><td>π as spoken</td></tr>
+            <tr><th><code>OPH_PHI</code></th><td>1.618</td><td>φ, the golden ratio</td></tr>
+            <tr><th><code>OPH_CRV</code></th><td>5.08</td><td>curvature, π × φ</td></tr>
+            <tr><th><code>OPH_HEP</code></th><td>7.01</td><td>the hepta-cycle</td></tr>
+          </tbody></table>
+        </div>
+        <div class="panel">
+          <h2>Grammar</h2>
+          <p>Numbers, <code>Y</code>, the constants, <code>+ − * / % ^</code> and brackets. A lower-case <code>x</code> means multiply. Functions: <code>oph_round</code>, <code>oph_flip</code> (reverse the digits), <code>oph_sqrt</code>, <code>oph_abs</code>, <code>oph_floor</code>, <code>oph_ceil</code>, <code>oph_log</code>, <code>oph_exp</code>, <code>oph_sin</code>, <code>oph_cos</code>, <code>oph_tan</code>.</p>
+          <p class="hint">Equations are parsed, never executed as code, so a shared file cannot smuggle anything in.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Try one</h2>
+        <div class="row-tools">
+          <label class="field grow"><span>Equation</span><input id="tryEq" type="text" value="X2+oph_flip(oph_round(Y))" spellcheck="false" autocomplete="off"></label>
+          <label class="field"><span>Y</span><input id="tryY" type="number" value="138" step="0.1"></label>
+        </div>
+        <output id="tryOut" class="try-out mono"></output>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= CHRONICON -->
+  <section class="screen chron" data-screen="chronicon" aria-labelledby="h-chron">
+    <div class="page wide">
+      <p class="eyebrow">Calendrics &amp; clocks</p>
+      <h1 id="h-chron" tabindex="-1">The Chronicon</h1>
+      <p class="lede">One moment, read on every wheel at once: the living clocks, the long cycles of the Archaix chronology, the moon, and nineteen calendars. Any day here can become an X-Date; any Z-Date can be opened here.</p>
+
+      <div class="clocks" id="clocks" aria-label="Living clocks"></div>
+
+      <div class="panel dial">
+        <div class="dial-controls">
+          <div class="seg" id="eraSeg" role="radiogroup" aria-label="Era">
+            <button type="button" role="radio" data-era="ce">CE</button>
+            <button type="button" role="radio" data-era="bc">BC</button>
+          </div>
+          <label class="field"><span>Year</span><input id="chYear" type="number" min="1" max="9999" step="1"></label>
+          <label class="field"><span>Month</span><input id="chMonth" type="number" min="1" max="12" step="1"></label>
+          <label class="field"><span>Day</span><input id="chDay" type="number" min="1" max="31" step="1"></label>
+          <button type="button" id="chToday">Today</button>
+          <button type="button" class="ghost" id="chToX" title="Add this day to the current event's X-Dates">Use as X-Date</button>
+        </div>
+        <input type="range" id="chSlider" min="-5238" max="2178" step="1" aria-label="Scrub through the chronology">
+        <div class="dial-jumps" id="chJumps"></div>
+        <div class="moment" id="chMoment"></div>
+      </div>
+
+      <div class="cycles" id="chCycles"></div>
+
+      <div class="grid2">
+        <div class="panel moon-panel">
+          <h2>The moon</h2>
+          <div class="moon-row">
+            <svg id="moonSvg" viewBox="0 0 150 150" role="img" aria-label="Moon phase"></svg>
+            <dl class="kv-list" id="moonFacts"></dl>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Resonance</h2>
+          <div class="flags" id="chFlags"></div>
+          <p class="mono small" id="chPal"></p>
+          <h3>Z-Dates in this year</h3>
+          <ul class="zlink-list" id="chZList"></ul>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>The calendar wall</h2>
+        <div class="wall" id="chWall"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>The event ledger</h2>
+          <div class="seg" id="ledgerSeg" role="radiogroup" aria-label="Filter the ledger">
+            <button type="button" role="radio" data-k="all">All</button>
+            <button type="button" role="radio" data-k="phx">Phoenix</button>
+            <button type="button" role="radio" data-k="nem">Nemesis</button>
+            <button type="button" role="radio" data-k="ner">NER 600</button>
+            <button type="button" role="radio" data-k="may">Baktun</button>
+            <button type="button" role="radio" data-k="key">Keys</button>
+          </div>
+        </div>
+        <div class="table-wrap tall">
+          <table class="ledger"><thead><tr><th scope="col">Year</th><th scope="col" class="num">AM</th><th scope="col" title="Phoenix node">Phx</th><th scope="col" title="Nemesis inner transit">Nem</th><th scope="col" title="Baktun boundary">Bak</th><th scope="col">Event</th></tr></thead><tbody id="ledgerBody"></tbody></table>
+        </div>
+      </div>
+
+      <div class="grid3 numbers">
+        <div class="panel"><h3>The 138 lattice</h3><p>Every Phoenix node sits on a 138-year grid, nested: 138 × 3 = 414, 138 × 4 = 552, 138 × 46 = 6348 years from 4309 BC to 2040.</p></div>
+        <div class="panel"><h3>The 19 of the moon</h3><p>The Metonic cycle: 19 years ≈ 235 synodic months, after which the moon's phases fall on the same calendar dates again.</p></div>
+        <div class="panel"><h3>Mirrors</h3><p>Palindromes are flagged wherever they appear — a year, an Annus Mundi year, a Julian Day, an MMDDYYYY date. 19 and 91 mirror; so do 138 and 831.</p></div>
+      </div>
+      <p class="fine">After the Archaix composite chronology of Jason Breshears. Presented as that thesis, for study and worldbuilding — not as established history. Calendar conversions come from your browser's own calendar tables; the Egyptian, Maya, French Republican and Chinese cycle readings are arithmetic approximations.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================= FILES -->
+  <section class="screen" data-screen="files" aria-labelledby="h-files">
+    <div class="page">
+      <p class="eyebrow">Documents</p>
+      <h1 id="h-files" tabindex="-1">Files &amp; events</h1>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Events in this document</h2>
+          <div class="head-tools"><button type="button" id="evNew">+ New event</button></div></div>
+        <div class="table-wrap"><table class="events-table"><thead><tr><th scope="col">Event</th><th scope="col">Scope</th><th scope="col" class="num">X-Dates</th><th scope="col" class="num">Ops</th><th scope="col"><span class="sr">Actions</span></th></tr></thead><tbody id="eventsBody"></tbody></table></div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel drop" id="dropZone">
+          <h2>Open</h2>
+          <p>Drop a <code>.oph</code> file here, or choose one. v12 files open as they are.</p>
+          <div class="row-tools">
+            <label class="btn-file">Choose .oph…<input type="file" id="fileInput" accept=".oph,.json,application/json"></label>
+            <label class="inline"><span>Checking</span>
+              <select id="modeSel">
+                <option value="FILE_INPUT_VALIDATION_MODE__LOOSE">Loose — repair</option>
+                <option value="FILE_INPUT_VALIDATION_MODE__ORIGINAL">Original</option>
+                <option value="FILE_INPUT_VALIDATION_MODE__STRICT">Strict — reject</option>
+              </select></label>
+          </div>
+          <div class="seg small" id="openHowSeg" role="radiogroup" aria-label="When opening">
+            <button type="button" role="radio" data-v="replace">Replace these events</button>
+            <button type="button" role="radio" data-v="append">Add to them</button>
+          </div>
+          <details><summary>Paste text instead</summary>
+            <textarea id="pasteArea" rows="6" spellcheck="false" placeholder='{"app_version":"12","iso_events":[…]}'></textarea>
+            <button type="button" id="pasteLoad">Load pasted text</button>
+          </details>
+          <div id="importReport" class="report" aria-live="polite"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Save</h2>
+          <label class="field"><span>File name</span><input id="fileName" type="text" value="natorion" spellcheck="false"></label>
+          <div class="seg small" id="minifySeg" role="radiogroup" aria-label="Format">
+            <button type="button" role="radio" data-v="pretty">Readable</button>
+            <button type="button" role="radio" data-v="min">Minified</button>
+          </div>
+          <div class="row-tools">
+            <button type="button" id="saveOph">Save .oph</button>
+            <button type="button" class="ghost" id="saveCsv">Results CSV</button>
+            <button type="button" class="ghost" id="saveSheet">Results .xls</button>
+            <button type="button" class="ghost" id="printBtn">Print</button>
+          </div>
+          <details><summary>Document text</summary><textarea id="docText" rows="10" readonly spellcheck="false"></textarea>
+            <button type="button" class="ghost" id="copyDoc">Copy</button></details>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <h2>Apply settings to other events</h2>
+          <p class="hint">Copy the current event's operations, filters, layers or scope onto the events you tick.</p>
+          <div class="checks" id="swapWhat"></div>
+          <div class="checks" id="swapTargets"></div>
+          <button type="button" id="swapGo">Apply</button>
+        </div>
+        <div class="panel">
+          <h2>Settings</h2>
+          <label class="field"><span>Treat “today” as</span><input id="todayOverride" type="date"></label>
+          <p class="hint">Leave empty for the real date. The “before today” filter uses it.</p>
+          <label class="check"><input type="checkbox" id="autoRun"> <span>Recalculate as I type</span></label>
+          <button type="button" class="ghost danger" id="resetAll">Start over (clears this browser's copy)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================= GUIDE -->
+  <section class="screen" data-screen="guide" aria-labelledby="h-guide">
+    <article class="page prose">
+      <p class="eyebrow">What the numbers mean</p>
+      <h1 id="h-guide" tabindex="-1">Guide</h1>
+      <p class="lede">The short version. Every button is explained in <b>MANUAL.md</b>, and <b>README.md</b> gets you going in two minutes; both are in the <code>natorion</code> folder.</p>
+
+      <h2>The loop</h2>
+      <ol>
+        <li><b>X-Dates.</b> Two or more anchor dates, oldest first.</li>
+        <li><b>Y.</b> For every pair of enabled X-Dates, Y is the number of days between them — whole days in Days scope, sunsets in HH:MM scope.</li>
+        <li><b>Operations.</b> Each turns Y into Z days, counted from the earlier (X1) or the later (X2) date of the pair.</li>
+        <li><b>Z-Dates.</b> Every projection landing on the same day merges into one Z-Date. It scores for each hit and for each MSRF match of its Z-value.</li>
+        <li><b>Filters and sort.</b> By default only Z-Dates after the last X-Date and after today are shown, up to 2559 days out.</li>
+      </ol>
+
+      <h2>Scoring</h2>
+      <p>Each operation hit adds the operation's weight: <b>1</b> for alpha, <b>½</b> for beta. A Z-value that matches an MSRF number adds <b>1</b> (Normal) or <b>2</b> (Important, Vortex). Under the current system (v8 and later), the best MSRF class <em>multiplies</em> instead: ×1.5 for Normal, ×2 for Important or Vortex, and its first match is left out of the points it multiplies.</p>
+      <p class="formula mono">score = (operation points + MSRF points, less the multiplying match) × best multiplier</p>
+      <p>A Z-value matches a Vortex number within 0.1. Otherwise it is rounded to a whole number and looked up — except that a value ending in exactly .5 matches nothing, because it leans to neither side.</p>
+      <details><summary>The three MSRF sets</summary><div id="msrfSets" class="mono small"></div></details>
+
+      <h2>Scope</h2>
+      <p><b>Days</b> counts calendar days in UTC, as v12 did. <b>HH:MM · sunset</b> reads each X-Date as a local time at the event's latitude and longitude, counts days as sunsets, and reports each Z-Date as the window from one sunset to the next.</p>
+
+      <h2>Resonance marks</h2>
+      <p>The Marks column adds the Chronicon's readings to each Z-Date: <b>⮌</b> when its MMDDYYYY form is a palindrome, <b>19</b> or <b>138</b> when its distance in days from today is a multiple of that number, and a glyph when a new moon (🌑), full moon (🌕) or eclipse falls within a day of it. The other moon phases can be switched on as timeline layers.</p>
+
+      <h2>How this was rebuilt</h2>
+      <p>Ophis v12 is an offline Electron app whose source ships un-obfuscated. Natorion re-derives its engine from that source and runs in any browser with no install and no server. <code>tests/parity.js</code> runs the original v12 code and this engine side by side on the sample files and on randomly generated events, and checks that every Z-Date, score, hit count and match agrees.</p>
+      <p>Deliberate differences:</p>
+      <ul>
+        <li>Equations are parsed by a small grammar, never compiled with <code>new Function()</code>, which closes v12's code-execution hole in shared <code>.oph</code> files. <code>^</code> now means power; v12 validated it as power and then ran it as XOR.</li>
+        <li>Nothing a file supplies is ever written into the page as HTML.</li>
+        <li>Moon phases are exact instants from Astronomy Engine, not a once-a-day approximation.</li>
+        <li>At high latitudes near the equinoxes, v12 swapped its sunset library for less accurate ones; Natorion keeps the accurate one.</li>
+        <li>In HH:MM scope, T-Dates are read at the event's location (v12 read them in the computer's own time zone).</li>
+        <li>An operation whose result is not a number for some Y is skipped for that Y instead of failing the whole run.</li>
+        <li>Time zones come from your browser's current time-zone database. Ophis v12 shipped 2023 data, so places whose rules changed since (Kazakhstan moved to UTC+5 in 2024, for one) show local times an hour apart in HH:MM scope. The instants and scores are the same.</li>
+      </ul>
+      <p class="fine">Ophis is a study instrument after the work of Jason Breshears (Archaix). Natorion studies and rebuilds the software; it makes no claim that the projections predict anything.</p>
+    </article>
+  </section>
+</main>
+
+<dialog id="detailDialog" class="drawer" aria-labelledby="detailTitle">
+  <form method="dialog" class="drawer-head"><h2 id="detailTitle">Z-Date</h2><button class="icon-btn" value="close" aria-label="Close">✕</button></form>
+  <div id="detailBody" class="drawer-body"></div>
+</dialog>
+
+<dialog id="pasteDialog" aria-labelledby="pasteTitle">
+  <form method="dialog">
+    <h2 id="pasteTitle">Paste X-Dates</h2>
+    <p class="hint">One date per line or separated by commas: <code>07/04/2026</code>, <code>2026-07-04</code>, or with a time <code>07/04/2026 18:30</code>. A file-name style list like <code>7-4-26-8-20-26</code> works too.</p>
+    <textarea id="pasteDates" rows="8" spellcheck="false"></textarea>
+    <label class="check"><input type="checkbox" id="pasteReplace" checked> <span>Replace the current X-Dates</span></label>
+    <div class="row-tools end"><button value="cancel" class="ghost">Cancel</button><button value="ok" id="pasteOk">Add dates</button></div>
+  </form>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="js/vendor/astronomy.min.js"></script>
+<script src="js/vendor/tz-lookup.js"></script>
+<script src="js/data/eclipses.js"></script>
+<script src="js/data/places.js"></script>
+<script src="js/engine/core.js"></script>
+<script src="js/engine/expr.js"></script>
+<script src="js/engine/time.js"></script>
+<script src="js/engine/sky.js"></script>
+<script src="js/engine/engine.js"></script>
+<script src="js/engine/oph.js"></script>
+<script src="js/chronicon/chronicon.js"></script>
+<script src="js/ui/dom.js"></script>
+<script src="js/ui/store.js"></script>
+<script src="js/ui/chart.js"></script>
+<script src="js/ui/cipher.js"></script>
+<script src="js/ui/operations.js"></script>
+<script src="js/ui/chronicon-view.js"></script>
+<script src="js/ui/files.js"></script>
+<script src="js/ui/app.js"></script>
+</body>
+</html>
