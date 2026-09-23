@@ -95,12 +95,18 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 - Pure front end: `index.html` + `css/` + `js/`. No build step, no server, no framework. Works from `file://`.
 - The engine re-derives the Ophis v12 source in this repo (`../src`). **`tests/parity.js`** runs the original v12 code and this engine side by side on the sample files and randomly generated events, comparing every Z-Date, score, hit count, MSRF match and contributing operation. Last runs: **1,003 of 1,003** identical (seed 138) and **402 of 403** (seed 19). The one difference is an HH:MM case in Kazakhstan, which changed time zone in 2024. v12 ships 2023 zone data; the browser's is current. The instants and scores still match.
 - **`tests/self-check.js`** runs 34 checks without the original source.
+- **`tests/browser.js`** drives the real app in headless Chromium: every screen, opening a v12 file, pasting dates, editing operations, the Chronicon bridge, the three exports, HH:MM scope, persistence across a reload, the timeline, and phone width with no sideways scrolling. It fails on any script error.
 - Formulas are parsed by a small grammar. They are never executed as code, which closes the code-execution hole in v12's shared `.oph` files. Nothing from a file is ever inserted into the page as HTML.
 
 ```bash
-TZ=UTC node natorion/tests/parity.js 300     # original vs rebuild (needs ../src and ../lib)
-node natorion/tests/self-check.js            # stand-alone checks
+cd natorion
+npm install && npm run setup:browser   # once: Playwright + Chromium, for the browser test only
+npm test                               # self-check + browser test
+npm run test:parity                    # original v12 vs rebuild (needs ../src and ../lib)
+node tests/browser.js --shots shots/   # browser test, saving a screenshot of every step
 ```
+
+The app itself needs none of this; `npm` is only for the tests.
 
 Bundled third-party code: [Astronomy Engine](https://github.com/cosinekitty/astronomy) (MIT, sunsets and moon phases) and [tz-lookup](https://github.com/darkskyapp/tz-lookup-oss) (time zone from a map position). The eclipse tables are the NASA-derived ones Ophis shipped.
 

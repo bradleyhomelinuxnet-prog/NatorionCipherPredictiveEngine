@@ -3,10 +3,12 @@
    headless in a vm sandbox) against the NATORION engine, on the sample .oph
    files and on randomly generated events.
 
-     TZ=UTC node natorion/tests/parity.js [randomCases=300] [seed=19138]
+     node natorion/tests/parity.js [randomCases=300] [seed=19138]
 
+   It runs in UTC unless TZ is set, so "today" is the same for both engines.
    Exit code 0 when every case matches. */
 "use strict";
+if (!process.env.TZ) process.env.TZ = "UTC";
 const vm = require("vm"), fs = require("fs"), path = require("path");
 const REPO = path.resolve(__dirname, "..", "..");
 const APP = path.resolve(__dirname, "..");
