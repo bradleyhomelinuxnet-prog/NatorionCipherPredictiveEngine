@@ -5071,7 +5071,7 @@ pre.blob {
       render();
       viewChanged();
     });
-    canvas.addEventListener("mousemove", (e) => {
+    canvas.addEventListener("pointermove", (e) => {
       if (panning) {
         const plotW = (canvas.clientWidth || 800) - PAD.left - PAD.right;
         const perPx = (panning.max - panning.min) / plotW;
@@ -5962,6 +5962,7 @@ stream
               download(new Blob([pre.textContent], { type: "application/json" }), "Export.oph");
               state.saved = true;
               toast("Wrote Export.oph");
+              notify();
             }
           })
         ])
