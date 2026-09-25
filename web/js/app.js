@@ -337,13 +337,11 @@
       if (!parsed) return;
       var wanted = T.utcMillis(parsed.year, parsed.month - 1, parsed.day);
       var todayUtc = T.floorToUtcMidnight(new Date()).getTime();
-      Store.globalOptions.local_time_offset_in_millis = wanted - todayUtc;
-      Store.commit("now");
+      Store.setNowOffset(wanted - todayUtc);
     });
     UI.on(hosts.status, "focusout", "#now-date", function () { setTimeout(App.renderStatus, 0); });
     UI.on(hosts.status, "click", '[data-action="reset-now"]', function () {
-      Store.globalOptions.local_time_offset_in_millis = 0;
-      Store.commit("now");
+      Store.setNowOffset(0);
     });
 
     /* ---- toolbar ---- */
@@ -463,7 +461,7 @@
       ? "ophis-session"
       : File.safeFileName(Store.currentEvent().name || "ophis")) + ".oph";
     File.download(name, Store.exportOph(), "application/json");
-    Store.dirty = false;
+    Store.markSaved();
     UI.toast("Saved " + name, "ok");
   };
 

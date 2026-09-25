@@ -703,6 +703,84 @@
     });
   });
 
+  /* ====================================================================== */
+  suite("session store", function (test) {
+    var Store = Ophis.Store;
+    var KEY = "ophis.web.session.v1";
+
+    /* Each test starts from a fresh two-event session. What the store and
+       this page's localStorage held before is put back afterwards. */
+    function withSession(fn) {
+      var kept = {
+        events: Store.events, index: Store.currentEventIndex, dirty: Store.dirty, results: Store.results,
+        selection: Store.selection, options: JSON.parse(JSON.stringify(Store.globalOptions))
+      };
+      var storedBefore = null;
+      try { storedBefore = localStorage.getItem(KEY); } catch (e) { /* no storage here */ }
+      try {
+        Store.events = [
+          event({ name: "A", x_dates: xdates(["01/01/2020", "07/19/2021", "02/06/2023"]) }),
+          event({ name: "B", x_dates: xdates(["03/03/2021", "09/09/2022"]) })
+        ];
+        Store.currentEventIndex = 0;
+        Store.dirty = false;
+        fn();
+      } finally {
+        Store.events = kept.events;
+        Store.currentEventIndex = kept.index;
+        Store.dirty = kept.dirty;
+        Store.results = kept.results;
+        Store.selection = kept.selection;
+        Object.keys(kept.options).forEach(function (key) { Store.globalOptions[key] = kept.options[key]; });
+        try {
+          if (storedBefore === null) localStorage.removeItem(KEY); else localStorage.setItem(KEY, storedBefore);
+        } catch (e) { /* no storage here */ }
+      }
+    }
+
+    test("an edit marks the session unsaved; switching events, Current time and New do not", function () {
+      withSession(function () {
+        Store.selectEvent(1);
+        assert.no(Store.dirty, "switching to another event is not an edit");
+        Store.setNowOffset(7 * C.MILLIS_PER_DAY);
+        assert.no(Store.dirty, "shifting Current time is not an edit");
+        Store.setNowOffset(0);
+        Store.addDate("x");
+        assert.ok(Store.dirty, "adding an X-Date is an edit");
+        Store.reset();
+        assert.no(Store.dirty, "a new, empty session has nothing to lose");
+      });
+    });
+
+    test("unsaved edits are still unsaved after a reload; Save and Open clear that", function () {
+      withSession(function () {
+        Store.addDate("x");
+        Store.dirty = false;                        // a reload starts again from the stored copy
+        assert.ok(Store.load(), "the session is restored");
+        assert.ok(Store.dirty, "and still counts as unsaved");
+
+        Store.markSaved();                          // Save
+        Store.dirty = true;
+        assert.ok(Store.load());
+        assert.no(Store.dirty, "saved before the reload, saved after it");
+
+        Store.addDate("x");
+        Store.importOph(Store.exportOph());         // Open
+        Store.dirty = true;
+        assert.ok(Store.load());
+        assert.no(Store.dirty, "a file just opened holds no unsaved edits");
+      });
+    });
+
+    test("a session stored before this was tracked counts as unsaved", function () {
+      withSession(function () {
+        localStorage.setItem(KEY, JSON.stringify({ events: Store.events, currentEventIndex: 0, globalOptions: Store.globalOptions }));
+        assert.ok(Store.load());
+        assert.ok(Store.dirty, "unknown is treated as unsaved, so opening a file asks first");
+      });
+    });
+  });
+
   root.Ophis.Tests = {
     suites: suites,
     assert: assert,
