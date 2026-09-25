@@ -180,7 +180,10 @@
     document.addEventListener("keydown", onKey);
     openModal = handle;
 
-    var initial = host.querySelector("[data-confirm]") || host.querySelector("footer [data-close]");
+    // Focus starts on Cancel / Close, never on the confirming button: these
+    // dialogs clear dates, delete events and replace sessions, and an Enter
+    // pressed twice must not do that.
+    var initial = host.querySelector("footer [data-close]");
     if (initial) initial.focus();
     return handle;
   };
