@@ -1,4 +1,4 @@
-# Publishes the landing page, the Natorion app, the reverse-engineering
+# Publishes the landing page, the Natorion app, Ophis Web, the reverse-engineering
 # report and the single-file build with every page it links to, to GitHub
 # Pages on every push to main. The first run switches Pages
 # on for the repository by itself (configure-pages `enablement`).
@@ -35,6 +35,16 @@ jobs:
           done
           cp -R natorion site/natorion
           cp -R ophis site/ophis
+          # Ophis Web: the v12 engine with a new interface, kept apart from the
+          # Chronicon and the clocks. It reads four data files from ../lib.
+          if [ -d web ]; then
+            cp -R web site/web
+            rm -rf site/web/tests
+            mkdir -p site/lib
+            for f in astronomy.browser.min.js tz_lookup_oss.js solar_eclipses_processed.js lunar_eclipses_processed.js; do
+              cp "lib/$f" site/lib/
+            done
+          fi
           rm -rf site/natorion/node_modules site/natorion/tests site/natorion/package.json
           touch site/.nojekyll
           find site -type f | wc -l
