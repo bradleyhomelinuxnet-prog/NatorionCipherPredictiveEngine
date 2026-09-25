@@ -13,7 +13,8 @@
   --line-2: rgba(216, 169, 67, .38);
   --gold: #d8a943;
   --gold-2: #f3d27a;
-  --red: #d3402f;
+  --red: #e25544;
+  --red-fill: #d3402f;   /* under white text (.flag.on): white on #e25544 is only 3.7:1 */
   --cyan: #54b8c9;
   --green: #7faa5a;
   --violet: #9b7fd0;
@@ -49,6 +50,7 @@
   --gold: #8a6412;
   --gold-2: #6d4c06;
   --red: #a8321f;
+  --red-fill: #a8321f;
   --cyan: #1f7282;
   --green: #4d7328;
   --violet: #6448a0;
@@ -57,7 +59,7 @@
   --shadow: 0 0 0 1px var(--line), 0 14px 30px -24px rgba(60, 40, 0, .5);
   --glow: none;
   --msrf-normal: #1f7282;
-  --msrf-important: #8a6412;
+  --msrf-important: #7d5a0f;
   --msrf-vortex: #a8321f;
   --alpha: #8a6412;
   --beta: #6448a0;
@@ -67,15 +69,20 @@
   :root:not([data-theme="dark"]) {
     --bg: #f3ede0; --bg-2: #ebe3d1; --panel: rgba(255, 252, 244, .86); --panel-solid: #fffaf0;
     --ink: #1f1a12; --ink-2: #3f372a; --dim: #6f6552; --line: rgba(138, 100, 18, .22); --line-2: rgba(138, 100, 18, .42);
-    --gold: #8a6412; --gold-2: #6d4c06; --red: #a8321f; --cyan: #1f7282; --green: #4d7328; --violet: #6448a0;
+    --gold: #8a6412; --gold-2: #6d4c06; --red: #a8321f; --red-fill: #a8321f; --cyan: #1f7282; --green: #4d7328; --violet: #6448a0;
     --focus: #a8321f; --field: #fffdf7; --shadow: 0 0 0 1px var(--line), 0 14px 30px -24px rgba(60, 40, 0, .5); --glow: none;
-    --msrf-normal: #1f7282; --msrf-important: #8a6412; --msrf-vortex: #a8321f; --alpha: #8a6412; --beta: #6448a0;
+    --msrf-normal: #1f7282; --msrf-important: #7d5a0f; --msrf-vortex: #a8321f; --alpha: #8a6412; --beta: #6448a0;
     color-scheme: light;
   }
 }
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+/* app.js measures the sticky top bar (--bar-cover), so a control reached by
+   keyboard lands below it. The bar's own controls are on screen already, so
+   focusing one must not scroll the page. */
+html { scroll-padding-top: var(--bar-cover, 0px); }
+html:has(.topbar:focus-within) { scroll-padding-top: 0; }
 body {
   margin: 0;
   min-height: 100vh;
@@ -206,7 +213,8 @@ main { padding: 18px clamp(16px, 2.4vw, 28px) 60px; }
 
 .work { display: grid; grid-template-columns: minmax(290px, 370px) minmax(0, 1fr); gap: var(--gap); align-items: start; }
 .work > *, .rail > * { min-width: 0; }
-.rail { display: flex; flex-direction: column; gap: var(--gap); position: sticky; top: 70px; max-height: calc(100vh - 86px); overflow: auto; padding: 2px; scrollbar-width: thin; }
+/* 130px: the 70px above the rail and main's 60px below .work, so at the foot of the page the rail still starts clear of the top bar. */
+.rail { display: flex; flex-direction: column; gap: var(--gap); position: sticky; top: 70px; max-height: calc(100vh - 130px); overflow: auto; padding: 2px; scrollbar-width: thin; }
 .rail .panel + .panel { margin-top: 0; }
 .output { display: flex; flex-direction: column; gap: var(--gap); min-width: 0; }
 .output .panel + .panel { margin-top: 0; }
@@ -319,7 +327,7 @@ tbody tr { transition: background .1s; }
 .kv-list dd { margin: 0; color: var(--gold-2); }
 .flags { display: flex; flex-wrap: wrap; gap: 6px; }
 .flag { font: 11px var(--f-mono); letter-spacing: .1em; padding: 5px 8px; border: 1px solid var(--line); border-radius: 20px; color: var(--dim); }
-.flag.on { color: #fff; background: var(--red); border-color: var(--red); box-shadow: var(--glow); }
+.flag.on { color: #fff; background: var(--red-fill); border-color: var(--red-fill); box-shadow: var(--glow); }
 .zlink-list { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .zlink-list button { font-size: 11px; padding: 5px 8px; }
 .zlink-list li.none { color: var(--dim); font-style: italic; }
@@ -395,6 +403,7 @@ dialog h2 { margin-bottom: 8px; }
   .event-pick { flex: 1; }
   .event-pick select { max-width: none; width: 100%; }
   .tabs { width: 100%; overflow-x: auto; flex-wrap: nowrap; }
+  .tabs button:focus-visible { outline-offset: -2px; }   /* inside the button: .tabs clips whatever overflows it */
   .results th:nth-child(7), .results td:nth-child(7) { display: none; }
   .checks.cols2 { grid-template-columns: 1fr; }
   .dial-controls .field { width: 78px; }
@@ -412,9 +421,9 @@ dialog h2 { margin-bottom: 8px; }
   :root, :root[data-theme] {
     --bg: #fff; --bg-2: #fff; --panel: #fff; --panel-solid: #fff; --field: #fff;
     --ink: #1f1a12; --ink-2: #3f372a; --dim: #6f6552; --line: rgba(138, 100, 18, .22); --line-2: rgba(138, 100, 18, .42);
-    --gold: #8a6412; --gold-2: #6d4c06; --red: #a8321f; --cyan: #1f7282; --green: #4d7328; --violet: #6448a0;
+    --gold: #8a6412; --gold-2: #6d4c06; --red: #a8321f; --red-fill: #a8321f; --cyan: #1f7282; --green: #4d7328; --violet: #6448a0;
     --focus: #a8321f; --shadow: none; --glow: none;
-    --msrf-normal: #1f7282; --msrf-important: #8a6412; --msrf-vortex: #a8321f; --alpha: #8a6412; --beta: #6448a0;
+    --msrf-normal: #1f7282; --msrf-important: #7d5a0f; --msrf-vortex: #a8321f; --alpha: #8a6412; --beta: #6448a0;
     color-scheme: light;
   }
   .topbar, .rail, .chart-panel .head-tools, .results-panel .head-tools, .toasts { display: none !important; }

@@ -29,6 +29,22 @@
     applyTheme();
   }
 
+  // Above 720 px the top bar is sticky, and a control that takes keyboard focus
+  // could be left underneath it. natorion.css turns the bar's height into
+  // scroll padding, so the browser brings such a control out below it. The bar
+  // wraps onto a second row on narrower screens or with a long event name, so
+  // it is measured, not assumed.
+  function keepClearOfBar() {
+    var bar = document.querySelector(".topbar");
+    function measure() {
+      var sticky = getComputedStyle(bar).position === "sticky";
+      document.documentElement.style.setProperty("--bar-cover", sticky ? (bar.offsetHeight + 8) + "px" : "0px");
+    }
+    measure();
+    if (root.ResizeObserver) new root.ResizeObserver(measure).observe(bar);
+    root.addEventListener("resize", measure);
+  }
+
   function renderEventPicker() {
     var sel = $("eventSelect");
     D.fill(sel, S.state.events.map(function (e, i) { return el("option", { value: String(i), text: (e.name || "Event " + (i + 1)) }); }).concat([el("option", { value: "new", text: "+ New event" })]));
@@ -43,6 +59,7 @@
   function start() {
     S.load();
     applyTheme();
+    keepClearOfBar();
     NC.cipher.init(); NC.opsView.init(); NC.chronView.init(); NC.files.init();
     renderMsrfSets();
     renderEventPicker();
