@@ -339,9 +339,26 @@
       var todayUtc = T.floorToUtcMidnight(new Date()).getTime();
       Store.setNowOffset(wanted - todayUtc);
     });
-    UI.on(hosts.status, "focusout", "#now-date", function () { setTimeout(App.renderStatus, 0); });
-    UI.on(hosts.status, "click", '[data-action="reset-now"]', function () {
+    // renderStatus() leaves the bar alone while the date field has focus, and
+    // catches up when focus leaves the bar. Moving between the field and the
+    // reset button is not leaving it, or the button would be rebuilt under the
+    // pointer and its click lost.
+    UI.on(hosts.status, "focusout", '#now-date, [data-action="reset-now"]', function (e) {
+      if (e.relatedTarget && hosts.status.contains(e.relatedTarget)) return;
+      setTimeout(App.renderStatus, 0);
+    });
+    // Pressing the button must not take focus from the field either: browsers
+    // that do not focus buttons on click (Safari, Firefox on macOS) blur the
+    // field with no relatedTarget.
+    UI.on(hosts.status, "mousedown", '[data-action="reset-now"]', function (e) { e.preventDefault(); });
+    UI.on(hosts.status, "click", '[data-action="reset-now"]', function (e, target) {
+      var field = document.getElementById("now-date");
+      var fromKeyboard = document.activeElement === target;
+      if (field && document.activeElement === field) field.blur();   // so the bar redraws now
       Store.setNowOffset(0);
+      // The button is gone after the redraw; keep keyboard focus in the bar.
+      var again = fromKeyboard && document.getElementById("now-date");
+      if (again) again.focus();
     });
 
     /* ---- toolbar ---- */
