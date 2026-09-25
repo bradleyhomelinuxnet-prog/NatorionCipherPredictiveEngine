@@ -61,7 +61,7 @@
   .hs .n{font-family:'Cinzel',serif;font-weight:800;font-size:23px;color:var(--gold2)}
   .hs .l{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:2px}
 
-  section{padding:clamp(24px,4vw,40px) 0;border-top:1px solid var(--line);scroll-margin-top:60px}
+  section{padding:clamp(24px,4vw,40px) 0;border-top:1px solid var(--line);scroll-margin-top:calc(var(--nav-h,50px) + 10px)}
   .sec-no{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.3em;color:var(--red);text-transform:uppercase}
   h2{font-family:'Cinzel',serif;font-weight:600;font-size:clamp(22px,4vw,33px);margin:.1em 0 .5em;color:var(--gold2);line-height:1.06}
   h3{font-family:'Cinzel',serif;font-weight:600;font-size:19px;color:var(--ink);margin:1.4em 0 .3em}
@@ -396,6 +396,11 @@ $('themeBtn').onclick=()=>applyTheme(_root.getAttribute('data-theme')==='light'?
 $('tsUp').onclick=()=>{_zoom=Math.min(1.5,Math.round((_zoom+0.1)*10)/10);applyZoom(_zoom);};
 $('tsDown').onclick=()=>{_zoom=Math.max(0.8,Math.round((_zoom-0.1)*10)/10);applyZoom(_zoom);};
 $('tsReset').onclick=()=>{_zoom=1;applyZoom(_zoom);};
+// The sticky nav wraps onto more rows on a narrow screen or at a larger text size. Tell the
+// sections its height, so a section link lands with the heading below the nav, not under it.
+const _nav=document.querySelector('nav.top');
+function measureNav(){_root.style.setProperty('--nav-h',_nav.offsetHeight+'px');}
+measureNav();if(window.ResizeObserver)new ResizeObserver(measureNav).observe(_nav);else addEventListener('resize',measureNav);
 </script>
 </body>
 </html>
