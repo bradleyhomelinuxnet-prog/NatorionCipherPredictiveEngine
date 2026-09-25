@@ -96,6 +96,7 @@
           ' data-focus-key="' + kind + '-' + index + '-time" aria-label="time">' : "") +
         '<span class="weekday">' + UI.esc(weekday) + '</span>' +
         '<label class="tick" data-tip="Include this date in the calculation"><input type="checkbox" data-field="enabled"' +
+          ' data-focus-key="' + kind + '-' + index + '-enabled"' +
           (entry.enabled === false ? "" : " checked") + ' aria-label="Include ' + UI.labelPlain(letter, index) + '"><span></span></label>' +
         '<button class="icon-btn" data-action="insert-date" data-tip="Insert a copy above" aria-label="Insert a copy of ' + UI.labelPlain(letter, index) + ' above">⤒</button>' +
         '<button class="icon-btn danger" data-action="remove-date" data-tip="Delete this date" aria-label="Delete ' + UI.labelPlain(letter, index) + '">✕</button>' +
@@ -220,6 +221,7 @@
         '<input type="number" class="weight-input" step="0.5" min="0" value="' + UI.esc(operation.weight) + '"' +
           ' data-field="weight" data-focus-key="op-' + index + '-weight" data-tip="Weight — 1 is alpha, 0.5 is beta" aria-label="weight">' +
         '<label class="tick" data-tip="Enable this operation"><input type="checkbox" data-field="enabled"' +
+          ' data-focus-key="op-' + index + '-enabled"' +
           (operation.enabled === false ? "" : " checked") + ' aria-label="Enable ' + UI.labelPlain("O", index) + '"><span></span></label>' +
         '<button class="icon-btn danger" data-action="remove-operation" data-tip="Delete this operation" aria-label="Delete ' + UI.labelPlain("O", index) + '">✕</button>' +
         (broken
@@ -292,7 +294,7 @@
       }
       html += '<li class="filter-row' + (enabled ? " on" : "") + '">' +
         '<span class="row-label small">' + filter.id + '</span>' +
-        '<label class="tick"><input type="checkbox" data-filter="' + filter.key + '"' + (enabled ? " checked" : "") +
+        '<label class="tick"><input type="checkbox" data-filter="' + filter.key + '" data-focus-key="filter-' + filter.key + '-on"' + (enabled ? " checked" : "") +
           ' aria-label="Filter ' + UI.esc(filter.id) + '"><span></span></label>' +
         '<span class="filter-label" data-tip="' + UI.esc(filter.help) + '">Hide ' + labelHtml + '</span>' +
         '</li>';
@@ -324,12 +326,12 @@
         '<textarea id="event-notes" rows="2" data-event-field="notes" data-focus-key="event-notes">' + UI.esc(event.notes || "") + '</textarea></div>' +
       '<div class="field-row">' +
         '<div class="field"><label for="event-scope" data-tip="Days: a day is a UTC calendar day.<br>HH:MM: a day runs sunset to sunset at the location below.">Scope</label>' +
-          '<select id="event-scope" data-event-field="scope">' +
+          '<select id="event-scope" data-event-field="scope" data-focus-key="event-scope">' +
             '<option value="' + C.EVENT_SCOPE__DAYS + '"' + (isHHMM ? "" : " selected") + '>Days</option>' +
             '<option value="' + C.EVENT_SCOPE__HH_MM + '"' + (isHHMM ? " selected" : "") + '>HH:MM (sunset)</option>' +
           '</select></div>' +
         '<div class="field"><label for="event-scoring" data-tip="v8+: the strongest MSRF match multiplies the score instead of adding its points.<br>v7: everything is additive.">Scoring</label>' +
-          '<select id="event-scoring" data-event-field="scoring_system">' +
+          '<select id="event-scoring" data-event-field="scoring_system" data-focus-key="event-scoring">' +
             '<option value="' + C.SCORING_SYSTEM__GTE_V8 + '"' + (event.scoring_system === C.SCORING_SYSTEM__LTE_V7 ? "" : " selected") + '>v8 and later</option>' +
             '<option value="' + C.SCORING_SYSTEM__LTE_V7 + '"' + (event.scoring_system === C.SCORING_SYSTEM__LTE_V7 ? " selected" : "") + '>v7 and earlier</option>' +
           '</select></div>' +
@@ -380,7 +382,7 @@
             option.label.toLowerCase() + " eclipse";
       html += '<label class="chip' + (on ? " on" : "") + (disabled ? " disabled" : "") + '"' +
         ' data-tip="' + UI.esc(tip) + '">' +
-        '<input type="checkbox" data-chart-option="' + option.key + '"' + (on ? " checked" : "") + (disabled ? " disabled" : "") + '>' +
+        '<input type="checkbox" data-chart-option="' + option.key + '" data-focus-key="chart-' + option.key + '"' + (on ? " checked" : "") + (disabled ? " disabled" : "") + '>' +
         '<span class="chip-glyph">' + (option.kind === "moon" ? T.MOON_GLYPHS[option.phase] : "◐") + '</span>' +
         UI.esc(option.label) + '</label>';
     });

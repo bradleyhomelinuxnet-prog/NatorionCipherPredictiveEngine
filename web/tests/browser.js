@@ -309,6 +309,19 @@ async function main() {
     await page.keyboard.press("Tab");
     check("an overlay chip shows a focus ring when reached by keyboard",
       await page.evaluate(() => { const chip = document.activeElement.closest(".chip"); return !!chip && getComputedStyle(chip).outlineStyle !== "none"; }));
+    // Each of these redraws its panel when changed; keyboard focus must come
+    // back to it. Each is changed twice, so the session ends as it began.
+    const lost = [];
+    for (const sel of ['#panel-xdates input[data-field="enabled"]', '#panel-operations input[data-field="enabled"]',
+      "#panel-filters input[data-filter]", "#chart-options input[data-chart-option]:not([disabled])", "#event-scope", "#event-scoring"]) {
+      const select = sel.startsWith("#event-");
+      for (const key of select ? ["ArrowDown", "ArrowUp"] : ["Space", "Space"]) {
+        await page.focus(sel);
+        await page.keyboard.press(key);
+        if (!(await settle(page, s => document.activeElement.matches(s), sel))) lost.push(sel + " after " + key);
+      }
+    }
+    check("a checkbox or select keeps keyboard focus when changing it redraws its panel", lost.length === 0, lost.join(" | "));
 
     section("cycles and the Backtest");
     check("the Cycles panel is drawn", /Cycles/.test(await page.textContent("#panel-cycles")));
