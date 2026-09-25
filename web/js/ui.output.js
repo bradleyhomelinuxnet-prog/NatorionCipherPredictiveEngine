@@ -87,8 +87,18 @@
    * the event in turn, and the one that brings back the most is named, with a
    * button that turns it off. Reading only: the event itself is not touched
    * until the button is pressed.
+   *
+   * That costs up to nine engine runs, so the answer is kept for as long as
+   * the results it explains: re-renders for a selection or a toggle reuse it,
+   * and a new cast replaces the results object and with it the answer.
    */
+  var hiding = { results: null, html: "" };
   function whatIsHiding(event, results) {
+    if (hiding.results !== results) hiding = { results: results, html: explainHiding(event, results) };
+    return hiding.html;
+  }
+
+  function explainHiding(event, results) {
     if (!results || !results.total_z_dates) return "";
     var now = Store.nowInstant();
     var best = null;
@@ -106,7 +116,8 @@
       trial(function (copy) { copy.t_dates = []; }, "the T-Dates (only Z-Dates on a T-Date are shown)", "");
     }
     if (!best) return '<p class="empty-why muted">No single filter explains it; several are hiding Z-Dates together.</p>';
-    return '<p class="empty-why">Turning off <b>' + UI.esc(best.label) + '</b> would show <b>' + best.shown + '</b>.' +
+    // The sentence is one span, so the row's flex gap falls only before the button.
+    return '<p class="empty-why"><span>Turning off <b>' + UI.esc(best.label) + '</b> would show <b>' + best.shown + '</b>.</span>' +
       (best.action ? ' <button class="btn small" ' + best.action + '>Turn it off</button>' : "") + '</p>';
   }
 

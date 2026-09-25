@@ -192,12 +192,12 @@ body {
 :root[data-theme="light"] select:focus,
 :root[data-theme="light"] textarea:focus { background: #fff; }
 
-/* The operations column is wide enough now to show a whole formula. */
 /* The Chronicon link sits among the toolbar buttons and must look like one. */
 a.btn { text-decoration: none; display: inline-flex; align-items: center; line-height: 1.5; }
 .chron-link { color: var(--cyan); border-color: color-mix(in srgb, var(--cyan) 45%, transparent); }
 .chron-link:hover { color: var(--cyan); border-color: var(--cyan); }
 
+/* The operations column is wide enough now to show a whole formula. */
 .operation-row { grid-template-columns: 26px minmax(0, 1fr) 50px 16px 22px; }
 .operation-input { font-size: 12px; }
 
@@ -255,23 +255,31 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; line-h
 .cyc-verdict {
   border-left: 3px solid var(--line-strong); padding: 6px 10px; margin: 0 0 10px;
   background: var(--panel-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  /* --dim on --panel-2 is 4.49:1 in the light theme; a fifth of ink lifts
+     the quieter text in the box to 5.8:1 (light) and 6.4:1 (dark). */
+  --cyc-quiet: color-mix(in srgb, var(--dim) 80%, var(--ink));
 }
 .cyc-verdict.v-some { border-left-color: var(--gold); }
 .cyc-verdict.v-strong { border-left-color: var(--green); }
 .cyc-numbers { font-size: 12.5px; color: var(--ink-2); }
 .cyc-numbers b { font-family: var(--display); font-size: 17px; font-weight: 600; color: var(--ink); }
-.cyc-verdict-text { font-size: 12px; color: var(--dim); margin-top: 2px; }
+.cyc-verdict .muted { color: var(--cyc-quiet); }
+.cyc-verdict-text { font-size: 12px; color: var(--cyc-quiet); margin-top: 2px; }
 .cyc-verdict.v-some .cyc-verdict-text { color: var(--gold-2); }
 .cyc-verdict.v-strong .cyc-verdict-text { color: var(--green); }
 .cyc-list { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-.cyc-list li {
-  display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 8px;
-  padding: 5px 6px; border-radius: var(--radius-sm); font-size: 12px; cursor: pointer;
+.cyc-list li { font-size: 12px; }
+/* Each echo is a button that selects its Z-Date. */
+.cyc-row {
+  display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 8px; width: 100%;
+  padding: 5px 6px; border: 0; border-radius: var(--radius-sm); background: none;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
 }
-.cyc-list.pairs li { grid-template-columns: minmax(0, 1fr); cursor: default; }
-.cyc-list li:hover { background: var(--panel-2); }
-.cyc-list li.selected { background: color-mix(in srgb, var(--gold) 13%, transparent); }
-.cyc-list li.cyc-more { display: block; cursor: default; font-style: italic; }
+.cyc-row:hover { background: var(--panel-2); }
+.cyc-row[aria-pressed="true"] { background: color-mix(in srgb, var(--gold) 13%, transparent); }
+.cyc-row:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.cyc-list.pairs li { padding: 5px 6px; }
+.cyc-list li.cyc-more { padding: 5px 6px; font-style: italic; }
 .cyc-date { font-family: var(--mono); color: var(--ink); }
 .cyc-what { color: var(--ink-2); line-height: 1.5; }
 .cyc-moon {
@@ -296,7 +304,10 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; line-h
 .bt-table tr:hover td { background: transparent; }
 .bt-table tr.bt-top td:nth-child(4) b { color: var(--green); }
 .bt-table tr.bt-hit td:nth-child(4) b { color: var(--gold-2); }
-.bt-table tr.bt-future td { opacity: .55; }
+/* Rows that are shown but not scored (not happened yet, or out of reach)
+   are quieter, but stay readable: --dim on the dialog is 4.9:1 (light) and
+   5.4:1 (dark), and each says in words why it is not scored. */
+.bt-table tr.bt-future td, .bt-table tr.bt-outside td { color: var(--dim); }
 
 /* ------------------------------------------------------------ motion */
 @keyframes almanac-rise {

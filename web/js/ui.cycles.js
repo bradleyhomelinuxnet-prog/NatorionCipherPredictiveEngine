@@ -20,22 +20,25 @@
   function loadSettings() {
     var saved = null;
     try { saved = JSON.parse(root.localStorage.getItem(KEY) || "null"); } catch (e) { saved = null; }
-    var out = {};
-    Object.keys(Cycles.DEFAULTS).forEach(function (k) {
-      out[k] = (saved && saved[k] !== undefined) ? saved[k] : Cycles.DEFAULTS[k];
-    });
-    return out;
+    // Whatever is stored, each setting comes back as one of its allowed values.
+    return Cycles.sanitizeSettings(saved);
   }
   V.saveSettings = function () {
     try { root.localStorage.setItem(KEY, JSON.stringify(V.settings)); } catch (e) { /* private mode */ }
   };
 
-  /** Recompute the echoes for whatever the engine last produced. Cheap. */
+  /* The page re-renders on every selection, sort and toggle, but the echoes
+     change only with a new cast, other settings or other X-Dates. */
+  var memo = { results: null, key: null };
+
+  /** Recompute the echoes for whatever the engine last produced. */
   V.refresh = function () {
     var event = Store.currentEvent();
-    V.analysis = (event && Store.results && !(Store.results.errors || []).length)
-      ? Cycles.analyze(event, Store.results, V.settings)
-      : null;
+    var results = Store.results;
+    var key = JSON.stringify([V.settings, event.x_dates, event.scope, event.lat, event.long]);
+    if (memo.results === results && memo.key === key) return V.analysis;
+    V.analysis = (results && !(results.errors || []).length) ? Cycles.analyze(event, results, V.settings) : null;
+    memo = { results: results, key: key };
     return V.analysis;
   };
 
@@ -79,7 +82,7 @@
   function verdictHtml(summary, what) {
     if (!summary) return "";
     return '<div class="cyc-verdict v-' + summary.verdict.level + '">' +
-      '<div class="cyc-numbers"><b>' + summary.observed + '</b> ' + what +
+      '<div class="cyc-numbers"><b>' + summary.observed + '</b> ' + UI.esc(what) +
       ' <span class="muted">· chance alone ≈ ' + num(summary.expected, 2) + " · " + pText(summary.pValue) + '</span></div>' +
       '<div class="cyc-verdict-text">' + UI.esc(summary.verdict.text) + '</div>' +
       '</div>';
@@ -102,18 +105,24 @@
       '<p class="panel-hint">Z-Dates a whole number of cycles from one of your X-Dates, measured against what random dates would give. Reading only — never changes a hit or a score.</p>' +
       '<div class="cyc-controls">';
 
+    // Each control carries a data-focus-key, so the re-render that follows a
+    // change hands keyboard focus back to it.
     Cycles.DEFINITIONS.forEach(function (def) {
       html += '<label class="cyc-toggle" data-tip="' + UI.esc(def.note) + '">' +
-        '<span class="tick"><input type="checkbox" data-cycle="' + def.id + '"' + (s[def.id] ? " checked" : "") + '><span></span></span>' +
+        '<span class="tick"><input type="checkbox" data-cycle="' + def.id + '" data-focus-key="cyc-' + def.id + '"' +
+        (s[def.id] ? " checked" : "") + '><span></span></span>' +
         '<span class="cyc-glyph cyc-' + def.id + '">' + def.glyph + '</span> ' + UI.esc(def.label) +
         ' <span class="muted">' + def.short + '</span></label>';
     });
-    html += '<label class="cyc-tol">within <select data-cycle-tolerance aria-label="Tolerance in days">' +
-      [1, 2, 3].map(function (d) { return '<option value="' + d + '"' + (s.tolerance === d ? " selected" : "") + '>±' + d + ' day' + (d > 1 ? "s" : "") + '</option>'; }).join("") +
+    html += '<label class="cyc-tol">within <select data-cycle-tolerance data-focus-key="cyc-tolerance" aria-label="Tolerance in days">' +
+      Cycles.CHOICES.tolerance.map(function (d) { return '<option value="' + d + '"' + (s.tolerance === d ? " selected" : "") + '>±' + d + ' day' + (d > 1 ? "s" : "") + '</option>'; }).join("") +
       '</select></label></div>';
 
     if (!a) {
-      host.innerHTML = html + '<p class="empty">Cast the event to look for echoes.</p>';
+      var blocked = Store.results && (Store.results.errors || []).length;
+      host.innerHTML = html + '<p class="empty">' + (blocked
+        ? "Echoes appear once the engine can project; the Output panel says what it needs."
+        : "Nothing has been projected yet.") + '</p>';
       return;
     }
     if (!a.defs.length) {
@@ -129,14 +138,21 @@
         (def.id === "metonic" ? "19, 38 or 57" : "138") + ' years before your recent ones to look for it.</p>';
     });
 
-    html += verdictHtml(a.summary, "of " + (a.summary ? a.summary.trials : 0) + " Z-Dates echo an X-Date");
+    // When no enabled cycle fits in the span on screen, the notes above say
+    // so; a "0 of N" verdict beneath them would only repeat it.
+    if (a.reach.some(function (r) { return r.possible; })) {
+      html += verdictHtml(a.summary, "of " + (a.summary ? a.summary.trials : 0) + " Z-Dates echo an X-Date");
+    }
 
     if (a.list.length) {
       html += '<ul class="cyc-list">';
       a.list.slice(0, 14).forEach(function (item) {
-        html += '<li data-cyc-z="' + UI.esc(item.key) + '" role="button" tabindex="0" class="' + (Store.selection.zKey === item.key ? "selected" : "") + '">' +
+        // A real button: Enter and Space work natively, and aria-pressed
+        // says which row is the selected Z-Date.
+        html += '<li><button type="button" class="cyc-row" data-cyc-z="' + UI.esc(item.key) + '"' +
+          ' data-focus-key="cyc-z-' + UI.esc(item.key) + '" aria-pressed="' + (Store.selection.zKey === item.key) + '">' +
           '<span class="cyc-date">' + UI.esc(item.zStruct.z_readable_start) + '</span>' +
-          '<span class="cyc-what">' + item.echoes.map(echoText).join("<br>") + '</span></li>';
+          '<span class="cyc-what">' + item.echoes.map(echoText).join("<br>") + '</span></button></li>';
       });
       if (a.list.length > 14) html += '<li class="muted cyc-more">and ' + (a.list.length - 14) + ' more — tagged in the table</li>';
       html += '</ul>';
@@ -160,27 +176,60 @@
 
   /* ------------------------------------------------------------ backtest */
 
-  function stepRow(step, tolerance, topN, allEvents) {
+  var BACKTEST_INTRO =
+    '<p>For each of your events from the third on, this stands on the day of the one before, gives the engine only the events up to then, ' +
+    'and checks whether it projected the next. Chance is measured near the real date: the share of the ' + Cycles.LOCAL_CONTROL_DAYS +
+    ' days either side of it that the projections happen to cover is the chance of a hit by luck alone. (A random date anywhere in the ' +
+    'years ahead would flatter the cast, since projections crowd the weeks after the last event, and so do real events.) ' +
+    'Nothing about your document changes.</p>';
+
+  /** Why a step could not be scored, when its event lies outside what the cast could reach. */
+  function outsideText(step) {
+    if (step.outside === "same-day") return "Same day as the event before it \u2014 not scored";
+    if (step.outside === "beyond-filter") return "Beyond the projection horizon (" + step.windowDays + " days) \u2014 not scored";
+    return "After the furthest projection (" + step.windowDays + " days out) \u2014 not scored";
+  }
+
+  function stepRow(step, allEvents) {
     var known = step.knownIndices.map(xLabel).join(" ");
-    var date = step.targetInstant.toISOString().slice(0, 10);
-    var cls = (step.future || step.inWindow === false) ? "bt-future" : (step.hit ? (step.topHit ? "bt-top" : "bt-hit") : "bt-miss");
+    var outside = !step.error && step.inWindow === false;
+    var cls = step.future ? "bt-future" : (outside ? "bt-outside" : (step.hit ? (step.topHit ? "bt-top" : "bt-hit") : "bt-miss"));
     var result;
     if (step.error) result = '<span class="warn-text">' + UI.esc(step.error) + '</span>';
     else if (step.hit) result = '<b>Hit</b> · rank ' + step.best.rank + " of " + step.projected + (step.best.off ? ' <span class="muted">(off ' + signedDays(step.best.off) + ')</span>' : "");
-    else if (step.inWindow === false) result = '<span class="muted">Beyond the projection horizon (' + step.windowDays + ' days) — not scored</span>';
+    else if (outside) result = '<span class="muted">' + outsideText(step) + '</span>';
     else result = 'Miss' + (step.nearest ? ' <span class="muted">· nearest off ' + signedDays(step.nearest.off) + '</span>' : ' <span class="muted">· nothing projected</span>');
     // A date still in the future has no outcome yet: its result is shown, not scored.
     if (step.future && !step.error) result += '<div class="muted bt-unscored">hasn\u2019t happened yet \u2014 shown, not scored</div>';
     return '<tr class="' + cls + '">' +
       (allEvents ? '<td class="muted">' + UI.esc(step.eventName || "") + '</td>' : "") +
       '<td class="lbl">' + known + '</td>' +
-      '<td class="lbl">' + xLabel(step.targetIndex) + ' <span class="mono">' + date + '</span></td>' +
+      '<td class="lbl">' + xLabel(step.targetIndex) + ' <span class="mono">' + UI.esc(step.targetLabel) + '</span></td>' +
       '<td>' + result + '</td>' +
-      '<td class="num">' + (step.error || step.inWindow === false ? "—" : (100 * step.chanceHit).toFixed(1) + "%") + '</td>' +
+      '<td class="num">' + (step.error || outside ? "—" : (100 * step.chanceHit).toFixed(1) + "%") + '</td>' +
       '</tr>';
   }
 
-  function backtestBody(tolerance, allEvents) {
+  function backtestControls(tolerance, allEvents) {
+    var count = Store.events.length;
+    return '<div class="bt-controls">' +
+      '<label>Match within <select data-bt-tolerance>' + Cycles.CHOICES.backtestTolerance.map(function (d) {
+        return '<option value="' + d + '"' + (tolerance === d ? " selected" : "") + '>' + (d === 0 ? "the exact day" : "±" + d + " day" + (d > 1 ? "s" : "")) + '</option>';
+      }).join("") + '</select></label>' +
+      // With a single event there is nothing to choose between.
+      (count > 1 ? '<label>Events <select data-bt-scope>' +
+        '<option value="one"' + (allEvents ? "" : " selected") + '>this event</option>' +
+        '<option value="all"' + (allEvents ? " selected" : "") + '>' + (count === 2 ? "both events" : "all " + count + " events") + '</option>' +
+      '</select></label>' : "") +
+      '</div>';
+  }
+
+  function notScoredNote(count, text) {
+    if (!count) return "";
+    return '<p class="cyc-note">' + count + ' event' + (count === 1 ? " " : "s ") + text(count === 1) + '</p>';
+  }
+
+  function backtestResults(tolerance, allEvents) {
     var topN = V.settings.topN;
     var events = allEvents ? Store.events : [Store.currentEvent()];
     var now = T.currentInstant(0);
@@ -194,27 +243,16 @@
     var notFuture = steps.filter(function (s) { return !s.future; });
     var summary = Cycles.summarize(notFuture, topN);
     var futureCount = steps.length - notFuture.length;
-    var beyondCount = notFuture.filter(function (s) { return !s.error && s.inWindow === false; }).length;
-
-    var html =
-      '<p>For each of your events from the third on, this stands on the day of the one before, gives the engine only the events up to then, ' +
-      'and checks whether it projected the next. The control is a random date in the same window: the share of that window the projections ' +
-      'happen to cover is the chance of a hit by luck alone. Nothing about your document changes.</p>' +
-      '<div class="bt-controls">' +
-        '<label>Match within <select data-bt-tolerance>' + [0, 1, 3, 7].map(function (d) {
-          return '<option value="' + d + '"' + (tolerance === d ? " selected" : "") + '>' + (d === 0 ? "the exact day" : "±" + d + " day" + (d > 1 ? "s" : "")) + '</option>';
-        }).join("") + '</select></label>' +
-        '<label>Events <select data-bt-scope>' +
-          '<option value="one"' + (allEvents ? "" : " selected") + '>this event</option>' +
-          '<option value="all"' + (allEvents ? " selected" : "") + '>all ' + Store.events.length + ' events</option>' +
-        '</select></label>' +
-      '</div>';
+    function outsideCount(reason) {
+      return notFuture.filter(function (s) { return !s.error && s.outside === reason; }).length;
+    }
 
     if (!steps.length) {
-      return html + '<p class="empty">Needs at least ' + (C.MINIMUM_NUMBER_OF_X_DATES + 1) + ' enabled X-Dates: two to cast from and a later one to test against.</p>';
+      return '<p class="empty">Needs at least ' + (C.MINIMUM_NUMBER_OF_X_DATES + 1) + ' enabled X-Dates: two to cast from and a later one to test against.</p>';
     }
 
     // With nothing scoreable, "0 of 0" boxes would only be noise; the notes below say why.
+    var html = "";
     if (summary.any.trials) html += '<div class="bt-summary">' +
       verdictHtml(summary.any, "of " + summary.any.trials + " events were projected within " + (tolerance ? "±" + tolerance + " day" + (tolerance > 1 ? "s" : "") : "the exact day")) +
       verdictHtml(summary.top, "of " + summary.top.trials + " were in the top " + topN + " by score") +
@@ -224,37 +262,46 @@
       html += '<p class="cyc-note">' + futureCount + ' of these X-Dates ' + (futureCount === 1 ? "is" : "are") + ' still in the future, so ' +
         (futureCount === 1 ? "it is" : "they are") + ' shown but not scored: a backtest can only measure prediction against events that have already happened.</p>';
     }
-    if (beyondCount) {
-      html += '<p class="cyc-note">' + beyondCount + ' event' + (beyondCount === 1 ? " falls" : "s fall") + ' beyond the projection horizon set by the ' +
-        '\u201cHide beyond N days\u201d filter, so ' + (beyondCount === 1 ? "it" : "they") + ' could not have been projected and ' +
-        (beyondCount === 1 ? "is" : "are") + ' not scored. Widen that filter to test ' + (beyondCount === 1 ? "it" : "them") + '.</p>';
-    }
+    html += notScoredNote(outsideCount("beyond-filter"), function (one) {
+      return (one ? "falls" : "fall") + ' beyond the projection horizon set by the \u201cHide beyond N days\u201d filter, so ' + (one ? "it" : "they") +
+        ' could not have been projected and ' + (one ? "is" : "are") + ' not scored. Widen that filter to test ' + (one ? "it" : "them") + '.';
+    });
+    html += notScoredNote(outsideCount("beyond-projections"), function (one) {
+      return (one ? "falls" : "fall") + ' after the furthest date the engine projected, so ' + (one ? "it" : "they") +
+        ' could not have been projected and ' + (one ? "is" : "are") + ' not scored.';
+    });
+    html += notScoredNote(outsideCount("same-day"), function (one) {
+      return (one ? "shares" : "share") + ' a day with the event before, so there was nothing to project and ' + (one ? "it is" : "they are") + ' not scored.';
+    });
     if (summary.any.trials && summary.any.trials < 8) {
       html += '<p class="cyc-note">Only ' + summary.any.trials + ' scored step' + (summary.any.trials === 1 ? "" : "s") +
         ' — too few to tell skill from luck either way. Every past event you add makes the answer firmer.</p>';
     }
 
     html += '<div class="detail-scroll"><table class="detail-table bt-table"><thead><tr>' +
-      (allEvents ? '<th>Event</th>' : "") + '<th>Known</th><th>Next event</th><th>Result</th><th class="num">Chance</th>' +
-      '</tr></thead><tbody>' + steps.map(function (s) { return stepRow(s, tolerance, topN, allEvents); }).join("") + '</tbody></table></div>';
+      (allEvents ? '<th>Event</th>' : "") + '<th>Known</th><th>Next event</th><th>Result</th>' +
+      '<th class="num" data-tip="How much of the ' + Cycles.LOCAL_CONTROL_DAYS + ' days either side of the real date the projections cover: the chance of a hit by luck alone">Chance</th>' +
+      '</tr></thead><tbody>' + steps.map(function (s) { return stepRow(s, allEvents); }).join("") + '</tbody></table></div>';
     return html;
   }
 
   V.openBacktest = function () {
     var tolerance = V.settings.backtestTolerance;
-    var allEvents = V.settings.allEvents === true;
-    var modal = UI.modal("Backtest", '<div class="bt-host"></div>');
-    var body = modal.host.querySelector(".bt-host");
-    // Tooltips inside the dialog come from the page-wide binding (app.js);
-    // binding again on every redraw would stack duplicate listeners.
+    // "All events" means something only when there is more than one.
+    var allEvents = V.settings.allEvents === true && Store.events.length > 1;
+    var modal = UI.modal("Backtest", '<div class="bt-host">' + BACKTEST_INTRO + backtestControls(tolerance, allEvents) +
+      '<div class="bt-results"></div></div>');
+    var host = modal.host.querySelector(".bt-host");
+    var results = host.querySelector(".bt-results");
+    // Only the results are redrawn, so a select keeps keyboard focus while its
+    // value is stepped with the arrow keys. Tooltips inside the dialog come
+    // from the page-wide binding (app.js).
     function draw() {
-      body.innerHTML = backtestBody(tolerance, allEvents);
+      results.innerHTML = backtestResults(tolerance, allEvents);
     }
-    body.addEventListener("change", function (event) {
-      if (event.target.matches("[data-bt-tolerance]")) tolerance = parseInt(event.target.value, 10);
-      if (event.target.matches("[data-bt-scope]")) allEvents = event.target.value === "all";
-      V.settings.backtestTolerance = tolerance;
-      V.settings.allEvents = allEvents;
+    host.addEventListener("change", function (event) {
+      if (event.target.matches("[data-bt-tolerance]")) V.settings.backtestTolerance = tolerance = parseInt(event.target.value, 10);
+      if (event.target.matches("[data-bt-scope]")) V.settings.allEvents = allEvents = event.target.value === "all";
       V.saveSettings();
       draw();
     });
@@ -275,12 +322,11 @@
       Store.notify("cycles");
     });
     UI.on(host, "click", "[data-cyc-z]", function (e, target) {
-      Store.selection.zKey = target.getAttribute("data-cyc-z");
+      // Pressing the selected row again clears the selection, as in the table.
+      var key = target.getAttribute("data-cyc-z");
+      Store.selection.zKey = Store.selection.zKey === key ? null : key;
       Store.selection.operationHash = null;
       Store.notify("selection");
-    });
-    UI.on(host, "keydown", "[data-cyc-z]", function (e, target) {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); target.click(); }
     });
     UI.on(host, "click", '[data-action="backtest"]', function () { V.openBacktest(); });
   };

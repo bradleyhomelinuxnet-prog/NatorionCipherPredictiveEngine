@@ -361,7 +361,10 @@
     // The Chronicon opens as a separate window sized to sit beside this one, and
     // a second click brings that same window forward rather than opening another.
     // If a blocker refuses the window, the link itself still opens it in a tab.
+    // A modified or non-primary click (new tab, new window, download) is the
+    // operator asking for something else, so the browser keeps its default.
     UI.on(toolbar, "click", '[data-action="chronicon"]', function (event, link) {
+      if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
       var win = window.open(link.href, link.target, "popup=yes,width=1280,height=860");
       if (!win) return;
       event.preventDefault();
