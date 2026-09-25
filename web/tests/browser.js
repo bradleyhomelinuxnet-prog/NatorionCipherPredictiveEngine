@@ -138,6 +138,7 @@ async function main() {
     ({ ctx, page } = await fresh(browser));
 
     section("tooltips");
+    const tipAtRest = await page.getAttribute("#tooltip", "aria-hidden");
     const pill = await page.$(".pill.op");
     if (pill) { await pill.hover(); await settle(page, () => document.getElementById("tooltip").classList.contains("show")); }
     const opTip = await page.evaluate(() => { const t = document.getElementById("tooltip"); return { sub: !!t.querySelector("sub"), text: t.textContent }; });
@@ -150,6 +151,15 @@ async function main() {
     const tip = await page.evaluate(() => { const t = document.getElementById("tooltip"); return { html: t.innerHTML, live: t.querySelectorAll("#inj, #injimg, #inj2").length }; });
     check("markup in an event name from a file shows as text", tip.live === 0 && tip.html.indexOf("&lt;b") >= 0, tip.html.slice(0, 120));
     check("the notes keep their italics", /<i>.*&lt;i id/.test(tip.html), tip.html.slice(0, 160));
+    // The pointer is moved rather than hover()ed: hover() may scroll first, and a scroll hides the tooltip.
+    const aboutBox = await (await page.$('[data-action="about"]')).boundingBox();
+    await page.mouse.move(aboutBox.x + aboutBox.width / 2, aboutBox.y + aboutBox.height / 2);
+    await settle(page, () => document.getElementById("tooltip").classList.contains("show"));
+    const tipShown = await page.getAttribute("#tooltip", "aria-hidden");
+    await page.mouse.move(2, 2);   // the corner of the top bar, where nothing has a tooltip
+    await settle(page, () => !document.getElementById("tooltip").classList.contains("show"));
+    const tipGone = await page.getAttribute("#tooltip", "aria-hidden");
+    check("screen readers find the tooltip only while it shows", tipAtRest === "true" && tipShown === null && tipGone === "true", [tipAtRest, tipShown, tipGone].map(String).join(" "));
 
     await ctx.close();
     ({ ctx, page } = await fresh(browser));
@@ -196,6 +206,8 @@ async function main() {
     ({ ctx, page } = await fresh(browser));
 
     section("current time");
+    const labelled = await page.getByLabel("Current time", { exact: true }).evaluateAll(fields => fields.map(field => field.id).join());
+    check("the field is named by its label", labelled === "now-date", labelled || "no field");
     const dateBefore = await page.inputValue("#now-date");
     await page.focus("#now-date");
     await page.keyboard.press("ArrowUp");
@@ -282,6 +294,17 @@ async function main() {
     }).map(el => el.outerHTML.slice(0, 80)));
     check("every button, checkbox and select has a name", unnamed.length === 0, unnamed.slice(0, 3).join(" | "));
     check("the toast is announced", await page.getAttribute("#toast", "role") === "status");
+    const tabs = await page.evaluate(() => {
+      const list = document.querySelector('[role="tablist"]'), add = document.querySelector('[data-action="add-event"]');
+      const last = list.lastElementChild.getBoundingClientRect(), box = add.getBoundingClientRect();
+      return { onlyTabs: Array.from(list.children).every(el => el.getAttribute("role") === "tab"), gap: Math.round(box.left - last.right), level: box.top === last.top && box.height === last.height };
+    });
+    check("the + button follows the tab list, beside the last tab", tabs.onlyTabs && tabs.gap === 6 && tabs.level, JSON.stringify(tabs));
+    const sides = await page.$$eval("aside", asides => asides.map(aside => aside.getAttribute("aria-label") || ""));
+    check("the two side columns have names of their own", sides.length === 2 && sides.every(Boolean) && sides[0] !== sides[1], sides.join(" | "));
+    check("the status bar is a named region", await page.getByRole("region", { name: "Status" }).count() === 1);
+    check("the page has one top-level heading", await page.getByRole("heading", { level: 1 }).count() === 1);
+    check("every column of the output table has a header", await page.$$eval(".output-table thead th", cells => cells.every(cell => cell.textContent.trim() !== "")));
 
     section("cycles and the Backtest");
     check("the Cycles panel is drawn", /Cycles/.test(await page.textContent("#panel-cycles")));

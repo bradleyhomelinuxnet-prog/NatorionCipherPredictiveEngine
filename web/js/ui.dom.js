@@ -63,7 +63,9 @@
 
   /* ------------------------------------------------------------- tooltip */
   /* One shared tooltip element; panels mark elements with data-tip="…" (HTML
-     already escaped by the caller). Keyboard focus shows it too. */
+     already escaped by the caller). Keyboard focus shows it too. While it is
+     not shown it is hidden from screen readers as well: at opacity 0 it would
+     still be read, empty or with the last tip in it. */
   var tipEl = null;
   function ensureTip() {
     if (!tipEl) tipEl = document.getElementById("tooltip");
@@ -75,6 +77,7 @@
     if (!tip || !html) return;
     tip.innerHTML = html;
     tip.classList.add("show");
+    tip.removeAttribute("aria-hidden");
 
     var box = anchor.getBoundingClientRect();
     var tipBox = tip.getBoundingClientRect();
@@ -91,7 +94,9 @@
 
   UI.hideTip = function () {
     var tip = ensureTip();
-    if (tip) tip.classList.remove("show");
+    if (!tip) return;
+    tip.classList.remove("show");
+    tip.setAttribute("aria-hidden", "true");
   };
 
   var scrollListenerAttached = false;

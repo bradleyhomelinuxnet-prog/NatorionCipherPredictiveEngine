@@ -56,8 +56,9 @@
         ' aria-selected="' + active + '" data-tip="' + UI.esc(tip) + '">' +
         '<span class="event-tab-ord">E' + (index + 1) + '</span>' + UI.esc(event.name) + '</button>';
     });
-    html += '<button class="event-tab add" data-action="add-event" data-tip="Add a new Iso-Event" aria-label="Add a new event">+</button>';
+    // A tab list holds only tabs, so the + button comes after it, not in it.
     html += '</div>';
+    html += '<button class="event-tab add" data-action="add-event" data-tip="Add a new Iso-Event" aria-label="Add a new event">+</button>';
     host.innerHTML = html;
   };
 

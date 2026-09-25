@@ -154,7 +154,7 @@
       return;
     }
 
-    var html = head + '<div class="table-scroll"><table class="output-table"><thead><tr><th class="ord"></th>';
+    var html = head + '<div class="table-scroll"><table class="output-table"><thead><tr><th class="ord"><span class="sr-only">Z#</span></th>';
     SORT_COLUMNS.forEach(function (column) {
       var active = sortType === column.type;
       html += '<th class="sortable col-' + column.type + (active ? " active" : "") + '" data-sort="' + column.type + '"' +

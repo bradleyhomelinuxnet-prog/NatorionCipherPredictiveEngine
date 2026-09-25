@@ -113,7 +113,7 @@
     }
 
     pieces.push('<span class="spacer"></span>');
-    pieces.push('<span class="status-item' + (offset ? " shifted" : "") + '">Current time ' +
+    pieces.push('<span class="status-item' + (offset ? " shifted" : "") + '"><label for="now-date">Current time</label>' +
       '<input type="date" id="now-date" value="' + UI.esc(Panels.toInputDate(T.formatUtcDateOnly(now))) + '"' +
       ' data-tip="The date the F3/F4 filters treat as today. Shift it for backtesting.">' +
       (offset ? '<button class="btn small ghost" data-action="reset-now">reset</button>' : '') +
