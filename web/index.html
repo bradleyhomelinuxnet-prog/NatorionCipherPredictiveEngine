@@ -32,6 +32,7 @@
     <button class="btn ghost" data-action="new" data-tip="Start a new session">New</button>
     <!-- The Chronicon is a separate instrument (the Natorion app). It opens in its own
          window beside this one; nothing of it is loaded into Ophis. -->
+    <button class="btn" data-action="backtest" data-tip="Would the cast have projected your later events from your earlier ones? Measured against chance.">Backtest</button>
     <a class="btn chron-link" data-action="chronicon" href="../natorion/index.html#chronicon" target="natorion-chronicon" rel="noopener" data-tip="Open the Chronicon &mdash; clocks, cycles and calendars &mdash; in its own window">Chronicon &#8599;</a>
     <button class="icon-btn" data-action="theme" data-tip="Light / dark">&#9681;</button>
     <button class="icon-btn" data-action="about" data-tip="What this is and how it scores">?</button>
@@ -78,6 +79,7 @@
   <aside class="rail rail-right">
     <section id="panel-operations" class="panel"></section>
     <section id="panel-filters" class="panel"></section>
+    <section id="panel-cycles" class="panel panel-cycles"></section>
   </aside>
 
 </main>
@@ -106,11 +108,13 @@
 <script src="js/ophis.time.js" defer></script>
 <script src="js/ophis.engine.js" defer></script>
 <script src="js/ophis.file.js" defer></script>
+<script src="js/ophis.cycles.js" defer></script>
 <script src="js/ophis.store.js" defer></script>
 <script src="js/ui.dom.js" defer></script>
 <script src="js/ui.panels.js" defer></script>
 <script src="js/ui.output.js" defer></script>
 <script src="js/ui.chart.js" defer></script>
+<script src="js/ui.cycles.js" defer></script>
 <script src="js/app.js" defer></script>
 
 </body>

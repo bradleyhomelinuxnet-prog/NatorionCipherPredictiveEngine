@@ -17,6 +17,7 @@
   var Panels = root.Ophis.Panels;
   var Output = root.Ophis.Output;
   var Chart = root.Ophis.Chart;
+  var CyclesView = root.Ophis.CyclesView;
   var Ophis = root.Ophis;
 
   var App = { clockTimer: null };
@@ -62,6 +63,9 @@
     Panels.renderEventSettings(hosts.eventSettings);
     Panels.renderOperations(hosts.operations);
     Panels.renderFilters(hosts.filters);
+    // Cycle echoes are read off the results before anything that shows them is drawn.
+    CyclesView.refresh();
+    CyclesView.renderPanel(hosts.cycles);
     Panels.renderChartOptions(hosts.chartOptions);
     Output.render(hosts.output);
     Output.renderDetail(hosts.detail);
@@ -290,6 +294,7 @@
         Store.commit("sort");
       }
     });
+    CyclesView.bind(hosts.cycles);
     UI.on(hosts.output, "click", ".z-row", function (e, target) {
       var pill = e.target.closest("[data-op-hash]");
       var key = target.getAttribute("data-z-key");
@@ -298,6 +303,10 @@
       Store.notify("selection");
     });
     UI.on(hosts.output, "click", '[data-action="export-csv"]', function () { App.exportCsv(); });
+    UI.on(hosts.output, "click", "[data-unfilter]", function (e, target) {
+      Store.currentEvent()[target.getAttribute("data-unfilter")] = false;
+      Store.commit("filters");
+    });
     UI.on(hosts.detail, "click", '[data-action="close-detail"]', function () {
       Store.selection.zKey = null;
       Store.selection.operationHash = null;
@@ -346,6 +355,7 @@
       try { win.focus(); } catch (e) { /* some browsers refuse focus; harmless */ }
     });
     UI.on(toolbar, "click", '[data-action="about"]', function () { App.about(); });
+    UI.on(toolbar, "click", '[data-action="backtest"]', function () { CyclesView.openBacktest(); });
 
     document.getElementById("file-input").addEventListener("change", function (domEvent) {
       var file = domEvent.target.files && domEvent.target.files[0];
@@ -493,6 +503,7 @@
       eventSettings: document.getElementById("panel-event"),
       operations: document.getElementById("panel-operations"),
       filters: document.getElementById("panel-filters"),
+      cycles: document.getElementById("panel-cycles"),
       chartOptions: document.getElementById("chart-options"),
       output: document.getElementById("panel-output"),
       detail: document.getElementById("panel-detail")
