@@ -121,6 +121,7 @@ as it does in this repository and on the published site.
 ```bash
 node web/tests/unit.node.js                              # behaviour tests
 node web/tests/cycles.node.js                            # cycle echoes and the backtest; chance figures checked by simulation
+node web/tests/browser.js                                # the page in headless Chromium: dialogs, tooltips, focus, sticky bars, touch, theme, phone width
 node web/tests/parity.node.js                            # differential against the original v12 engine
 node web/tests/parity.node.js --fuzz 500 --seed 138      # plus 500 random events, reproducibly
 ```
@@ -130,8 +131,9 @@ compares both engines field by field over 29 fixtures, including every `.oph` in
 the repository; `--fuzz N` adds N randomised events, and `--seed` makes them
 repeatable. Current state: all pass, with one named and fully-explained
 divergence. See [docs/PARITY.md](docs/PARITY.md). GitHub Actions runs the unit
-tests, the cycle tests and the seeded fuzz run on every push
-(`.github/workflows/tests.yml`).
+tests, the cycle tests, the seeded fuzz run and the browser test on every push
+(`.github/workflows/tests.yml`). The browser test needs Playwright with
+Chromium (`npm i playwright && npx playwright install --with-deps chromium`).
 
 The same behaviour tests run in the browser at `web/tests/index.html`, which
 also has a box for trying formulas — including injection payloads — by hand.
