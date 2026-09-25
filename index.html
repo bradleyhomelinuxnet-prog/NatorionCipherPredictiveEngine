@@ -9,7 +9,12 @@
 <meta property="og:title" content="Natorion Cipher">
 <meta property="og:description" content="Seed the dates. Cast the numbers. Read what survives. A front-end rebuild of the Ophis v12 engine with the Chronicon.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="natorion/docs/cipher.png">
+<meta property="og:url" content="https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/">
+<meta property="og:image" content="https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/docs/cipher.png">
+<meta property="og:image:alt" content="The Cipher screen: X-Dates, the timeline and ranked Z-Dates">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#08080d">
+<link rel="canonical" href="https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%2308080d' stroke='%23d8a943' stroke-width='3'/%3E%3Cpath d='M32 8 L32 56 M14 20 L50 44 M50 20 L14 44' stroke='%23f3d27a' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23d3402f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -115,6 +120,7 @@
     <div class="hero-shot"><img src="natorion/docs/cipher.png" alt="The Cipher screen: X-Dates on the left, the timeline and ranked Z-Dates on the right" width="1200" height="760"></div>
   </header>
 
+  <main>
   <section id="what">
     <div class="sec-no">I · What it is</div>
     <h2>Two or more dates in, the dates they point to out</h2>
@@ -165,14 +171,18 @@
     <h2>Where it came from</h2>
     <p>Ophis v12 is an offline Electron app whose source ships un-obfuscated. This repository took it apart as a white-box study of <code>.exe</code> packaging and Electron attack surface, found the code-execution hole in its shared preset files, and then rebuilt the engine so that hole cannot exist. The write-up is the portfolio piece; the app is the proof.</p>
     <p>The original is here too: the v12 <code>.exe</code>'s own code, unchanged, running in your browser with a small stand-in for Electron. It behaves exactly like the desktop program, including that hole, so open only <code>.oph</code> files you trust.</p>
+    <p><b>Ophis Web</b> sits between the two: the same v12 engine rewritten as a plain web page with a new interface and without the Chronicon. It parses formulas instead of running them as code, and its own test runs it side by side with the original. The <b>Hardened Engine Lab</b> shows the fix on a single page: the original <code>new Function()</code> path and the safe parser, fed the same formulas and the same attack strings. The <b>single-file build</b> is an earlier ground-up rebuild of Ophis in one self-contained HTML file.</p>
     <div class="cta" style="justify-content:flex-start">
       <a class="btn ghost" href="ophis/index.html">Open the original Ophis v12</a>
       <a class="btn ghost" href="web/index.html">Open Ophis Web</a>
       <a class="btn ghost" href="Ophis_v12_ReverseEngineering_Report.html">Read the reverse-engineering report</a>
+      <a class="btn ghost" href="Ophis_v12_Hardened_Engine_Lab.html">Open the Hardened Engine Lab</a>
+      <a class="btn ghost" href="OPHIS-Natorion-Cipher.html">Open the single-file build</a>
       <a class="btn ghost" href="https://github.com/bradleyhomelinuxnet-prog/NatorionCipherPredictiveEngine#readme">The case study on GitHub</a>
     </div>
     <p class="mirror"><b>19</b> · 91 &nbsp;·&nbsp; <b>138</b> · 831 &nbsp;·&nbsp; seed · cast · read · read · cast · seed</p>
   </section>
+  </main>
 
   <footer>
     Ophis is a study instrument after the work of Jason Breshears (Archaix). Natorion studies and rebuilds the software; it makes no claim that the projections predict anything. Not affiliated with Archaix.

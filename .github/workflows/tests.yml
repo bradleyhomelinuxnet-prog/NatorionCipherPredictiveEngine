@@ -20,7 +20,9 @@ concurrency:
 
 jobs:
   natorion:
-    runs-on: ubuntu-latest
+    # Pinned: Playwright's --with-deps installs system packages by distro name,
+    # so the browser test should not change OS under us when ubuntu-latest moves.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5

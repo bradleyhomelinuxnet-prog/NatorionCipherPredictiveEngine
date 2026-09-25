@@ -2,7 +2,7 @@
 
 ## Preface
 
-This document extends the main reverse-engineering report with three targeted deep-dives requested by the reader: a complete end-to-end trace of the compute cycle for a representative event, a mathematical reference for all sixteen default operations, and an exhaustive analysis of the three MSRF filter arrays. Each part stands alone but shares terminology, constants, and source-file citations with the others; read together they cover the full path from `runOphisOnEvent` entry to scored Z-Date output.
+This document extends the main reverse-engineering report with three targeted deep-dives: a complete end-to-end trace of the compute cycle for a representative event, a mathematical reference for all sixteen default operations, and an exhaustive analysis of the three MSRF filter arrays. Each part stands alone but shares terminology, constants, and source-file citations with the others; read together they cover the full path from `runOphisOnEvent` entry to scored Z-Date output.
 
 ## Part I — End-to-end Compute Trace
 
@@ -10,7 +10,7 @@ This document extends the main reverse-engineering report with three targeted de
 
 **Scenario:** `Test-Bitcoin-Halving-Cycle` — MARKETS, DAYS scope, Dallas (32.8, -96.8), X1=2012-11-28, X2=2016-07-09, GTE_V8 scoring, all 16 default operations at weight 1.0.
 
-Note on operation count: the source at `src/ophis_model__params.js` (`DEFAULT_OPHIS_OPERATIONS`) actually declares **15** operations — 14 legacy operations plus the new Hepta-Cycle operation. Per the prompt's stipulation, we treat all 16 as enabled at weight 1.0; where the 16th would be, we use the `OPH_HEP` operation `X1+YxOPH_HEP` (declared but shipped with `enabled = OPERATION_ENABLED_FALSE` at `src/ophis_model__params.js` line for op #16). Under the GTE_V8 clone path (`cloneDefaultOperationsForAppVersionGte8`, same file) all ops are force-enabled and both `OPERATION_EQUATION_FOR_RADIUS_PROJECTION` and `OPERATION_EQUATION_FOR_ORIGINAL_BETA_PHI_6` are re-weighted to ALPHA (1.0). For this trace we assume the prompt's "all 16 at weight 1.0" — i.e. every operation is ALPHA.
+Note on operation count: the source at `src/ophis_model__params.js` (`DEFAULT_OPHIS_OPERATIONS`) actually declares **15** operations — 14 legacy operations plus the new Hepta-Cycle operation. For this addendum we treat all 16 as enabled at weight 1.0; where the 16th would be, we use the `OPH_HEP` operation `X1+YxOPH_HEP` (declared but shipped with `enabled = OPERATION_ENABLED_FALSE` at `src/ophis_model__params.js` line for op #16). Under the GTE_V8 clone path (`cloneDefaultOperationsForAppVersionGte8`, same file) all ops are force-enabled and both `OPERATION_EQUATION_FOR_RADIUS_PROJECTION` and `OPERATION_EQUATION_FOR_ORIGINAL_BETA_PHI_6` are re-weighted to ALPHA (1.0). For this trace we assume the prompt's "all 16 at weight 1.0" — i.e. every operation is ALPHA.
 
 ---
 
@@ -588,7 +588,7 @@ var MSRF_FILTER__NORMAL = [
 
 ### Count
 
-Physically there are 277 slots as written (276 literal integers + `HIGHEST_MSRF_NUMBER`). The prompt's "276 integers" count matches the literal-integer entries; the trailing symbolic constant makes it 277 in `MSRF_FILTER__NORMAL.length`.
+Physically there are 277 slots as written (276 literal integers + `HIGHEST_MSRF_NUMBER`). The commonly quoted "276 integers" count matches the literal-integer entries; the trailing symbolic constant makes it 277 in `MSRF_FILTER__NORMAL.length`.
 
 ---
 
