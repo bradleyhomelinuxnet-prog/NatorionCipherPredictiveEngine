@@ -365,6 +365,12 @@
    * test allows (web/tests/cycles.node.js checks this). The verdicts hardly
    * move between 30 and 90 days; 60 holds a representative stretch of
    * projections while still following how their density changes.
+   *
+   * One known limit: when events are only weeks apart, the top-N figure is a
+   * little generous. Noise with gaps of 30 days on average was called "above
+   * chance" in about 7% of 960 series, not 5%, while the any-hit figure stayed
+   * fair. A window scaled to the typical gap between the events would correct
+   * it.
    */
   var LOCAL_CONTROL_DAYS = 60;
   Cycles.LOCAL_CONTROL_DAYS = LOCAL_CONTROL_DAYS;
