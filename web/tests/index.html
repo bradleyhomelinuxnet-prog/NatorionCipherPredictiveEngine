@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ophis Web · tests</title>
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self' file:; style-src 'self' file:; img-src 'self' file: data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<link rel="stylesheet" href="../css/app.css">
+<link rel="stylesheet" href="tests.css">
+</head>
+<body class="tests-page">
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">&#9737;</span>
+    <span class="brand-text"><b>OPHIS</b><span class="brand-sub">test runner</span></span>
+  </div>
+  <div class="spacer"></div>
+  <div class="toolbar">
+    <a class="btn" href="../index.html">&larr; Back to the app</a>
+  </div>
+</header>
+
+<main class="tests-main">
+
+  <section class="panel">
+    <header class="panel-head"><h2>Results</h2><span class="spacer"></span><span id="summary" class="panel-note">running…</span></header>
+    <div id="results"></div>
+  </section>
+
+  <section class="panel">
+    <header class="panel-head"><h2>Try a formula</h2></header>
+    <p class="panel-hint">
+      Anything inside the grammar computes with Y&nbsp;=&nbsp;1656. Anything outside it &mdash; a global, a
+      constructor, a function call &mdash; is a syntax error, never code. This is the same parser the app uses.
+    </p>
+    <div class="try-row">
+      <input id="try-input" type="text" spellcheck="false" value="X2+oph_flip(oph_round(Y/OPH_PHI))" aria-label="Formula to test">
+      <button class="btn primary" id="try-run">Evaluate</button>
+    </div>
+    <div id="try-out" class="try-out"></div>
+    <div class="try-presets">
+      <span class="panel-note">try:</span>
+      <button class="btn small ghost preset">X2+oph_round(Y)</button>
+      <button class="btn small ghost preset">X1+YxOPH_HEP</button>
+      <button class="btn small ghost preset">X2+oph_round(Y/19)x19</button>
+      <button class="btn small ghost preset">X2+oph_flip(Y)+138</button>
+      <button class="btn small ghost preset danger">X2+constructor.constructor("return 1")()</button>
+      <button class="btn small ghost preset danger">X2+globalThis</button>
+      <button class="btn small ghost preset danger">X2+0;alert(1)</button>
+    </div>
+  </section>
+
+</main>
+
+<script src="../../lib/astronomy.browser.min.js" defer></script>
+<script src="../../lib/tz_lookup_oss.js" defer></script>
+<script src="../js/ophis.constants.js" defer></script>
+<script src="../js/ophis.expr.js" defer></script>
+<script src="../js/ophis.time.js" defer></script>
+<script src="../js/ophis.engine.js" defer></script>
+<script src="../js/ophis.file.js" defer></script>
+<script src="unit.js" defer></script>
+<script src="runner.js" defer></script>
+
+</body>
+</html>
