@@ -25,6 +25,8 @@
   var REFIT_REASONS = ["boot", "import", "events", "dates", "reset", "event-settings"];
 
   var hosts = {};
+  // How much of the top of the page the sticky bars cover (keepClearOfBars).
+  var barsCover = 0;
 
   /* ====================================================================== */
   /* Render                                                                 */
@@ -73,7 +75,7 @@
     // A freshly picked Z-Date should be readable without hunting for it.
     if (reason === "selection" && Store.selection.zKey && hosts.detail.classList.contains("open")) {
       var box = hosts.detail.getBoundingClientRect();
-      if (box.top > window.innerHeight - 80 || box.bottom < 80) {
+      if (box.top > window.innerHeight - 80 || box.bottom < barsCover + 80) {
         hosts.detail.scrollIntoView({ block: "nearest", behavior: "smooth" });
       }
     }
@@ -545,10 +547,11 @@
   /* ====================================================================== */
 
   /**
-   * The sticky bars cover the top of the page, and the top bar grows as it
-   * wraps on a narrow screen. Tell the browser how much they cover, so a
-   * field reached by keyboard, or a panel scrolled into view, lands below
-   * them rather than underneath.
+   * The sticky bars cover the top of the page. The top bar grows as it wraps
+   * on a narrow screen, and neither bar sticks on a short one (app.css), so
+   * measure how much they cover and keep it current. app.css turns it into
+   * scroll padding, so a field reached by keyboard, or a panel scrolled into
+   * view, lands below the bars rather than underneath.
    */
   function keepClearOfBars() {
     var bars = [document.querySelector(".topbar"), hosts.status].filter(Boolean);
@@ -558,15 +561,16 @@
         var style = window.getComputedStyle(bar);
         if (style.position === "sticky") covered = Math.max(covered, (parseFloat(style.top) || 0) + bar.offsetHeight);
       });
-      document.documentElement.style.scrollPaddingTop = covered ? (covered + 8) + "px" : "";
+      barsCover = covered;
+      document.documentElement.style.setProperty("--bars-cover", covered ? (covered + 8) + "px" : "0px");
     }
     measure();
     if (window.ResizeObserver) {
       var observer = new window.ResizeObserver(measure);
       bars.forEach(function (bar) { observer.observe(bar); });
-    } else {
-      window.addEventListener("resize", measure);
     }
+    // A change of height alone does not resize the bars, but can unstick them.
+    window.addEventListener("resize", measure);
   }
 
   App.boot = function () {

@@ -68,6 +68,15 @@
 /* body grows with the page: a body pinned to the screen height would carry
    the sticky bars off the top once the page scrolls past one screen. */
 html { height: 100%; }
+/* app.js measures how much of the top of the page the sticky bars cover
+   (--bars-cover), so a field reached by keyboard, or a panel scrolled into
+   view, lands below them. A control in a sticky bar is on screen already, so
+   focusing one must not scroll the page. */
+html { scroll-padding-top: var(--bars-cover, 0px); }
+html:has(.topbar:focus-within) { scroll-padding-top: 0; }
+@media not all and (max-width: 900px) {
+  html:has(.statusbar:focus-within) { scroll-padding-top: 0; }
+}
 body {
   margin: 0;
   background: var(--bg);
@@ -624,6 +633,12 @@ body.dropping::after {
   .date-rows.with-time .date-row { grid-template-columns: 24px minmax(0, 1fr) 62px 16px 22px 22px; }
   .date-rows.with-time .date-row .weekday { display: none; }
   .table-scroll { max-height: none; }
+}
+
+/* On a short screen, such as a phone on its side or a page zoomed far in,
+   the bars would fill much of it; there they scroll away with the page. */
+@media (max-height: 500px) {
+  .topbar, .statusbar { position: static; }
 }
 
 @media (prefers-reduced-motion: reduce) {

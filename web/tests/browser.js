@@ -70,6 +70,8 @@ const focusFromUnderBars = (page, selector) => page.evaluate(sel => {
   const hit = document.elementFromPoint(box.left + Math.min(box.width / 2, 20), box.top + box.height / 2);
   return field === hit || field.contains(hit);
 }, selector);
+const scrollY = page => page.evaluate(() => Math.round(window.scrollY));
+const toFoot = page => page.evaluate(() => { window.scrollTo(0, document.documentElement.scrollHeight); return Math.round(window.scrollY); });
 // Waits up to two seconds for a condition in the page, so a slow machine gets
 // the time it needs; a condition that never comes true still fails its check.
 const settle = (page, condition, arg) => page.waitForFunction(condition, arg, { timeout: 2000 }).then(() => true, () => false);
@@ -231,6 +233,21 @@ async function main() {
     });
     check("the top bar and the status bar stay on screen at the foot of the page", bars[0] === 0 && bars[2] === bars[1], bars.join(", "));
     check("a field under the bars comes clear when it takes focus", await focusFromUnderBars(page, "#event-name"));
+    const foot = await toFoot(page);
+    await page.focus('#toolbar [data-action="open"]');
+    for (let i = 0; i < 5; i++) await page.keyboard.press("Tab");
+    check("focus moving along the top bar leaves the page where it was", await scrollY(page) === foot, foot + " -> " + await scrollY(page));
+    await page.evaluate(() => window.scrollTo(0, 600));
+    const about = await (await page.$('[data-action="about"]')).boundingBox();
+    await page.mouse.click(about.x + about.width / 2, about.y + about.height / 2);
+    await page.waitForSelector("#modal.open");
+    await page.keyboard.press("Escape");
+    check("…and so does closing a dialog opened from it", await scrollY(page) === 600, await scrollY(page));
+    await page.evaluate(() => document.activeElement.blur());
+    await page.setViewportSize({ width: 700, height: 900 });
+    const followed = await settle(page, () => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) >=
+      document.querySelector(".topbar").getBoundingClientRect().bottom);
+    check("when the window narrows and the top bar wraps, fields still come clear of it", followed && await focusFromUnderBars(page, "#event-name"));
 
     await ctx.close();
     ({ ctx, page } = await fresh(browser));
@@ -293,6 +310,29 @@ async function main() {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     check("no sideways scroll at 390 px", overflow <= 0, overflow + " px");
     check("a field under the taller top bar comes clear when it takes focus", await focusFromUnderBars(page, "#event-name"));
+    await toFoot(page);
+    const phoneBar = await page.evaluate(() => Math.round(document.querySelector(".topbar").getBoundingClientRect().top));
+    check("the top bar stays on screen at the foot of the page", phoneBar === 0, phoneBar);
+    // A Z-Date is open; the table is scrolled so its details (above the table)
+    // sit under the bar; another Z-Date is picked from the table. The page draws
+    // in between, as it would for a person, and nothing holds focus (the app
+    // gives focus back after a redraw, which would scroll).
+    await page.evaluate(() => { document.activeElement.blur(); document.querySelectorAll(".z-row")[0].click(); });
+    await settle(page, () => document.getElementById("panel-detail").classList.contains("open"));
+    await page.evaluate(() => {
+      const detail = document.getElementById("panel-detail");
+      window.scrollTo(0, detail.getBoundingClientRect().top + window.scrollY + 120);
+      return new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done)));
+    });
+    await page.evaluate(() => document.querySelectorAll(".z-row")[1].click());
+    const detailShown = await settle(page, () => document.getElementById("panel-detail").getBoundingClientRect().top >=
+      document.querySelector(".topbar").getBoundingClientRect().bottom - 1);
+    check("a Z-Date picked from the table shows its details below the bar", detailShown,
+      await page.evaluate(() => Math.round(document.getElementById("panel-detail").getBoundingClientRect().top)));
+    await page.setViewportSize({ width: 844, height: 390 });
+    await toFoot(page);
+    const shortBar = await page.evaluate(() => Math.round(document.querySelector(".topbar").getBoundingClientRect().bottom));
+    check("on a screen too short for them, the bars scroll away with the page", shortBar <= 0, shortBar);
     await ctx.close();
 
     check("no page errors, console errors or failed requests", errors.length === 0, errors.slice(0, 5).join(" | "));
