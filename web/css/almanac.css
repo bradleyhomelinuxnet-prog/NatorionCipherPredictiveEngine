@@ -192,6 +192,11 @@ body {
 :root[data-theme="light"] textarea:focus { background: #fff; }
 
 /* The operations column is wide enough now to show a whole formula. */
+/* The Chronicon link sits among the toolbar buttons and must look like one. */
+a.btn { text-decoration: none; display: inline-flex; align-items: center; line-height: 1.5; }
+.chron-link { color: var(--cyan); border-color: color-mix(in srgb, var(--cyan) 45%, transparent); }
+.chron-link:hover { color: var(--cyan); border-color: var(--cyan); }
+
 .operation-row { grid-template-columns: 26px minmax(0, 1fr) 50px 16px 22px; }
 .operation-input { font-size: 12px; }
 

@@ -335,6 +335,16 @@
       });
     });
     UI.on(toolbar, "click", '[data-action="theme"]', function () { App.toggleTheme(); });
+    // The Chronicon opens as a separate window sized to sit beside this one, and
+    // a second click brings that same window forward rather than opening another.
+    // If a blocker refuses the window, the link itself still opens it in a tab.
+    UI.on(toolbar, "click", '[data-action="chronicon"]', function (event, link) {
+      var win = window.open(link.href, link.target, "popup=yes,width=1280,height=860");
+      if (!win) return;
+      event.preventDefault();
+      try { win.opener = null; } catch (e) { /* cross-origin already: nothing to clear */ }
+      try { win.focus(); } catch (e) { /* some browsers refuse focus; harmless */ }
+    });
     UI.on(toolbar, "click", '[data-action="about"]', function () { App.about(); });
 
     document.getElementById("file-input").addEventListener("change", function (domEvent) {
