@@ -82,9 +82,10 @@
   /* Phase instants within about a day of each date. A date stands for its
      whole day, so the window is centred on its noon: ±1.5 days from noon is
      "the day before, the day, or the day after". v12 used a mean-lunation
-     approximation sampled once a day; these are the true instants. */
+     approximation sampled once a day; these are the true instants.
+     The cost follows the number of dates, not the span between them. */
   function moonPhasesNear(datesMs, wanted) {
-    var A = astro(), found = new Map();
+    var A = astro(), found = [];
     if (!A) return [];
     datesMs.forEach(function (d) {
       var mid = d + DAY / 2;
@@ -93,12 +94,22 @@
           var t = A.SearchMoonPhase(ph.lon, new Date(mid - 1.5 * DAY), 3);
           if (t) {
             var ms = t.date.getTime();
-            if (Math.abs(ms - mid) <= 1.5 * DAY) found.set(ph.key + ms, { kind: "moon", phase: ph, ms: ms });
+            if (Math.abs(ms - mid) <= 1.5 * DAY) found.push({ kind: "moon", phase: ph, ms: ms });
           }
         } catch (e) { /* out of range */ }
       });
     });
-    return Array.from(found.values()).sort(function (a, b) { return a.ms - b.ms; });
+    // Neighbouring dates find the same phase, up to a fraction of a second
+    // apart (each search starts elsewhere). A phase recurs every 29.5 days, so
+    // two finds of one phase less than a day apart are one event: keep the first.
+    found.sort(function (a, b) { return a.ms - b.ms; });
+    var last = {};
+    return found.filter(function (f) {
+      var prev = last[f.phase.key];
+      if (prev !== undefined && f.ms - prev < DAY) return false;
+      last[f.phase.key] = f.ms;
+      return true;
+    });
   }
 
   /* Every phase instant between two times, for the chosen phases. */

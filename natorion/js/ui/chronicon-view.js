@@ -8,8 +8,11 @@
   var era = "ce", ledgerFilter = "all", ticker = null, now0 = new Date();
   var SVGNS = "http://www.w3.org/2000/svg";
 
+  // The dial runs from 9999 BC to 9999 CE, as the Year box says. A larger
+  // year is pulled back to 9999: far enough out, the moon cannot be computed.
   function astro() {
-    var y = Math.max(1, Math.abs(parseInt($("chYear").value, 10) || 1));
+    var typed = Math.abs(parseInt($("chYear").value, 10) || 1), y = Math.min(NC.C.MAX_YEAR, Math.max(1, typed));
+    if (typed > NC.C.MAX_YEAR) { $("chYear").value = y; D.toast("The dial runs from " + NC.C.MAX_YEAR + " BC to " + NC.C.MAX_YEAR + " CE.", true); }
     return era === "bc" ? 1 - y : y;
   }
   function md() {
@@ -182,7 +185,7 @@
     $("chToday").addEventListener("click", function () { now0 = new Date(); setAstro(now0.getFullYear(), now0.getMonth() + 1, now0.getDate()); });
     $("chToX").addEventListener("click", function () {
       var a = astro(), p = md();
-      if (a < 1) { NC.dom.toast("X-Dates run from 1 CE to 9999 CE.", true); return; }
+      if (a < 1 || a > NC.C.MAX_YEAR) { NC.dom.toast("X-Dates run from 1 CE to " + NC.C.MAX_YEAR + " CE.", true); return; }
       var date = T.pad(p.m) + "/" + T.pad(p.d) + "/" + a;
       S.change(function (e) { e.x_dates = (e.x_dates || []).concat([{ date: date, time: "00:00", enabled: true }]); });
       NC.cipher.renderDates("x");

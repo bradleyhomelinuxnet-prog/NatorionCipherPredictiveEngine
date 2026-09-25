@@ -169,13 +169,16 @@
     (e.x_dates || []).forEach(function (x) { if (x.enabled === true) { var m = T.inputDateToMs(e, x); if (m !== null) dates.push(m); } });
     if (!dates.length) return [];
     dates.sort(function (a, b) { return a - b; });
-    var key = dates[0] + ":" + dates[dates.length - 1] + ":" + dates.length;
+    // The Marks column shows new and full moons; the timeline, the phases switched on.
+    var wanted = NC.sky.PHASES.filter(function (ph) { return ph.key === "new" || ph.key === "full" || C.fieldOn(e, ph.field); });
+    var key = wanted.map(function (ph) { return ph.key; }).join() + "|" + dates.join();
     if (astroCache.key !== key) {
-      var t0 = dates[0] - 3 * DAY, t1 = dates[dates.length - 1] + 3 * DAY, list = [];
-      if (t1 - t0 < 400 * 365.25 * DAY) list = NC.sky.moonPhasesBetween(t0, t1);
+      // Search around each date, not through every lunation from the first
+      // date to the last: with dates centuries apart that took seconds.
+      var t0 = dates[0] - 3 * DAY, t1 = dates[dates.length - 1] + 3 * DAY, list = NC.sky.moonPhasesNear(dates, wanted);
       var E = NC.sky.eclipses();
       E.solar.concat(E.lunar).forEach(function (x) { if (x.ms >= t0 && x.ms <= t1) list.push(x); });
-      astroCache = { key: key, list: list, dates: dates };
+      astroCache = { key: key, list: list };
     }
     return astroCache.list.map(function (a) {
       var tol = a.kind === "eclipse" ? C.ECLIPSE_TOLERANCE_DAYS * DAY : 1.5 * DAY, lo = 0, hi = dates.length - 1, near = false;
@@ -361,6 +364,8 @@
   function addFromZ(t, kind) {
     var zone = S.state.results.zone, d = T.msToInputDate(t.start, zone);
     if (hh()) d = T.msToInputDate(t.end - 60000, zone);   // inside the window, before its closing sunset
+    var y = +d.date.split("/")[2];
+    if (!(y >= 1 && y <= C.MAX_YEAR)) { D.toast(d.date + " is outside the years X- and T-Dates can hold (1 to " + C.MAX_YEAR + ").", true); return; }
     S.change(function (e) { var k = kind === "x" ? "x_dates" : "t_dates"; e[k] = (e[k] || []).concat([d]); });
     renderDates(kind);
     D.toast("Added " + d.date + " as a" + (kind === "x" ? "n X" : " T") + "-Date.");

@@ -191,7 +191,7 @@
   ];
   C.CHART_LAYERS = [
     field("chart_option__show_chart", "Chart", "Show the timeline.", true),
-    field("chart_option__show_dates", "Date labels", "Label X- and Z-Dates on the timeline.", true),
+    field("chart_option__show_dates", "Z labels", "Label each Z-Date on the timeline (Z1, Z2 …). X-Date labels always show.", true),
     field("chart_option__show_new_moons", "New moon", "New moons within a day of any X- or Z-Date.", false),
     field("chart_option__show_first_quarter_moons", "First quarter", "First quarters within a day of any X- or Z-Date.", false),
     field("chart_option__show_full_moons", "Full moon", "Full moons within a day of any X- or Z-Date.", false),

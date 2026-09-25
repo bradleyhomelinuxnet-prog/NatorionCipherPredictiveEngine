@@ -15,13 +15,32 @@
   var hoverKey = null;
   var M = { l: 14, r: 14, t: 18, axis: 54, lane: 26 };
 
-  function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#d8a943"; }
+  // While printing, colours come from a hidden element that carries the light
+  // palette (dark ink): at "beforeprint" the page itself still has its screen colours.
+  var printing = false, lightInk = null;
+  function css(name) {
+    var from = document.documentElement;
+    if (printing) {
+      if (!lightInk) { lightInk = document.createElement("div"); lightInk.className = "light-ink"; lightInk.hidden = true; document.body.appendChild(lightInk); }
+      from = lightInk;
+    }
+    return getComputedStyle(from).getPropertyValue(name).trim() || "#d8a943";
+  }
 
   function init(canvas, tipEl, on) {
     cv = canvas; ctx = cv.getContext("2d"); tip = tipEl;
     handlers.select = on.select || handlers.select; handlers.open = on.open || handlers.open;
     var ro = new ResizeObserver(function () { resize(); draw(); });
     ro.observe(cv.parentNode);
+    // The colours come from CSS variables, so redraw whenever those change
+    // without a resize: printing (dark ink on white) and the OS switching
+    // between light and dark.
+    root.addEventListener("beforeprint", function () { printing = true; draw(); });
+    root.addEventListener("afterprint", function () { printing = false; draw(); });
+    if (root.matchMedia) ["print", "(prefers-color-scheme: light)"].forEach(function (q) {
+      var mq = root.matchMedia(q), redraw = function () { draw(); };
+      if (mq.addEventListener) mq.addEventListener("change", redraw); else if (mq.addListener) mq.addListener(redraw);
+    });
     wire();
     resize();
   }

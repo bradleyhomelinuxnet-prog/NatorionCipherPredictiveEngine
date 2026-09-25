@@ -118,7 +118,9 @@
     return ev;
   }
 
-  /* text -> { events, errors, warnings, appVersion } */
+  /* text -> { events, errors, warnings, appVersion, empty }. `empty` is true
+     when the document held no events and LOOSE started a fresh Event 1 (as
+     v12 did); the app refuses such a document instead of opening it. */
   function parse(text, mode) {
     mode = mode || V.LOOSE;
     var errors = [], warnings = [], data;
@@ -136,7 +138,7 @@
     if (createFresh) { warnings.push("No events found; started a fresh Event 1."); events = [newEvent("Event 1")]; }
     else if (Array.isArray(list)) list.forEach(function (ev, i) { var n = normalizeEvent(ev, i, mode, errors, warnings); if (n) events.push(n); });
     if (errors.length) return { events: null, errors: errors, warnings: warnings, appVersion: appVersion };
-    return { events: events, errors: [], warnings: warnings, appVersion: appVersion };
+    return { events: events, errors: [], warnings: warnings, appVersion: appVersion, empty: createFresh };
   }
 
   /* events -> .oph text. Minify drops everything equal to its default, as

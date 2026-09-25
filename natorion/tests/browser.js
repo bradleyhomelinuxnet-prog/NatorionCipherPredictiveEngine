@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /* Browser test: drives the real app in headless Chromium through Playwright
    and checks what a person would do with it — every screen, the projection,
-   opening a v12 file, pasting dates, editing operations, the Chronicon
-   bridge, exports, HH:MM scope, persistence, the timeline and phone width.
+   opening a v12 file (and refusing one with no events), managing events,
+   pasting dates, editing operations, the Chronicon bridge, the skip link,
+   exports, HH:MM scope, persistence, the timeline and phone width.
 
      node natorion/tests/browser.js                 # run the checks
      node natorion/tests/browser.js --shots out/    # also save screenshots
@@ -56,6 +57,9 @@ async function prepare(ctx) {
   // Start the browser's clock on the date the checks assume; time still moves on from there.
   if (ctx.clock && ctx.clock.install) await ctx.clock.install({ time: new Date("2026-09-23T12:00:00") });
 }
+// A dialog the next step expects (a RegExp its message must match). It is
+// accepted once; any other dialog counts as an error.
+let expectDialog = null;
 function watchErrors(page, bucket) {
   page.on("pageerror", e => bucket.push("pageerror: " + e.message));
   page.on("console", m => {
@@ -63,7 +67,11 @@ function watchErrors(page, bucket) {
     if (FONT_HOSTS.test((m.location() && m.location().url) || "")) return;
     bucket.push("console: " + m.text() + " @ " + ((m.location() && m.location().url) || ""));
   });
-  page.on("dialog", d => { bucket.push("dialog: " + d.type() + " " + d.message()); d.accept(); });
+  page.on("dialog", d => {
+    if (expectDialog && expectDialog.test(d.message())) expectDialog = null;
+    else bucket.push("dialog: " + d.type() + " " + d.message());
+    d.accept();
+  });
 }
 
 // Wait until the engine has run after the last change: the status line
@@ -166,6 +174,25 @@ async function main() {
     check("a v12 file can be added after them", names.length === 4 && names[2] === "Six anchors", names.join(" | "));
     check("the added event is the open one", (await page.evaluate(() => NC.store.state.current)) === 2);
     await page.click('#openHowSeg button[data-v="replace"]');
+    // A document with no events is refused: Loose checking would otherwise put
+    // a blank Event 1 in place of the three events open here.
+    const doc = () => page.evaluate(() => JSON.stringify(NC.store.state.events) + "|" + NC.store.state.current);
+    const docBefore = await doc(), reportBefore = await text(page, "#importReport");
+    await page.setInputFiles("#fileInput", { name: "no-events.json", mimeType: "application/json", buffer: Buffer.from('{"app_version":"12","iso_events":[]}') });
+    await page.waitForFunction(t => document.getElementById("importReport").textContent.replace(/\s+/g, " ").trim() !== t, reportBefore, { timeout: 10000 });
+    await page.waitForTimeout(500);   // past the 400 ms save delay
+    const refusal = await text(page, "#importReport");
+    check("a document with no events is refused, and nothing changes", /holds no events/.test(refusal) && (await doc()) === docBefore, refusal);
+    // Duplicating or deleting an event above the open one leaves that event open.
+    const opened = () => page.evaluate(() => ({ names: NC.store.state.events.map(e => e.name).join(" | "), open: NC.store.event().name, picker: document.getElementById("eventSelect").selectedOptions[0].textContent }));
+    await page.click('#eventsBody tr:nth-child(1) button:has-text("Duplicate")');
+    const dup = await opened();
+    check("duplicating an event above the open one keeps it open", dup.names === "Event 1 | Event 1 copy | Event 2 | Six anchors" && dup.open === "Six anchors" && dup.picker === "Six anchors", JSON.stringify(dup));
+    expectDialog = /^Delete “Event 1 copy”\?/;
+    await page.click('#eventsBody tr:nth-child(2) button:has-text("Delete")');
+    await settle(page);
+    const del = await opened();
+    check("… and so does deleting one", !expectDialog && del.names === "Event 1 | Event 2 | Six anchors" && del.open === "Six anchors" && del.picker === "Six anchors", JSON.stringify(del));
     await page.selectOption("#eventSelect", "0");
     await go(page, "cipher");
     await settle(page);
@@ -240,6 +267,11 @@ async function main() {
     await page.click('#ledgerSeg button[data-k="phx"]');
     const kinds = await page.$$eval("#ledgerBody .dot", d => d.map(x => x.className));
     check("the ledger filters to Phoenix rows", kinds.length > 0 && kinds.every(k => /d-phx/.test(k)), kinds.length);
+    // The skip link goes to #main, which is not a screen: it must not switch screens.
+    await page.focus("a.skip");
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(200);
+    check("the skip link keeps the Chronicon screen", await page.evaluate(() => location.hash === "#main" && document.querySelector('.screen[data-active="true"]').dataset.screen === "chronicon"));
     await shot(page, "chronicon-2040", { fullPage: true });
 
     console.log("exports");
@@ -306,6 +338,14 @@ async function main() {
     await settle(page);
     check("events survive a reload", (await page.evaluate(() => NC.store.state.events.length)) === evCount);
     check("the place survives a reload", (await page.inputValue("#evLat")) === "29.98");
+    // Opened at an address fragment that is not a screen, the app shows the saved screen.
+    await go(page, "guide");
+    await page.evaluate(() => NC.store.persistNow());   // the screen is kept with the next save
+    await page.goto("about:blank");
+    await page.goto(PAGE + "#main");
+    await settle(page);
+    check("opened at #main, the app shows the saved screen", await page.evaluate(() => document.querySelector('.screen[data-active="true"]').dataset.screen === "guide" && location.hash === "#guide"));
+    await go(page, "cipher");
     const bgBefore = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     await page.click("#themeBtn");
     check("the theme button switches to light, and the page changes", await page.evaluate(b => document.documentElement.dataset.theme === "light" && getComputedStyle(document.body).backgroundColor !== b, bgBefore));
@@ -326,6 +366,13 @@ async function main() {
       check("no sideways scroll on " + s + " at 390 px", on === s && w <= 390, on + " " + w);
       await shot(mp, "phone-" + s);
     }
+    // Files is the widest screen; hold it to a smaller phone too.
+    await mp.setViewportSize({ width: 375, height: 812 });
+    await mp.goto(PAGE + "#files");
+    await mp.waitForTimeout(400);
+    const on375 = await mp.evaluate(() => (document.querySelector('.screen[data-active="true"]') || {}).dataset.screen);
+    const w375 = await mp.evaluate(() => document.documentElement.scrollWidth);
+    check("no sideways scroll on files at 375 px", on375 === "files" && w375 <= 375, on375 + " " + w375);
     await phone.close();
 
     check("no page errors in the whole run", errors.length === 0, errors.join("\n"));

@@ -45,7 +45,7 @@ const MUTANTS = [
   ["phoenix-residue", "js/chronicon/chronicon.js", "var PHX = { residue: 108,", "var PHX = { residue: 107,"],
   ["clocks-frozen", "js/ui/chronicon-view.js", "ticker = setInterval(tick, 1000);", "ticker = null;"],
   ["bridge-month-off", "js/ui/chronicon-view.js", "setAstro(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());", "setAstro(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());"],
-  ["hash-listener-gone", "js/ui/app.js", 'root.addEventListener("hashchange", function () { go(location.hash.slice(1), true); });', ""],
+  ["hash-listener-gone", "js/ui/app.js", 'root.addEventListener("hashchange", function () { var h = location.hash.slice(1); if (SCREENS.indexOf(h) >= 0) go(h, true); });', ""],
   ["select-noop", "js/ui/app.js", "S.select(parseInt(this.value, 10));", "S.scheduleRun(true);"],
   ["msrf-sets-empty", "js/ui/app.js", 'D.fill($("msrfSets"), [p("Vortex, within 0.1", C.MSRF_VORTEX), p("Important", C.MSRF_IMPORTANT), p("Normal", C.MSRF_NORMAL)]);', 'D.fill($("msrfSets"), [p("Vortex, within 0.1", []), p("Important", []), p("Normal", [])]);']
 ];
