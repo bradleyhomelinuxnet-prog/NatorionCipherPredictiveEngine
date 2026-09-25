@@ -11,7 +11,7 @@ The `.exe` is an Electron app. All of its logic lives in `resources/app.asar`. T
 
 | Part of the exe | What it does | In this folder |
 |---|---|---|
-| `ophis.html` | The page and its script loader | `index.html`, with three small additions (below) |
+| `ophis.html` | The page and its script loader | `index.html`, with four small additions (below) |
 | `src/*.js`, `src/ophis.css` | The whole app: engine, screens, chart, export | Copied **byte-for-byte** |
 | `lib/*` | Third-party libraries (Chart.js, Leaflet, moment, jsPDF…) | Only the libraries `ophis.html` loads, copied byte-for-byte except line 1 of `suncalc.js` (below) |
 | `img/*` | Icons, moon/eclipse symbols, offline world-map tiles | Copied byte-for-byte |
@@ -43,8 +43,9 @@ Only three things are new.
   calls `init()` once the page has loaded. What a web page needs on top of that is listed under
   *What cannot be the same in a browser*.
 - **`src/browser_bridge.css`** styles that menu bar.
-- **`index.html`** differs from `ophis.html` in three small places. It declares UTF-8, it loads the
-  two bridge files, and it hands the last script tag to the bridge so `init()` runs last.
+- **`index.html`** differs from `ophis.html` in four small places. It declares UTF-8 and the page's
+  language (`lang="en"`, which screen readers need), it loads the two bridge files, and it hands the
+  last script tag to the bridge so `init()` runs last.
 
 ## Running it
 
