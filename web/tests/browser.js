@@ -122,6 +122,14 @@ async function main() {
     await page.keyboard.press("Escape");
     const back = await page.evaluate(() => document.activeElement && document.activeElement.getAttribute("data-action"));
     check("Tab stays inside a dialog, and focus returns when it closes", inside && back === "new", inside + " " + back);
+    await page.focus('[data-action="clear-x"]');
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Escape");
+    const backToPanel = await page.evaluate(() => document.activeElement && document.activeElement.getAttribute("data-action"));
+    check("…also for a dialog opened from a panel, whose buttons are redrawn", backToPanel === "clear-x", backToPanel);
+    await page.evaluate(() => { Ophis.Store.selection.zKey = Ophis.Store.results.z_keys_sorted[0]; Ophis.Store.notify("selection"); });
+    await page.keyboard.press("Escape");
+    check("outside a dialog, Escape still clears the selected Z-Date", await page.evaluate(() => Ophis.Store.selection.zKey) === null);
 
     // Each section starts from a fresh page, so one failure cannot cascade.
     await ctx.close();
@@ -206,6 +214,11 @@ async function main() {
       await settle(page, () => Ophis.Store.globalOptions.local_time_offset_in_millis === 0);
     }
     check("reset works while the field has focus, with a real press", !!reset && await offset(page) === 0, await offset(page));
+    await page.evaluate(() => Ophis.Store.setNowOffset(7 * 864e5));
+    await page.focus('[data-action="reset-now"]');
+    await page.evaluate(() => Ophis.App.renderStatus());   // what the 30-second clock tick does
+    check("the reset button keeps keyboard focus when the clock ticks",
+      await page.evaluate(() => document.activeElement.getAttribute("data-action")) === "reset-now");
 
     await ctx.close();
     ({ ctx, page } = await fresh(browser));

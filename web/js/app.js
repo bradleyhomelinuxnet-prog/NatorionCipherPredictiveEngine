@@ -88,10 +88,12 @@
   };
 
   App.renderStatus = function () {
-    // Rebuilding the bar would throw the Current time field away mid-edit and
-    // send its caret back to the month; it catches up when the field is left.
+    // Rebuilding the bar would throw away whatever in it has focus: the
+    // Current time field mid-edit, sending its caret back to the month, or the
+    // reset button, dropping keyboard focus to the page. The bar catches up
+    // when focus leaves it.
     var active = document.activeElement;
-    if (active && active.id === "now-date") return;
+    if (active && hosts.status.contains(active)) return;
     var event = Store.currentEvent();
     var results = Store.results;
     var offset = Store.globalOptions.local_time_offset_in_millis;
@@ -339,7 +341,7 @@
       var todayUtc = T.floorToUtcMidnight(new Date()).getTime();
       Store.setNowOffset(wanted - todayUtc);
     });
-    // renderStatus() leaves the bar alone while the date field has focus, and
+    // renderStatus() leaves the bar alone while anything in it has focus, and
     // catches up when focus leaves the bar. Moving between the field and the
     // reset button is not leaving it, or the button would be rebuilt under the
     // pointer and its click lost.
@@ -352,9 +354,9 @@
     // field with no relatedTarget.
     UI.on(hosts.status, "mousedown", '[data-action="reset-now"]', function (e) { e.preventDefault(); });
     UI.on(hosts.status, "click", '[data-action="reset-now"]', function (e, target) {
-      var field = document.getElementById("now-date");
       var fromKeyboard = document.activeElement === target;
-      if (field && document.activeElement === field) field.blur();   // so the bar redraws now
+      // Let go of focus in the bar, or renderStatus() would not redraw it now.
+      if (hosts.status.contains(document.activeElement)) document.activeElement.blur();
       Store.setNowOffset(0);
       // The button is gone after the redraw; keep keyboard focus in the bar.
       var again = fromKeyboard && document.getElementById("now-date");
@@ -421,7 +423,10 @@
         domEvent.preventDefault(); document.getElementById("file-input").click(); return;
       }
       if (typing) return;
-      if (domEvent.key === "Escape") {
+      // Escape in a dialog belongs to the dialog (ui.dom.js), which closes and
+      // gives focus back. Clearing the selection as well would redraw the
+      // panels first and throw away the button that focus goes back to.
+      if (domEvent.key === "Escape" && !document.querySelector("#modal.open")) {
         Store.selection.zKey = null;
         Store.selection.operationHash = null;
         Store.notify("selection");
