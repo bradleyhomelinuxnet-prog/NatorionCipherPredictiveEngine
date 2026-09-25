@@ -34,12 +34,14 @@
     var alpha = Engine.isAlpha(operation);
 
     var anchorLabel = UI.label("X", result.operation.anchor === C.STARTING_X1 ? yStruct.x_1_ordinal : yStruct.x_2_ordinal);
-    var display = Expr.display(operation.equation)
-      .replace("X1", anchorLabel).replace("X2", anchorLabel);
+    // The formula is text and is escaped once; the anchor label is markup
+    // (X<sub>3</sub>) and goes in after that, so it is not escaped with it.
+    var formula = Expr.display(operation.equation);
+    var display = UI.esc(formula).replace("X1", anchorLabel).replace("X2", anchorLabel);
 
     // The same formula with Y and the constants filled in, so the arithmetic
     // can be checked by eye — this is what the desktop tooltip shows too.
-    var withY = display.split("+").slice(1).join("+").replace(/Y/g, UI.decimal(yStruct.rotation_count_y));
+    var withY = formula.split("+").slice(1).join("+").replace(/Y/g, UI.decimal(yStruct.rotation_count_y));
     Object.keys(C.CONSTANT_VALUES).forEach(function (name) {
       withY = withY.split(name).join("" + C.CONSTANT_VALUES[name]);
     });
@@ -50,7 +52,7 @@
       ["Type", '<span class="' + (alpha ? "alpha" : "beta") + '">' + (alpha ? "Alpha" : "Beta") + " operation</span>"],
       ["Label", UI.label("O", result.operation_ordinal)],
       ["Pair", UI.label("X", yStruct.x_1_ordinal) + " → " + UI.label("X", yStruct.x_2_ordinal)],
-      ["Formula", "Z-Date = " + UI.esc(display)],
+      ["Formula", "Z-Date = " + display],
       ["Y", UI.label("X", yStruct.x_1_ordinal) + " → " + UI.label("X", yStruct.x_2_ordinal) + " = " + UI.days(yStruct.rotation_count_y)],
       ["Z-Value", UI.esc(withY) + " = " + UI.days(result.z_value)],
       ["Z", anchorLabel + " → Z-Date = " + UI.days(result.rotation_count_z)],
