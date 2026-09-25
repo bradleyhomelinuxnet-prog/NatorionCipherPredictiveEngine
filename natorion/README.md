@@ -1,8 +1,8 @@
-# Natorion Cipher — README for dummies
+# Natorion Cipher — Quick start
 
 **Natorion Cipher** is a date-projection tool that runs in your web browser. You give it two or more dates that matter to you; it counts the days between them, runs those counts through sixteen number formulas, and lists the future dates they point to, strongest first. It also includes **the Chronicon**, a page of live clocks, long historical cycles, the moon, and nineteen calendars.
 
-It rebuilds **Ophis v12** (the Windows desktop app also called PSYFR) as a plain web page. Nothing to install, no account, no internet needed after the first open, and nothing leaves your computer.
+It rebuilds **Ophis v12** (the Windows desktop app also called PSYFR) as a plain web page. Nothing to install, no account, and nothing leaves your computer. Opened from a copy of its folder, it needs no internet at all.
 
 > The full manual, with every button explained, is in **[MANUAL.md](MANUAL.md)**.
 
@@ -24,7 +24,7 @@ Works in Chrome, Edge, Firefox and Safari, on a computer, tablet or phone.
 
 **If double-clicking opens a text editor instead:** right-click `index.html` → **Open with** → choose your browser.
 
-**If you have no internet:** it still works. The fancy fonts just fall back to plain ones.
+**If you have no internet:** open it from the folder. It works fully offline; the fancy fonts just fall back to plain ones. (The web address needs a connection to load.)
 
 ---
 
@@ -94,7 +94,7 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 | "At least 2 X-Dates are required." | Add a second date, and make sure both have their tick box ticked. |
 | "X2 must come after X1." | Put your dates in order, oldest first (use the ↑ button). |
 | "Every projection was filtered out." | Open **Filters** on the left and untick **Before today** or raise **Beyond N days**. |
-| A red formula on the Operations screen | That formula has a typo. Hover over it or read the red message under it. |
+| A red formula on the Operations screen | That formula has a mistake. The red message under it says what it is. |
 | My work disappeared | You were probably in a private window or cleared the browser. Open your last saved `.oph` file. |
 | HH:MM mode is slow | It calculates real sunsets for your location, which takes a moment. Days mode is instant. |
 
@@ -105,7 +105,7 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 - Pure front end: `index.html` + `css/` + `js/`. No build step, no server, no framework. Works from `file://`.
 - The engine re-derives the Ophis v12 source in this repo (`../src`). **`tests/parity.js`** runs the original v12 code and this engine side by side on the sample files and on randomly generated events — Days and HH:MM scope, T-Dates, every filter, disabled and unreadable dates, both scoring systems, all five sorts, extra and duplicate operations, "today" placed inside the date range — comparing every Z-Date, score, hit count, MSRF match and contributing operation. Last runs: **1,003 of 1,003** identical (seed 138) and **403 of 403** (seed 19). The one known class of difference is time-zone *data*: v12 ships 2023 zone rules, the browser's are current, so a place whose rules changed since (Kazakhstan moved to UTC+5 in 2024) shows local times an hour apart in HH:MM scope while the instants and scores still match.
 - **`tests/self-check.js`** runs 34 checks without the original source.
-- **`tests/browser.js`** drives the real app in headless Chromium: every screen, a known projection with a known score, opening v9 and v12 files, pasting dates, editing operations, the Chronicon bridge and Dossier, the three exports, HH:MM scope, persistence across a reload, the timeline, and phone width with no sideways scrolling. It fails on any script error and on any unexpected dialog. 64 checks.
+- **`tests/browser.js`** drives the real app in headless Chromium: every screen, a known projection with a known score, opening v9 and v12 files, refusing a document with no events, duplicating and deleting events around the open one, pasting dates, editing operations, the Chronicon bridge and Dossier, the skip link, the three exports, HH:MM scope, persistence across a reload, the timeline, and phone widths with no sideways scrolling. It fails on any script error and on any unexpected dialog. 70 checks.
 - **`tests/mutants.js`** proves the browser test can fail: it breaks the app in 30 deliberate ways (a save that drops every X-Date, a CSV with no rows, a frozen clock, a chart that draws nothing, sunsets at midnight, a parser that lets names through …) and runs the browser test against each. It catches 29; the thirtieth is a CSS rule that other rules already make redundant.
 - Formulas are parsed by a small grammar. They are never executed as code, which closes the code-execution hole in v12's shared `.oph` files. Nothing from a file is ever inserted into the page as HTML.
 
@@ -114,7 +114,7 @@ cd natorion
 npm install && npm run setup:browser   # once: Playwright + Chromium (with system libraries), for the browser test only
 npm test                               # self-check + browser test
 npm run test:mutants                   # can the browser test fail? (30 deliberate breaks)
-npm run test:parity                    # original v12 vs rebuild (needs ../src and ../lib)
+npm run test:parity                    # original v12 vs rebuild (needs ../src, ../lib and the three sample .oph files in the repo root)
 node tests/browser.js --shots shots/   # browser test, saving a screenshot of every step
 ```
 

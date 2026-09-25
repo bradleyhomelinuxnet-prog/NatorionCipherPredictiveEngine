@@ -6,6 +6,22 @@
 <title>Natorion Cipher</title>
 <meta name="description" content="Natorion Cipher: a front-end rebuild of the Ophis v12 date-projection engine, joined to the Chronicon calendrics and clocks.">
 <meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#08080d" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3ede0" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Natorion Cipher">
+<meta property="og:title" content="Natorion Cipher">
+<meta property="og:description" content="A front-end rebuild of the Ophis v12 date-projection engine, joined to the Chronicon calendrics and clocks. It runs entirely in your browser.">
+<meta property="og:url" content="https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/">
+<meta property="og:image" content="https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/docs/cipher.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="760">
+<meta property="og:image:alt" content="The Cipher screen: X-Dates on the left, the timeline and ranked Z-Dates on the right">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Natorion Cipher">
+<meta name="twitter:description" content="A front-end rebuild of the Ophis v12 date-projection engine, joined to the Chronicon calendrics and clocks. It runs entirely in your browser.">
+<meta name="twitter:image" content="https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/docs/cipher.png">
+<meta name="twitter:image:alt" content="The Cipher screen: X-Dates on the left, the timeline and ranked Z-Dates on the right">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%2308080d' stroke='%23d8a943' stroke-width='3'/%3E%3Cpath d='M32 8 L32 56 M14 20 L50 44 M50 20 L14 44' stroke='%23f3d27a' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23d3402f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,7 +79,7 @@
             <p class="hint">In HH:MM scope a day runs sunset to sunset at this place, and each Z-Date is the window between two sunsets.</p>
           </div>
           <div id="dayStartBox" class="field"><span>Day begins at (UTC)</span>
-            <input id="evDayStart" type="time" step="60" value="00:00">
+            <input id="evDayStart" type="time" step="60" value="00:00" aria-label="Day begins at (UTC)">
           </div>
         </div>
 
@@ -191,7 +207,7 @@
         </div>
         <div class="panel">
           <h2>Grammar</h2>
-          <p>Numbers, <code>Y</code>, the constants, <code>+ − * / % ^</code> and brackets. A lower-case <code>x</code> means multiply. Functions: <code>oph_round</code>, <code>oph_flip</code> (reverse the digits), <code>oph_sqrt</code>, <code>oph_abs</code>, <code>oph_floor</code>, <code>oph_ceil</code>, <code>oph_log</code>, <code>oph_exp</code>, <code>oph_sin</code>, <code>oph_cos</code>, <code>oph_tan</code>.</p>
+          <p>Numbers, <code>Y</code>, the constants, <code>+ - * / % ^</code> and brackets. A lower-case <code>x</code> means multiply. Functions: <code>oph_round</code>, <code>oph_flip</code> (reverse the digits), <code>oph_sqrt</code>, <code>oph_abs</code>, <code>oph_floor</code>, <code>oph_ceil</code>, <code>oph_log</code>, <code>oph_exp</code>, <code>oph_sin</code>, <code>oph_cos</code>, <code>oph_tan</code>.</p>
           <p class="hint">Equations are parsed, never executed as code, so a shared file cannot smuggle anything in.</p>
         </div>
       </div>
@@ -288,7 +304,7 @@
             <li><b>Nemesis X Object</b> — <span class="k">792 years</span>, sixty inside Sol and seven-hundred-thirty-two without. It is currently outside; <span class="live" data-live="toNemesis">—</span> years to the 2046 return.</li>
             <li><b>Anunnaki NER</b> — the <span class="k">600-year</span> epochs; 762 CE falls exactly on the 6000th NER year, as your work has it.</li>
             <li><b>Mayan Long-Count</b> — the thirteen baktuns, closing at 13.0.0.0.0 in 2046.</li>
-            <li><b>The Moon</b> — drawn on the Metonic <span class="k">19-year</span> cycle (235 lunations), woundable back beyond 2843 BC.</li>
+            <li><b>The Moon</b> — drawn on the Metonic <span class="k">19-year</span> cycle (235 lunations), and can be wound back beyond 2843 BC.</li>
           </ul>
           <p>Every anchor lands clean. 2022 CE returns AM 5916; the Great Flood returns AM 1656; the moon reads near-full for the night of 30 May 2026, as it truly was. The same twenty years separate 2026 from the 2046 Nemesis return and from the close of the Long-Count — the wheels agree with one another.</p>
         </details>
@@ -377,7 +393,7 @@
             <div class="panel"><div class="big-num">666</div><h3>A perfect palindrome</h3><p>First stone (AM 990) to the Flood (AM 1656). Reads the same from either shore.</p></div>
             <div class="panel"><div class="big-num">1080</div><h3>Capstone = Moon's radius</h3><p>AM 1080, and the Moon's radius in miles, and 3 × 360.</p></div>
             <div class="panel"><div class="big-num">138</div><h3>The Phoenix lattice</h3><p>×3 = 414, ×4 = 552, ×46 = 6348 — the world the Stone rose inside.</p></div>
-            <div class="panel"><div class="big-num">19</div><h3>The Metonic moon</h3><p>235 lunations to the year — and the same 12.368 hidden in the 440-cubit base. 19 and 91 mirror; so do 138 and 831.</p></div>
+            <div class="panel"><div class="big-num">19</div><h3>The Metonic moon</h3><p>235 lunations in 19 years, 12.368 to the year — the same 12.368 hidden in the 440-cubit base. 19 and 91 mirror; so do 138 and 831.</p></div>
           </div>
         </details>
 
@@ -409,7 +425,7 @@
           <p>Beneath the six cosmological wheels the Engine carries a second tier: a wall of world <b>calendars</b> that re-read whatever moment the dial is set to, living clocks led by Cairo time on the Giza plateau — and, at its head, the <b>Anunna reckoning</b> as you restore it.</p>
           <h3>The šar is a day, not a year</h3>
           <p>Your load-bearing correction: the Sumerian <b>šar</b> was never a "year." The earliest records counted it as a <span class="k">day</span> — more exactly, <em>a turning of the stars about the eye of the dragon</em>. That single move collapses the Anunna reigns from hundreds of thousands of years into mere centuries, and it makes every old-world calendar a <b>day-count</b> system sharing one architecture of 12 and 144.</p>
-          <p>So the Engine's Anunna clock counts <b>turnings</b> — literal days — since Year One of the Pre-Flood world, AM 1 (3895 BC), and reads them back in the Draconian measures:</p>
+          <p>So the Engine's Anunna clock counts <b>turnings</b> — literal days — since Year One of the Pre-Flood world (1 January 3895 BC, where the Annus Mundi count starts), and reads them back in the Draconian measures:</p>
           <ul>
             <li>1 <b>Draconian year</b> = <span class="k">360</span> turnings — the 360-day pre-Flood orbit.</li>
             <li>1 <b>NER</b> = 600 Draconian years = <span class="k">216,000</span> turnings.</li>
@@ -477,7 +493,7 @@
             <button type="button" class="ghost" id="saveSheet">Results .xls</button>
             <button type="button" class="ghost" id="printBtn">Print</button>
           </div>
-          <details><summary>Document text</summary><textarea id="docText" rows="10" readonly spellcheck="false"></textarea>
+          <details><summary>Document text</summary><textarea id="docText" rows="10" readonly spellcheck="false" aria-label="Document text"></textarea>
             <button type="button" class="ghost" id="copyDoc">Copy</button></details>
         </div>
       </div>
@@ -506,7 +522,7 @@
     <article class="page prose">
       <p class="eyebrow">What the numbers mean</p>
       <h1 id="h-guide" tabindex="-1">Guide</h1>
-      <p class="lede">The short version. Every button is explained in <b>MANUAL.md</b>, and <b>README.md</b> gets you going in two minutes; both are in the <code>natorion</code> folder.</p>
+      <p class="lede">The short version. Every button is explained in the <a href="https://github.com/bradleyhomelinuxnet-prog/NatorionCipherPredictiveEngine/blob/main/natorion/MANUAL.md" rel="noopener" target="_blank">manual</a>, and the <a href="https://github.com/bradleyhomelinuxnet-prog/NatorionCipherPredictiveEngine/blob/main/natorion/README.md" rel="noopener" target="_blank">README</a> gets you going in two minutes.</p>
 
       <h2>The loop</h2>
       <ol>
@@ -555,7 +571,7 @@
   <form method="dialog">
     <h2 id="pasteTitle">Paste X-Dates</h2>
     <p class="hint">One date per line or separated by commas: <code>07/04/2026</code>, <code>2026-07-04</code>, or with a time <code>07/04/2026 18:30</code>. A file-name style list like <code>7-4-26-8-20-26</code> works too.</p>
-    <textarea id="pasteDates" rows="8" spellcheck="false"></textarea>
+    <textarea id="pasteDates" rows="8" spellcheck="false" aria-label="Dates to paste"></textarea>
     <label class="check"><input type="checkbox" id="pasteReplace" checked> <span>Replace the current X-Dates</span></label>
     <div class="row-tools end"><button value="cancel" class="ghost">Cancel</button><button value="ok" id="pasteOk">Add dates</button></div>
   </form>
