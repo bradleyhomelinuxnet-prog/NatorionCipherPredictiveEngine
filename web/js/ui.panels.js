@@ -24,14 +24,18 @@
     if (parts.length !== 3) return "";
     var month = parseInt(parts[0], 10), day = parseInt(parts[1], 10), year = parseInt(parts[2], 10);
     if (isNaN(month) || isNaN(day) || isNaN(year)) return "";
-    // <input type="date"> needs four year digits: 999 must be written 0999.
-    return ("000" + year).slice(-4) + "-" + T.pad2(month) + "-" + T.pad2(day);
+    // <input type="date"> needs at least four year digits: 999 must be
+    // written 0999. A longer year (a .oph can hold 12026) stays whole.
+    var yyyy = year < 1000 ? ("000" + year).slice(-4) : "" + year;
+    return yyyy + "-" + T.pad2(month) + "-" + T.pad2(day);
   }
 
+  /* Written as the app writes every date: 0033, not 33 (the desktop app
+     reads the two alike). */
   function fromInputDate(value) {
     var parts = ("" + (value || "")).split("-");
     if (parts.length !== 3) return "";
-    return T.pad2(parseInt(parts[1], 10)) + "/" + T.pad2(parseInt(parts[2], 10)) + "/" + parseInt(parts[0], 10);
+    return T.formatDateParts({ year: parseInt(parts[0], 10), month: parseInt(parts[1], 10), day: parseInt(parts[2], 10) });
   }
 
   P.toInputDate = toInputDate;

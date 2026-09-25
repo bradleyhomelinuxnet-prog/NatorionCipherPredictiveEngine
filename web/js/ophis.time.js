@@ -159,12 +159,14 @@
     catch (e) { return "UTC"; }
   };
 
-  /* Offset (ms) of a timezone at a given instant. */
+  /* Offset (ms) of a timezone at a given instant. Intl writes the year 0
+     (1 BC) as "1" with the era "BC", so the era is read as well: without it
+     the year 0000 came out as 6 BC. */
   function zoneOffsetMillis(utcMillis, timeZone) {
     var dtf = zoneOffsetMillis._cache[timeZone];
     if (!dtf) {
       dtf = new Intl.DateTimeFormat("en-US", {
-        timeZone: timeZone, hour12: false,
+        timeZone: timeZone, hour12: false, era: "short",
         year: "numeric", month: "2-digit", day: "2-digit",
         hour: "2-digit", minute: "2-digit", second: "2-digit"
       });
@@ -172,8 +174,10 @@
     }
     var p = {};
     dtf.formatToParts(new Date(utcMillis)).forEach(function (part) { p[part.type] = part.value; });
+    var year = parseInt(p.year, 10);
+    if (/^B/.test(p.era || "")) year = 1 - year;   // 1 BC is the year 0, 2 BC the year -1
     var asUtc = T.utcMillis(
-      parseInt(p.year, 10), parseInt(p.month, 10) - 1, parseInt(p.day, 10),
+      year, parseInt(p.month, 10) - 1, parseInt(p.day, 10),
       parseInt(p.hour, 10) % 24, parseInt(p.minute, 10), parseInt(p.second, 10)
     );
     return asUtc - utcMillis;

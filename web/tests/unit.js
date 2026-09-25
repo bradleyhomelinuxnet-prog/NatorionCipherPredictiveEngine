@@ -332,6 +332,30 @@
       assert.eq(T.daysInMonth(4, 2), 29, "4 AD is a leap year on the proleptic Gregorian calendar");
       assert.eq(T.formatUtcDateOnly(T.floorToUtcMidnight(new Date(T.utcMillis(99, 11, 31, 18)))), "12/31/0099");
     });
+
+    test("the year 0 keeps its era through a timezone", function () {
+      // Intl writes the year 0 as "1" with the era "BC". Read without the era,
+      // the offset came out years wide and 01/01/0000 12:00 in New York
+      // landed in 6 BC. Tokyo at 00:30 is still the day before in UTC, so
+      // that case also reads an instant in the year -1.
+      [["America/New_York", 12, 0], ["Asia/Tokyo", 0, 30]].forEach(function (c) {
+        var millis = T.wallTimeToUtcMillis(0, 1, 1, c[1], c[2], c[0]);
+        assert.ok(Math.abs(T.zoneOffsetMillis(millis, c[0])) < C.MILLIS_PER_DAY, c[0] + ": the offset is hours, not years");
+        var w = T.utcMillisToWallTime(millis, c[0]);
+        assert.deep([w.year, w.month, w.day, w.hours, w.minutes], [0, 1, 1, c[1], c[2]], c[0] + " round trip");
+      });
+    });
+
+    test("the date fields read and write four-digit years", function () {
+      var P = Ophis.Panels;
+      assert.eq(P.toInputDate("02/14/0033"), "0033-02-14");
+      assert.eq(P.toInputDate("02/14/33"), "0033-02-14", "a short year is padded for the field");
+      assert.eq(P.toInputDate("07/04/2026"), "2026-07-04");
+      assert.eq(P.toInputDate("07/04/12026"), "12026-07-04", "a five-digit year is not cut to 2026");
+      assert.eq(P.fromInputDate("0033-02-14"), "02/14/0033", "written back with four digits");
+      assert.eq(P.fromInputDate("2026-07-04"), "07/04/2026");
+      assert.eq(P.fromInputDate(""), "", "a cleared field gives nothing, and the old date stays");
+    });
   });
 
   /* ====================================================================== */

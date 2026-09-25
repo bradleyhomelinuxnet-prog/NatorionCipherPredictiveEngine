@@ -146,10 +146,13 @@ refused, not the exact sentence.
 Both builds accept a year of up to four digits, so `02/14/0033` is a valid
 X-Date. The desktop app then projects it as **2033**: its date library reads
 a year below 100 as two digits. This build projects it as the year 33, and
-writes such years back with four digits (`0033`). Every fixture and every
-random event in the parity run is dated well after year 99, so the two
-engines still agree on all of them; `web/tests/unit.js` pins this build's
-side of the difference.
+writes such years with four digits (`0033`): in the Z-Dates, in the CSV, and
+in any X- or T-Date entered through its date fields. A date read from a file
+keeps the text it had. The desktop app reads `0033`, `033` and `33` alike
+(all as 2033), so the extra digits change nothing when it opens a file saved
+here. Every fixture and every random event in the parity run is dated well
+after year 99, so the two engines still agree on all of them;
+`web/tests/unit.js` pins this build's side of the difference.
 
 ---
 
