@@ -65,7 +65,9 @@
 
 /* ----------------------------------------------------------------- reset */
 * { box-sizing: border-box; }
-html, body { height: 100%; }
+/* body grows with the page: a body pinned to the screen height would carry
+   the sticky bars off the top once the page scrolls past one screen. */
+html { height: 100%; }
 body {
   margin: 0;
   background: var(--bg);

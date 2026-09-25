@@ -539,6 +539,31 @@
   /* Boot                                                                   */
   /* ====================================================================== */
 
+  /**
+   * The sticky bars cover the top of the page, and the top bar grows as it
+   * wraps on a narrow screen. Tell the browser how much they cover, so a
+   * field reached by keyboard, or a panel scrolled into view, lands below
+   * them rather than underneath.
+   */
+  function keepClearOfBars() {
+    var bars = [document.querySelector(".topbar"), hosts.status].filter(Boolean);
+    function measure() {
+      var covered = 0;
+      bars.forEach(function (bar) {
+        var style = window.getComputedStyle(bar);
+        if (style.position === "sticky") covered = Math.max(covered, (parseFloat(style.top) || 0) + bar.offsetHeight);
+      });
+      document.documentElement.style.scrollPaddingTop = covered ? (covered + 8) + "px" : "";
+    }
+    measure();
+    if (window.ResizeObserver) {
+      var observer = new window.ResizeObserver(measure);
+      bars.forEach(function (bar) { observer.observe(bar); });
+    } else {
+      window.addEventListener("resize", measure);
+    }
+  }
+
   App.boot = function () {
     hosts = {
       eventBar: document.getElementById("event-bar"),
@@ -563,6 +588,7 @@
     Chart.attach(document.getElementById("chart-canvas"));
     Store.subscribe(App.render);
     wire();
+    keepClearOfBars();
 
     Store.recalculate();
     App.render("boot");

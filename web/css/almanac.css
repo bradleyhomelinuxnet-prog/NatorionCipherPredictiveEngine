@@ -91,8 +91,8 @@ body {
 :root[data-theme="light"] ::selection { background: var(--gold); color: var(--paper-ink); }
 
 /* ------------------------------------------------------------ chrome */
-/* body is a flex column pinned to the viewport height, so its bars must not
-   be allowed to shrink when the page is taller than the screen. */
+/* body is a flex column at least one screen tall; the bars keep their own
+   height and the layout takes the rest. */
 .topbar { height: 58px; padding: 0 18px; flex: 0 0 auto; }
 .statusbar { top: 58px; padding: 7px 20px; flex: 0 0 auto; }
 .appfoot { flex: 0 0 auto; }
