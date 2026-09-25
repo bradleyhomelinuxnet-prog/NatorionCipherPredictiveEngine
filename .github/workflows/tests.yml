@@ -1,9 +1,9 @@
 # Runs every test suite on every push and pull request.
 #   natorion — the stand-alone self-check, the browser test in headless
 #              Chromium, and the parity test against the original Ophis v12 source.
-#   web      — Ophis Web's unit tests, and its differential test against the
-#              same original engine, plus 500 random events (seeded, so a
-#              failure reproduces).
+#   web      — Ophis Web's unit tests, the cycle-echo and backtest tests, and
+#              its differential test against the same original engine, plus
+#              500 random events (seeded, so a failure reproduces).
 name: Tests
 
 on:
@@ -48,5 +48,7 @@ jobs:
           node-version: 22
       - name: Unit tests
         run: node web/tests/unit.node.js
+      - name: Cycle echoes and backtest
+        run: node web/tests/cycles.node.js
       - name: Parity with the original v12 engine, plus 500 random events
         run: node web/tests/parity.node.js --fuzz 500 --seed 138 --quiet

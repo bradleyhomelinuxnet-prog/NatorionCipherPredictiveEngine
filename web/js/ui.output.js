@@ -81,6 +81,35 @@
 
   /* -------------------------------------------------------------- render */
 
+  /**
+   * When every Z-Date is filtered out, say which filter is doing it. Each
+   * enabled filter (and the T-Date restriction) is switched off on a copy of
+   * the event in turn, and the one that brings back the most is named, with a
+   * button that turns it off. Reading only: the event itself is not touched
+   * until the button is pressed.
+   */
+  function whatIsHiding(event, results) {
+    if (!results || !results.total_z_dates) return "";
+    var now = Store.nowInstant();
+    var best = null;
+    function trial(mutate, label, action) {
+      var copy = JSON.parse(JSON.stringify(event));
+      mutate(copy);
+      var shown = Engine.run(copy, { nowInstant: now }).z_keys_sorted.length;
+      if (shown > 0 && (!best || shown > best.shown)) best = { shown: shown, label: label, action: action };
+    }
+    C.FILTERS.forEach(function (f) {
+      if (!Engine.filterEnabled(event, f.key)) return;
+      trial(function (copy) { copy[f.key] = false; }, f.id + " \u00b7 Hide " + f.label.replace("{n}", "N"), 'data-unfilter="' + f.key + '"');
+    });
+    if ((event.t_dates || []).some(function (t) { return t.enabled === true; })) {
+      trial(function (copy) { copy.t_dates = []; }, "the T-Dates (only Z-Dates on a T-Date are shown)", "");
+    }
+    if (!best) return '<p class="empty-why muted">No single filter explains it; several are hiding Z-Dates together.</p>';
+    return '<p class="empty-why">Turning off <b>' + UI.esc(best.label) + '</b> would show <b>' + best.shown + '</b>.' +
+      (best.action ? ' <button class="btn small" ' + best.action + '>Turn it off</button>' : "") + '</p>';
+  }
+
   O.render = function (host) {
     var event = Store.currentEvent();
     var results = Store.results;
@@ -107,7 +136,8 @@
 
     if (!keys.length) {
       host.innerHTML = head + '<p class="empty">' + UI.esc(C.NO_RESULTS_MESSAGE) +
-        ' <span class="muted">' + results.total_z_dates + ' were generated before filtering.</span></p>';
+        ' <span class="muted">' + results.total_z_dates + ' were generated before filtering.</span></p>' +
+        whatIsHiding(event, results);
       return;
     }
 
@@ -149,6 +179,7 @@
           (event.scope === C.EVENT_SCOPE__HH_MM
             ? '<span class="z-date-end">→ ' + UI.esc(zStruct.z_readable_end) + '</span>'
             : '<span class="z-meta">' + UI.esc(weekday) + " · " + (daysOut === 0 ? "today" : (daysOut > 0 ? "in " + daysOut + "d" : Math.abs(daysOut) + "d ago")) + '</span>') +
+          (root.Ophis.CyclesView ? root.Ophis.CyclesView.tagFor(key) : "") +
         '</td>' +
         '<td class="num col-hits">' + zStruct.hit_count + '</td>' +
         '<td class="num col-score"><span class="score heat-' + heatStep(zStruct.score, results) + '">' + zStruct.score + '</span></td>' +
