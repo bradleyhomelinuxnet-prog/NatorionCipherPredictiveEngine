@@ -23,12 +23,15 @@
           i === st.current ? el("span.hint", { text: "open " }) : el("button.ghost", { type: "button", text: "Open", onclick: function () { S.select(i); NC.app.go("cipher"); } }),
           el("button.ghost", { type: "button", text: "Duplicate", onclick: function () {
             var copy = JSON.parse(JSON.stringify(e)); copy.name = (e.name || "Event") + " copy";
-            st.events.splice(i + 1, 0, copy); S.persist(); S.emit("switch"); renderEvents();
+            // The copy goes in below row i; the open event keeps its place in the list.
+            st.events.splice(i + 1, 0, copy); if (st.current > i) st.current++;
+            S.persist(); S.emit("switch"); renderEvents();
           } }),
           el("button.ghost.danger", { type: "button", text: "Delete", disabled: st.events.length < 2, onclick: function () {
             if (!confirm("Delete “" + (e.name || "this event") + "”? This cannot be undone.")) return;
+            var cur = st.current;
             st.events.splice(i, 1);
-            S.replaceEvents(st.events, Math.min(st.current, st.events.length - 1)); renderEvents();
+            S.replaceEvents(st.events, i < cur ? cur - 1 : Math.min(cur, st.events.length - 1)); renderEvents();
           } })
         ])
       ]);
@@ -56,6 +59,13 @@
   function load(text, sourceName) {
     var mode = S.state.settings.validation, p = NC.oph.parse(text, mode);
     if (!p.events) { report(false, "Could not open " + (sourceName || "the text") + ":", p.errors); D.toast("That document could not be opened.", true); return false; }
+    // Loose checking would start a blank Event 1 in place of a document with
+    // no events. Opening it would wipe the events here, so refuse it instead.
+    if (p.empty) {
+      report(false, "Nothing opened: " + (sourceName || "the text") + " holds no events.", ["An .oph document keeps its events in an \"iso_events\" list, and this one has none. Your events here are unchanged."]);
+      D.toast("That document holds no events. Nothing was changed.", true);
+      return false;
+    }
     var append = S.state.settings.openHow === "append";
     if (append) S.replaceEvents(S.state.events.concat(p.events), S.state.events.length);
     else S.replaceEvents(p.events, 0);
@@ -159,8 +169,9 @@
     $("todayOverride").addEventListener("change", function () { S.setSetting("todayOverride", this.value); S.scheduleRun(true); });
     $("autoRun").addEventListener("change", function () { S.setSetting("autoRun", this.checked); });
     $("resetAll").addEventListener("click", function () {
-      if (!confirm("Clear everything this browser remembers and start over with the demo event? Save a .oph first if you want to keep your work.")) return;
+      if (!confirm("Start over? This clears the events and settings this browser remembers (only the light/dark choice stays) and loads the demo event. Save a .oph first if you want to keep your work.")) return;
       try { root.localStorage.removeItem("natorion.v1"); } catch (e) { /* ignore */ }
+      S.resetSettings();
       S.replaceEvents([S.demoEvent()], 0); render(); NC.app.go("cipher");
     });
     // Drag and drop anywhere on the page opens a file.

@@ -17,10 +17,16 @@
     return ev;
   }
 
+  function defaultSettings() {
+    return { theme: "", autoRun: true, todayOverride: "", minify: false, openHow: "replace", validation: C.VALIDATION.LOOSE, fileName: "natorion", screen: "cipher" };
+  }
+  // Settings with a fixed set of values: a saved value outside the set is ignored.
+  var CHOICES = { theme: ["", "light", "dark"], openHow: ["replace", "append"], validation: Object.keys(C.VALIDATION).map(function (k) { return C.VALIDATION[k]; }) };
+
   var state = {
     events: [demoEvent()],
     current: 0,
-    settings: { theme: "", autoRun: true, todayOverride: "", minify: false, openHow: "replace", validation: C.VALIDATION.LOOSE, fileName: "natorion", screen: "cipher" },
+    settings: defaultSettings(),
     results: null,
     selectedKey: null
   };
@@ -34,17 +40,29 @@
         var parsed = NC.oph.parse(JSON.stringify({ app_version: C.APP_VERSION, iso_events: saved.events }), C.VALIDATION.LOOSE);
         if (parsed.events && parsed.events.length) state.events = parsed.events;
       }
-      if (saved && typeof saved.current === "number") state.current = Math.max(0, Math.min(state.events.length - 1, saved.current));
-      if (saved && saved.settings) Object.keys(state.settings).forEach(function (k) { if (saved.settings[k] !== undefined) state.settings[k] = saved.settings[k]; });
+      if (saved && Number.isInteger(saved.current)) state.current = Math.max(0, Math.min(state.events.length - 1, saved.current));
+      // A saved setting is kept only when it has its default's type (and, for
+      // a choice, one of its values); anything else leaves the default.
+      var ss = saved && saved.settings;
+      if (ss && typeof ss === "object") Object.keys(state.settings).forEach(function (k) {
+        var v = ss[k];
+        if (typeof v !== typeof state.settings[k] || (CHOICES[k] && CHOICES[k].indexOf(v) < 0)) return;
+        state.settings[k] = v;
+      });
     } catch (e) { /* private window or corrupt copy: start fresh */ }
   }
 
   var saveTimer = null;
   function persistNow() {
+    clearTimeout(saveTimer); saveTimer = null;
     try { root.localStorage.setItem(KEY, JSON.stringify({ events: state.events, current: state.current, settings: state.settings })); emit("saved", true); }
     catch (e) { emit("saved", false); }
   }
   function persist() { emit("dirty"); clearTimeout(saveTimer); saveTimer = setTimeout(persistNow, 400); }
+  // Save now, but only if a change is still waiting. Leaving the page calls
+  // this, not persistNow(): a second tab holding an older copy must not
+  // overwrite, as it closes, what another tab has saved since.
+  function flush() { if (saveTimer !== null) persistNow(); }
 
   function event() { return state.events[state.current]; }
 
@@ -57,6 +75,13 @@
     if (opts.run !== false) scheduleRun(opts.immediate);
   }
   function setSetting(k, v) { state.settings[k] = v; persist(); emit("settings", k); }
+  // Every setting back to its default except the light/dark choice ("Start over").
+  function resetSettings() {
+    var d = defaultSettings();
+    d.theme = state.settings.theme;
+    Object.keys(d).forEach(function (k) { state.settings[k] = d[k]; });
+    persist();
+  }
 
   function select(i) {
     state.current = Math.max(0, Math.min(state.events.length - 1, i));
@@ -99,8 +124,8 @@
   }
 
   NC.store = {
-    state: state, on: on, emit: emit, load: load, event: event, change: change, setSetting: setSetting,
-    select: select, replaceEvents: replaceEvents, persist: persist, persistNow: persistNow,
+    state: state, on: on, emit: emit, load: load, event: event, change: change, setSetting: setSetting, resetSettings: resetSettings,
+    select: select, replaceEvents: replaceEvents, persist: persist, persistNow: persistNow, flush: flush,
     scheduleRun: scheduleRun, runNow: runNow, nowMs: nowMs, demoEvent: demoEvent
   };
 })(typeof window !== "undefined" ? window : globalThis);

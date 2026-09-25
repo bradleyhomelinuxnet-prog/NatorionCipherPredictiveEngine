@@ -24,6 +24,16 @@
  *   resetProgram       location.reload()
  *   onSignedIn / refreshMenuOptions   enable menu items / tick the checkbox items
  *   logToCli / closeAppWithHeadless*  console only (headless mode is a CLI feature)
+ *
+ * Differences a web page forces on top of that mapping:
+ *
+ *   - The published site shares one origin (and so one localStorage) with the other apps in this
+ *     repository. Reset Program's localStorage.clear() removes only the key Ophis itself uses.
+ *   - The headless_* URL parameters that drive the exe's command-line mode are removed before
+ *     init(): in a browser that mode has nowhere to write and only hangs the page.
+ *   - File pickers need a recent click or key press, so an Open that follows a slow answer to
+ *     "not saved" asks for one more click instead of failing silently.
+ *   - Off-site links in the app's help text open in a new tab instead of replacing the app.
  */
 (function () {
     'use strict';
@@ -31,10 +41,19 @@
     var MENUBAR_HEIGHT_PX = 30;
     var OPH_FILE_TYPES = [{ description: 'OPH Files', accept: { 'application/json': ['.oph'] } }];
 
+    // The only localStorage key the renderer uses: SERIALIZED_FIELD__LOCAL_STORAGE_SAVE_BLOB in
+    // ophis_config.js (read in ophis_main.js, written in ophis_model__persistence.js).
+    var OPHIS_STORAGE_KEY_FALLBACK = 'save_blob';
+
+    // The renderer replaces console.log while in headless mode and routes it to logToCli
+    // (ophis_logging.js), so the bridge keeps the browser's own console.log for itself.
+    var nativeConsoleLog = console.log.bind(console);
+
     var hasFsAccess = typeof window.showOpenFilePicker === 'function' && typeof window.showSaveFilePicker === 'function';
 
     var fileHandles = {};      // file name -> FileSystemFileHandle (so "Save" writes back to the same file)
     var droppedFiles = {};     // file name -> File (from drag-and-drop, when no handle is available)
+    var pendingDrop = null;    // the last dropped .oph, until the renderer asks to open it
     var menuState = { signedIn: false, operationsColVisible: false, prettify: false, minify: false };
     var suppressUnloadWarning = false;
     var zoomLevel = 0;
@@ -43,7 +62,7 @@
     // ------------------------------------------------------------------ helpers
 
     function log(message) {
-        console.log('browser_bridge: ' + message);
+        nativeConsoleLog('browser_bridge: ' + message);
     }
 
     // Electron reached renderer functions by name through executeJavaScript(); we do the same
@@ -56,12 +75,38 @@
         log('renderer function not found: ' + name);
     }
 
+    // showToast() and showDialog() insert their text as HTML, so anything taken from a file name is escaped.
+    function escapeHtml(text) {
+        return String(text).replace(/[&<>"']/g, function (ch) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+        });
+    }
+
     function toast(message) {
         if (typeof window.showToast === 'function') {
             window.showToast(message);
         } else {
             alert(message);
         }
+    }
+
+    // A file picker may only open during a click or key press (Chrome allows about five seconds).
+    // The renderer's "not saved" confirm() can outlast that, so ask for one more click.
+    function userGestureExpired() {
+        return !!(navigator.userActivation && navigator.userActivation.isActive === false);
+    }
+
+    function askForClick(message, buttonLabel, retry) {
+        if (typeof window.showDialog === 'function') {
+            window.showDialog(message, 'Cancel', buttonLabel, retry);
+        } else {
+            toast(message + ' Use the File menu again.');
+        }
+    }
+
+    function reportPickerError(err) {
+        nativeConsoleLog(String(err));
+        toast('Could not show the file dialog, see console for details.');
     }
 
     function baseName(path) {
@@ -92,6 +137,12 @@
         setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     }
 
+    // Without the File System Access API (Firefox, Safari) a save is a download: say where it went.
+    function downloadCopy(fileName, contents) {
+        download(fileName, contents);
+        toast('Downloaded "' + escapeHtml(fileName) + '". This browser cannot write to files directly, so each save is a new download.');
+    }
+
     async function ensureWritable(handle) {
         if (typeof handle.queryPermission !== 'function') {
             return;
@@ -113,7 +164,7 @@
     }
 
     function reportSaveError(err) {
-        console.log(String(err));
+        nativeConsoleLog(String(err));
         callRenderer('onSaveToFileError', ['Got error saving json string, see above.']);
     }
 
@@ -128,9 +179,14 @@
                 callRenderer('onOphFileOpenError', [fileName, 'Got null parsing json string.']);
             }
         } catch (err) {
-            console.log(String(err));
+            nativeConsoleLog(String(err));
             callRenderer('onOphFileOpenError', [fileName, 'Got error opening file or parsing json string, see above.']);
         }
+    }
+
+    function reportReadError(fileName, err) {
+        nativeConsoleLog(String(err));
+        callRenderer('onOphFileOpenError', [fileName, 'Got error opening file or parsing json string, see above.']);
     }
 
     function isAbort(err) {
@@ -156,6 +212,8 @@
                 file.text().then(function (text) {
                     droppedFiles[file.name] = file;
                     deliverOphText(file.name, text, false);
+                }).catch(function (err) {
+                    reportReadError(file.name, err);
                 });
             });
             document.body.appendChild(hiddenFileInput);
@@ -164,19 +222,31 @@
     }
 
     async function openFileExplorer() {
+        if (userGestureExpired()) {
+            askForClick('Choose the .oph file to open.', 'Choose file…', openFileExplorer);
+            return;
+        }
         if (hasFsAccess) {
             var handles;
             try {
                 handles = await window.showOpenFilePicker({ types: OPH_FILE_TYPES, multiple: false });
             } catch (err) {
-                if (!isAbort(err)) { console.log(String(err)); }
+                if (!isAbort(err)) { reportPickerError(err); }
                 return;
             }
             var handle = handles[0];
-            var file = await handle.getFile();
+            var file;
+            var text;
+            try {
+                file = await handle.getFile();
+                text = await file.text();
+            } catch (err) {
+                reportReadError(handle.name, err);
+                return;
+            }
             fileHandles[file.name] = handle;
             log('Chose file to open: ' + file.name);
-            deliverOphText(file.name, await file.text(), false);
+            deliverOphText(file.name, text, false);
         } else {
             var input = getHiddenFileInput();
             input.value = '';
@@ -188,17 +258,22 @@
         var suggested = currentFileName() || 'untitled.oph';
 
         if (hasFsAccess) {
+            if (userGestureExpired()) {
+                askForClick('Choose where to save the file.', 'Save As…', function () { saveFileAs(fileContents); });
+                return;
+            }
             var handle;
             try {
                 handle = await window.showSaveFilePicker({ suggestedName: suggested, types: OPH_FILE_TYPES });
             } catch (err) {
-                if (!isAbort(err)) { console.log(String(err)); }
+                if (!isAbort(err)) { reportPickerError(err); }
                 return;
             }
             log('About to save to file: ' + handle.name);
             try {
                 await writeToHandle(handle, fileContents);
             } catch (err) {
+                // The renderer only marks the session saved in onSaveAsSuccess, so its state is still right.
                 reportSaveError(err);
                 return;
             }
@@ -206,12 +281,13 @@
             callRenderer('onSaveAsSuccess', [handle.name]);
         } else {
             var name = window.prompt('Save As — enter a file name:', suggested);
+            name = name === null ? '' : name.trim();
             if (!name) {
                 return;
             }
-            name = ensureOphExtension(name.trim());
+            name = ensureOphExtension(name);
             log('About to save to file: ' + name);
-            download(name, fileContents);
+            downloadCopy(name, fileContents);
             callRenderer('onSaveAsSuccess', [name]);
         }
     }
@@ -224,16 +300,35 @@
                 await writeToHandle(handle, fileContents);
             } catch (err) {
                 reportSaveError(err);
+                // Save (flushChangesToDisk(true)) marked the session saved without waiting for this
+                // write. A plain flushChangesToDisk() is what every edit calls under Electron: it sets
+                // hasUnsavedChanges, stores only the options in localStorage and shows "(Not Saved)".
+                // It does not call autoSaveToFile again.
+                callRenderer('flushChangesToDisk');
             }
         } else {
-            download(name, fileContents);
+            downloadCopy(name, fileContents);
         }
     }
 
     async function openOphFile(filePath) {
         var name = baseName(filePath);
         try {
-            if (fileHandles[name]) {
+            if (pendingDrop && pendingDrop.name === name) {
+                // The renderer is opening the file just dropped. Only now does it replace whatever an
+                // earlier file of the same name left behind; a drop without a writable handle clears
+                // the old handle, so Save downloads instead of writing into that other file.
+                var drop = pendingDrop;
+                pendingDrop = null;
+                var dropHandle = await drop.handlePromise;
+                droppedFiles[name] = drop.file;
+                if (dropHandle && dropHandle.kind === 'file') {
+                    fileHandles[name] = dropHandle;
+                } else {
+                    delete fileHandles[name];
+                }
+                deliverOphText(name, await drop.file.text(), false);
+            } else if (fileHandles[name]) {
                 var file = await fileHandles[name].getFile();
                 deliverOphText(name, await file.text(), false);
             } else if (droppedFiles[name]) {
@@ -242,8 +337,7 @@
                 callRenderer('onOphFileOpenError', [name, 'The browser has no access to that path. Use File > Open... instead.']);
             }
         } catch (err) {
-            console.log(String(err));
-            callRenderer('onOphFileOpenError', [name, 'Got error opening file or parsing json string, see above.']);
+            reportReadError(name, err);
         }
     }
 
@@ -270,7 +364,9 @@
         openFileExplorer: async function () { return openFileExplorer(); },
         confirmCloseApp: async function () { return confirmCloseApp(); },
         onSignedIn: async function () { menuState.signedIn = true; renderMenuState(); },
-        logToCli: async function (message) { console.log(message); },
+        // Must not use console.log: in headless mode that is the renderer's override, which calls
+        // logToCli again (ophis_logging.js), and the page would recurse until it hangs.
+        logToCli: async function (message) { nativeConsoleLog(message); },
         closeAppWithHeadlessError: async function () { log('headless error exit requested (no-op in the browser)'); },
         closeAppWithHeadlessSuccess: async function () { log('headless success exit requested (no-op in the browser)'); },
         resetProgram: async function () { return resetProgram(); },
@@ -508,7 +604,7 @@
     }
 
     // Keyboard accelerators. Ctrl+N is reserved by most browsers and cannot be intercepted;
-    // the others work.
+    // the others work where the browser passes them to the page (Cmd+Q on a Mac never arrives).
     function installAccelerators() {
         document.addEventListener('keydown', function (event) {
             if (!(event.ctrlKey || event.metaKey) || event.altKey) {
@@ -522,6 +618,8 @@
                 callRenderer('electronBridgeIncoming_openFileExplorer');
             } else if (key === 'n') {
                 callRenderer('electronBridgeIncoming_startNewFile');
+            } else if (key === 'q') {
+                callRenderer('onCloseAppRequested');
             } else {
                 handled = false;
             }
@@ -534,40 +632,94 @@
     // Opening a .oph by dropping it on the window: the browser's equivalent of the .oph file
     // association (app.on('open-file') / second-instance argv in main.js).
     function installDragAndDrop() {
+        function hasFiles(dataTransfer) {
+            return !!dataTransfer && Array.prototype.indexOf.call(dataTransfer.types || [], 'Files') >= 0;
+        }
         function ophFileFrom(dataTransfer) {
-            if (!dataTransfer) {
-                return null;
+            // Walk the items rather than dataTransfer.files: getAsFileSystemHandle() lives on the item,
+            // and the two lists need not line up when the drag also carries text or links.
+            var items = dataTransfer.items || [];
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].kind === 'file') {
+                    var itemFile = items[i].getAsFile();
+                    if (itemFile && /\.oph$/i.test(itemFile.name)) {
+                        return { file: itemFile, item: items[i] };
+                    }
+                }
             }
-            for (var i = 0; i < dataTransfer.files.length; i++) {
-                if (/\.oph$/i.test(dataTransfer.files[i].name)) {
-                    return { file: dataTransfer.files[i], item: dataTransfer.items ? dataTransfer.items[i] : null };
+            var files = dataTransfer.files || [];
+            for (var j = 0; j < files.length; j++) {
+                if (/\.oph$/i.test(files[j].name)) {
+                    return { file: files[j], item: null };
                 }
             }
             return null;
         }
         document.addEventListener('dragover', function (event) {
-            if (event.dataTransfer && Array.prototype.some.call(event.dataTransfer.items || [], function (it) { return it.kind === 'file'; })) {
+            if (hasFiles(event.dataTransfer)) {
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'copy';
             }
         });
         document.addEventListener('drop', function (event) {
+            if (!hasFiles(event.dataTransfer)) {
+                return;   // text dragged into an input: let the browser insert it
+            }
+            // Always cancel a file drop, or the browser leaves the app to show the file.
+            event.preventDefault();
             var found = ophFileFrom(event.dataTransfer);
             if (!found) {
+                toast('Only .oph files can be opened here.');
                 return;
             }
-            event.preventDefault();
-            droppedFiles[found.file.name] = found.file;
-            if (found.item && typeof found.item.getAsFileSystemHandle === 'function') {
-                found.item.getAsFileSystemHandle().then(function (handle) {
-                    if (handle && handle.kind === 'file') {
-                        fileHandles[found.file.name] = handle;
-                    }
-                }).catch(function () { /* read-only drop; Save will download instead */ });
-            }
+            // getAsFileSystemHandle() only works during this event, so ask for the handle now. It is
+            // bound to the file name only when the renderer opens this drop (openOphFile): until then
+            // an earlier file with the same name keeps its own handle and contents.
+            var handlePromise = (found.item && typeof found.item.getAsFileSystemHandle === 'function')
+                ? found.item.getAsFileSystemHandle().catch(function () { return null; })
+                : Promise.resolve(null);
+            pendingDrop = { name: found.file.name, file: found.file, handlePromise: handlePromise };
             log('Received open-file: ' + found.file.name);
             callRenderer('onOphFileOpenedFromOutsideApp', [found.file.name]);
         });
+    }
+
+    // Links in the renderer's help text (e.g. the NASA eclipse page) have no target. Inside the exe
+    // they never replaced the app; here they would navigate away from it, so open them in a new tab.
+    function installExternalLinkGuard() {
+        document.addEventListener('click', function (event) {
+            if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+                return;
+            }
+            var link = event.target && event.target.closest ? event.target.closest('a[href]') : null;
+            if (!link || link.target || link.hasAttribute('download')) {
+                return;
+            }
+            if (!/^https?:$/.test(link.protocol) || link.origin === window.location.origin) {
+                return;
+            }
+            event.preventDefault();
+            window.open(link.href, '_blank', 'noopener');
+        });
+    }
+
+    // GitHub Pages serves this app, natorion/ and web/ from one origin, so they share localStorage.
+    // The renderer's Reset Program calls localStorage.clear() (ophis_controller.js); here that removes
+    // only the key Ophis uses and leaves the other apps' saved sessions alone.
+    function scopeLocalStorageClear() {
+        var nativeClear = Storage.prototype.clear;
+        Storage.prototype.clear = function () {
+            var local = null;
+            try { local = window.localStorage; } catch (e) { /* storage blocked */ }
+            if (local !== null && this === local) {
+                var key = typeof window.SERIALIZED_FIELD__LOCAL_STORAGE_SAVE_BLOB === 'string'
+                    ? window.SERIALIZED_FIELD__LOCAL_STORAGE_SAVE_BLOB
+                    : OPHIS_STORAGE_KEY_FALLBACK;
+                this.removeItem(key);
+                return undefined;
+            }
+            return nativeClear.apply(this, arguments);
+        };
     }
 
     // Electron intercepts the window close and asks the renderer (onCloseAppRequested), which
@@ -590,11 +742,37 @@
 
     // ------------------------------------------------------------------ start-up
 
+    // The exe's command-line mode (--headless, --output-path …) reaches the renderer as headless*
+    // query parameters. A browser has nowhere to write its output, and the mode replaces the
+    // console and skips the UI, so a link carrying them would leave a blank or frozen page.
+    function dropHeadlessParameters() {
+        var params;
+        try { params = new URLSearchParams(window.location.search); } catch (e) { return; }
+        var names = [];
+        params.forEach(function (value, name) {
+            if (name === 'headless' || name.indexOf('headless_') === 0) {
+                names.push(name);
+            }
+        });
+        if (names.length === 0) {
+            return;
+        }
+        names.forEach(function (name) { params.delete(name); });
+        var query = params.toString();
+        try {
+            window.history.replaceState(window.history.state, '', window.location.pathname + (query ? '?' + query : '') + window.location.hash);
+            log('headless mode belongs to the desktop exe; ignoring ' + names.join(', '));
+        } catch (err) {
+            log('could not remove ' + names.join(', ') + ' from the address: ' + err);
+        }
+    }
+
     function callInitOnce() {
         if (initCalled) {
             return;
         }
         initCalled = true;
+        dropHeadlessParameters();
         if (typeof window.init === 'function') {
             log('did-finish-load; calling init()');
             window.init();
@@ -603,11 +781,14 @@
         }
     }
 
+    scopeLocalStorageClear();
+
     document.addEventListener('DOMContentLoaded', function () {
         buildMenubar();
         installAccelerators();
         installDragAndDrop();
         installCloseGuard();
+        installExternalLinkGuard();
     });
 
     window.ophisBrowserBridge = {

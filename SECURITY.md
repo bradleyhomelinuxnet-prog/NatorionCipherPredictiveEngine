@@ -5,9 +5,9 @@ White-box review of the owner’s own software. Full narrative + citations in
 
 ## Threat model
 
-Ophis is offline and single-user by design (the README recommends air-gapping it). The realistic attacker is therefore a
+Ophis is offline and single-user by design (its own README, [`README.txt`](README.txt), recommends air-gapping it). The realistic attacker is therefore a
 **malicious `.oph` preset file** shared in the user community (“seed this preset”) and double-clicked by a victim — the `.oph`
-extension is registered to the app (`package.json:25–29`) and the `open-file` / second-instance handlers auto-load it
+extension is registered to the app (`package.json:18–23`) and the `open-file` / second-instance handlers auto-load it
 (`main.js:304–346, 532–548`). Under that model the two Critical findings chain to full host compromise from opening a shared file.
 
 ## Findings
@@ -25,15 +25,21 @@ extension is registered to the app (`package.json:25–29`) and the `open-file` 
 
 Proposed fixes (report §7/§8). A working proof-of-fix for #1 ships in this repo:
 [`Ophis_v12_Hardened_Engine_Lab.html`](Ophis_v12_Hardened_Engine_Lab.html) — a sandboxed recursive-descent parser that replaces
-`new Function()`, self-verifying **parity** (identical output on all 16 shipped ops) and **injection resistance** (10/10 payloads
-blocked) in the browser.
+`new Function()`, self-verifying **parity** (identical output on the 16 shipped operations and 6 cookbook ones, 22/22) and
+**injection resistance** (10/10 payloads blocked) in the browser. Its page policy allows `'unsafe-eval'` only so the vulnerable
+reference engine beside the parser can run; before that was added, the policy blocked the reference and the page reported
+0/22. The two browser rebuilds, [`natorion/`](natorion/) and [`web/`](web/), parse formulas the same way and contain no
+`eval` or `new Function` at all; each is checked against the original engine by its own parity test.
 
 - [ ] **#1** Replace `new Function` with the parser (drop-in; see the lab). Then remove `'unsafe-eval'` from the CSP.
 - [ ] **#2** `nodeIntegration:false`, `contextIsolation:true` (explicit), `sandbox:true`; confine every IPC write path (reject absolute/`..`, jail to an allowed dir; prefer `dialog.showSaveDialog`).
 - [ ] **#3** Remove the client-side gate or move auth server-side; don’t ship secrets in `ophis_config.js`.
 - [ ] **#4** Pass structured data over IPC instead of building JS strings.
 - [ ] **#5** Sanitise/escape strings before they reach the CLI log stream.
-- [ ] **Rewrites** HTML-escape the anchor `label` before `innerHTML` (`PSYFR1.html:960, 981`); replace their own `new Function` with the same parser.
+- [x] **Rewrites** HTML-escape the anchor `label` and the formulas before `innerHTML` — done in `PSYFR1.html`,
+  `Natori-On-PSYFR-Main-UI.html` and `NatoriOphis.html`, so a label from a loaded configuration file shows as text.
+- [ ] **Rewrites** Replace their own `new Function` (`PSYFR1.html:739`, `NatoriOphis.html:533`) with the same parser. Its
+  character allowlist keeps it to arithmetic today, but it is still a filter in front of a compiler.
 
 ## Disclosure
 

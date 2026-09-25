@@ -90,7 +90,7 @@ unpacked_full/
 | Layer | What | Notes |
 |---|---|---|
 | Outer | NSIS **portable** stub (32-bit PE) | Extracts to `%TEMP%` and runs `Ophis.exe` |
-| Runtime | **Electron 39.2.4** (`package.json:21`), Chromium + Node, ia32 | `Ophis.exe` 210 MB unpacked; `ffmpeg.dll`, `vk_swiftshader.dll`, ICU, 56 locale paks |
+| Runtime | **Electron 39.2.4** (`package.json:14`), Chromium + Node, ia32 | `Ophis.exe` 210 MB unpacked; `ffmpeg.dll`, `vk_swiftshader.dll`, ICU, 56 locale paks |
 | App | `resources/app.asar` (32.5 MB) | Electron’s uncompressed archive; `"main": "main.js"` |
 | Renderer | `ophis.html` + 24 `src/*.js` + `lib/*` | Loaded by a hand-rolled serial `<script>` injector |
 
@@ -261,7 +261,7 @@ Because the payload is `JSON.stringify`-ed (control chars escaped) and `"`/`\` a
 | 5 | Low | Headless CLI log forging / terminal-escape injection from file-derived strings | `main.js:201–203`; `ophis_logging.js` |
 | — | Info | CSP allows `unsafe-eval`+`unsafe-inline`; `debugger;` left in; dev-style cache-buster loader; DevTools reachable via View menu | `ophis.html:72`; `main.js:739` |
 
-> **Threat-model caveat for the write-up.** This is an **offline, single-user, air-gapped** tool by design (README). The realistic attacker is a **malicious `.oph` file** shared in the Telegram community (“seed this preset”), double-clicked by a victim — the `.oph` extension is registered to the app (`package.json:25–29`) and `open-file`/second-instance handlers auto-load it (`main.js:304–346, 532–548`). Under that model, Findings #1+#2 chain to full host compromise from opening a shared “preset,” which is exactly how these files circulate.
+> **Threat-model caveat for the write-up.** This is an **offline, single-user, air-gapped** tool by design (README). The realistic attacker is a **malicious `.oph` file** shared in the Telegram community (“seed this preset”), double-clicked by a victim — the `.oph` extension is registered to the app (`package.json:18–23`) and `open-file`/second-instance handlers auto-load it (`main.js:304–346, 532–548`). Under that model, Findings #1+#2 chain to full host compromise from opening a shared “preset,” which is exactly how these files circulate.
 
 ---
 
@@ -276,7 +276,7 @@ You’ve been rebuilding Ophis as **single-file, dependency-free** HTML apps. Fi
 
 **Two real issues to fix before it ships as a portfolio piece:**
 
-1. **`new Function()` on user formula input** (`PSYFR1.html:739`, `NatoriOphis.html:533`, and even the `OPHIS.html:988` demo). Guarded only by a regex character-allowlist (`:736–737`) — a denylist, not a sandbox. In a browser (no Node) the blast radius is the page itself, so it’s **self-XSS**, but it’s the same anti-pattern the report criticises in the parent app.
+1. **`new Function()` on user formula input** (`PSYFR1.html:739`, `NatoriOphis.html:533`, and even the `OPHIS.html:991` demo). Guarded only by a regex character-allowlist (`:736–737`) — a denylist, not a sandbox. In a browser (no Node) the blast radius is the page itself, so it’s **self-XSS**, but it’s the same anti-pattern the report criticises in the parent app.
 2. **Unescaped `innerHTML` of the anchor `label`** (`PSYFR1.html:960`, op label `:981`). `a.label` comes straight from the input (`:970`) with no escaping — a label like `<img src=x onerror=…>` executes. User-controlled, and it round-trips through saved/imported JSON config.
 
 Neither is a network-exfil risk in an offline page, but both are the exact “derived text → live compiler / innerHTML” smell your report calls out — fixing them makes the portfolio story *“I found these classes of bug and then didn’t commit them myself.”*

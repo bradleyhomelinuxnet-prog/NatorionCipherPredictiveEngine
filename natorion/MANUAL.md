@@ -57,7 +57,7 @@ A few words you'll see everywhere:
 1. Open the **`natorion`** folder.
 2. Double-click **`index.html`**.
 
-Your browser opens the app. There is nothing to install and no login. After the first open it works without internet; only the decorative fonts need a connection, and plain fonts stand in without one.
+Your browser opens the app. There is nothing to install and no login. Opened from the folder, it works without internet; only the decorative fonts need a connection, and plain fonts stand in without one. (The web address needs a connection to load.)
 
 If double-clicking opens something other than a browser, right-click the file, choose **Open with**, and pick Chrome, Edge, Firefox or Safari.
 
@@ -152,7 +152,7 @@ Take two X-Dates: **X1 = 07/04/2026** and **X2 = 08/20/2026**.
 
 The same pair feeds all sixteen operations. #2 reverses the digits of 47 to get 74 and lands on 11/02/2026 (74 is also on the list). #1 simply adds 47 days to X2, landing on 10/06/2026. With more X-Dates there are more pairs: six dates make 15 pairs, and 15 pairs × 16 formulas give up to 240 projections. When several land on the **same day**, they merge into one row, and that row's score climbs.
 
-> A small precision note, kept from the original: 76.05 rounds to 76.1, which falls *just* outside the ±0.1 window around the vortex number 76.2. So it counts as the normal number 76, not the vortex. Natorion reproduces Ophis v12's arithmetic exactly, down to cases like this.
+> A small precision note, kept from the original: 76.05 rounds to 76.1, exactly 0.1 from the vortex number 76.2, on the very edge of its ±0.1 window. In the computer's floating-point arithmetic, 76.2 − 76.1 comes out a hair over 0.1 (0.10000000000000853), so it counts as the normal number 76, not the vortex. Natorion reproduces Ophis v12's arithmetic exactly, down to cases like this.
 
 ---
 
@@ -173,7 +173,7 @@ In the worked example, 11/04/2026 has one alpha hit (1 point) and one normal MSR
 
 - **Vortex** (12 numbers, matched within 0.1): 21.7, 32.6, 43.5, 65.3, 76.2, 87.1, 217.8, 326.7, 435.6, 653.4, 762.3, 871.2.
 - **Important** (53 whole numbers), e.g. 84, 126, 360, 432, 1260, 1656, 2520.
-- **Normal** (276 whole numbers), e.g. 12, 138, 144, 365, 666, 1461, 2559.
+- **Normal** (325 whole numbers), e.g. 12, 138, 144, 365, 666, 1461, 2559.
 
 A Z that ends in exactly **.5** (such as 137.5) matches nothing; the rule is that it leans to neither side. The full lists are in the **Guide** screen under *The three MSRF sets*.
 
@@ -392,7 +392,7 @@ The **Marks** column of the Z-Dates table adds four kinds of sign:
 | **⮌** | The date written as MMDDYYYY reads the same backwards. 02/02/2020 → 02022020. |
 | **19** | The day is a whole multiple of 19 days from today. 19 is the Metonic number: 19 years hold 235 moons. |
 | **138** | The day is a whole multiple of 138 days from today. 138 is the Phoenix step. |
-| 🌑 🌕 ◉ ⬤ | A new moon, a full moon, or an eclipse falls within a day. |
+| 🌑 🌕 ◉ ◐ ⬤ ◑ | A new moon or a full moon falls within a day, or an eclipse does: ◉ total and ◐ partial solar, ⬤ total and ◑ partial lunar. |
 
 Marks don't change the score. They are a second reading laid over the first. The derivation panel spells them out, e.g. *266 days = 19 × 14*.
 
@@ -406,7 +406,7 @@ Mirrors turn up everywhere once you look: 19 and 91, 138 and 831. Formula #2, `o
 
 - **Treat "today" as** — pretend today is another date. The *Before today* filter and the 19/138 marks use it. Leave it empty for the real date.
 - **Recalculate as I type** — on by default.
-- **Start over** — clears this browser's copy and reloads the example. Save a file first.
+- **Start over** — clears this browser's copy of your events and settings (only the light/dark choice stays) and reloads the example. Save a file first.
 
 **Keyboard:**
 

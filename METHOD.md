@@ -3,7 +3,11 @@
 The reproducible spine of the study. The discipline that matters: **identify the container from bytes before running anything.** Nothing here executes the target binary.
 
 ## 0. Environment
-Windows 11 · Node v24.15.0 · `7zip-bin` (7za 21.07) · `@electron/asar` 11.12.1. All extraction is offline.
+Windows 11 · Node v24.15.0 · `7zip-bin` (7za 21.07) · `@electron/asar` (run through `npx`). All extraction is offline.
+
+Work in a scratch folder **outside** this repository. The repo's own `package.json` is the original app's manifest, so an
+`npm install` inside the repo would also install its Electron and electron-builder dev dependencies (hundreds of packages)
+and write a new dependency into the preserved manifest.
 
 ## 1. Triage — read bytes, don’t execute
 
@@ -22,9 +26,10 @@ Conclusion before any execution: an **NSIS portable** wrapper around a compresse
 electron-builder’s NSIS package embeds a 7z archive, which a standalone extractor reads directly — no admin install, no detonation.
 
 ```bash
+mkdir -p ~/ophis-extract && cd ~/ophis-extract     # anywhere outside the repo
 npm install 7zip-bin
-ZA=node_modules/7zip-bin/win/x64/7za.exe
-"$ZA" l Ophis_v12_Windows.exe
+ZA=$(node -p "require('7zip-bin').path7za")       # the 7za binary for this OS
+"$ZA" l /path/to/Ophis_v12_Windows.exe
 ```
 
 Listing reveals the Electron distribution: `resources\app.asar` (32,524,448 bytes), `Ophis.exe` (the Chromium/Node runtime, 210 MB unpacked), `ffmpeg.dll`, `icudtl.dat`, 56 `locales\*.pak`, etc.
@@ -32,7 +37,7 @@ Listing reveals the Electron distribution: `resources\app.asar` (32,524,448 byte
 ## 3. Extract the app bundle
 
 ```bash
-"$ZA" e Ophis_v12_Windows.exe "resources/app.asar" -o./extracted
+"$ZA" e /path/to/Ophis_v12_Windows.exe "resources/app.asar" -o./extracted
 ```
 
 ## 4. Unpack the asar
@@ -40,7 +45,7 @@ Listing reveals the Electron distribution: `resources\app.asar` (32,524,448 byte
 Electron’s `asar` is a tar-like archive; `@electron/asar` expands it into a normal tree.
 
 ```bash
-npx asar extract extracted/app.asar extracted/unpacked_full
+npx @electron/asar extract extracted/app.asar extracted/unpacked_full
 ```
 
 Yields the full renderer **plus the three files a source-only pass never sees**:

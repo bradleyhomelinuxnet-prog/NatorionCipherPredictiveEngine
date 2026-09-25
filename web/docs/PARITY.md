@@ -141,6 +141,16 @@ A few messages are reworded for clarity ("X2 must be later than X1" rather than
 the HTML-laced original). The parity runner compares *whether* an engine
 refused, not the exact sentence.
 
+### 5 · Years 0–99 are the years written
+
+Both builds accept a year of up to four digits, so `02/14/0033` is a valid
+X-Date. The desktop app then projects it as **2033**: its date library reads
+a year below 100 as two digits. This build projects it as the year 33, and
+writes such years back with four digits (`0033`). Every fixture and every
+random event in the parity run is dated well after year 99, so the two
+engines still agree on all of them; `web/tests/unit.js` pins this build's
+side of the difference.
+
 ---
 
 ## What is not reproduced
@@ -159,8 +169,9 @@ refused, not the exact sentence.
 ## Running the checks
 
 ```bash
-node web/tests/unit.node.js       # 78 behaviour tests, no dependencies
-node web/tests/parity.node.js     # differential against the original engine
+node web/tests/unit.node.js                           # behaviour tests, no dependencies
+node web/tests/parity.node.js                         # differential against the original engine
+node web/tests/parity.node.js --fuzz 500 --seed 138   # plus 500 random events, as CI runs it
 ```
 
 Both exit non-zero on failure. The same behaviour tests also run in the browser

@@ -1,0 +1,13 @@
+# Keeps the actions the workflows use up to date, such as the Node 24
+# versions GitHub asked for when it retired Node 20 for Actions in
+# September 2026. Dependabot opens one pull request a month with every
+# pending bump in it.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]

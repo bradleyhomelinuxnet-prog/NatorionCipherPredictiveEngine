@@ -324,6 +324,14 @@
       var instant = new Date(Date.UTC(2027, 0, 19, 23, 59, 59));
       assert.eq(T.floorToUtcMidnight(instant).getTime(), Date.UTC(2027, 0, 19));
     });
+
+    test("years 0-99 are the years written, not 1900-1999", function () {
+      var instant = T.xDateToInstant(C.EVENT_SCOPE__DAYS, T.newXDate("02/14/0033"), 0, 0, []);
+      assert.eq(instant.getUTCFullYear(), 33);
+      assert.eq(T.formatUtcDateOnly(instant), "02/14/0033", "early years keep four digits");
+      assert.eq(T.daysInMonth(4, 2), 29, "4 AD is a leap year on the proleptic Gregorian calendar");
+      assert.eq(T.formatUtcDateOnly(T.floorToUtcMidnight(new Date(T.utcMillis(99, 11, 31, 18)))), "12/31/0099");
+    });
   });
 
   /* ====================================================================== */
@@ -486,6 +494,15 @@
       assert.eq(results.y_structs.length, 10, "5 anchors make 10 pairs");
       assert.eq(operationHits, 10 * 16, "10 pairs x 16 operations, however they group");
       assert.eq(results.total_z_dates, 153, "160 offsets landing on 153 distinct days");
+    });
+
+    test("HH:MM scope refuses a location the .oph reader would refuse", function () {
+      var results = run(event({
+        scope: C.EVENT_SCOPE__HH_MM, lat: 70, long: 10, location_enabled: true,
+        x_dates: xdates([["06/21/2018", "23:00"], ["12/21/2019", "13:00"]])
+      }));
+      assert.eq(results.errors.length, 1);
+      assert.ok(/latitude|sunset library/.test(results.errors[0]), results.errors[0]);
     });
   });
 
@@ -671,6 +688,12 @@
       assert.ok(csv.length > 1);
       var cells = csv[1].split(",");
       assert.ok(cells[0].indexOf("Round trip") >= 0 || cells[0].charAt(0) === '"', "the event name is first");
+    });
+
+    test("download names are tidy", function () {
+      assert.eq(FileIO.safeFileName("Sample · four anchors"), "Sample_four_anchors");
+      assert.eq(FileIO.safeFileName("a/b\\c:d"), "a_b_c_d");
+      assert.eq(FileIO.safeFileName("..."), "ophis");
     });
 
     test("CSV quotes a name containing a comma", function () {

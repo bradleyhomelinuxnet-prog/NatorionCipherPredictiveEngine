@@ -245,9 +245,10 @@
     var allEvents = V.settings.allEvents === true;
     var modal = UI.modal("Backtest", '<div class="bt-host"></div>');
     var body = modal.host.querySelector(".bt-host");
+    // Tooltips inside the dialog come from the page-wide binding (app.js);
+    // binding again on every redraw would stack duplicate listeners.
     function draw() {
       body.innerHTML = backtestBody(tolerance, allEvents);
-      UI.bindTooltips(body);
     }
     body.addEventListener("change", function (event) {
       if (event.target.matches("[data-bt-tolerance]")) tolerance = parseInt(event.target.value, 10);

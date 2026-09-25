@@ -35,7 +35,8 @@
   --gap: 16px;
   color-scheme: dark;
 }
-:root[data-theme="light"] {
+/* .light-ink: a hidden element the timeline reads its print colours from. */
+:root[data-theme="light"], .light-ink {
   --bg: #f3ede0;
   --bg-2: #ebe3d1;
   --panel: rgba(255, 252, 244, .86);
@@ -318,7 +319,7 @@ tbody tr { transition: background .1s; }
 .kv-list dd { margin: 0; color: var(--gold-2); }
 .flags { display: flex; flex-wrap: wrap; gap: 6px; }
 .flag { font: 11px var(--f-mono); letter-spacing: .1em; padding: 5px 8px; border: 1px solid var(--line); border-radius: 20px; color: var(--dim); }
-.flag.on { color: var(--bg); background: var(--red); border-color: var(--red); box-shadow: var(--glow); }
+.flag.on { color: #fff; background: var(--red); border-color: var(--red); box-shadow: var(--glow); }
 .zlink-list { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .zlink-list button { font-size: 11px; padding: 5px 8px; }
 .zlink-list li.none { color: var(--dim); font-style: italic; }
@@ -348,6 +349,7 @@ tbody tr { transition: background .1s; }
 .events-table input { width: 100%; }
 .events-table .acts { white-space: nowrap; text-align: right; }
 .events-table .acts button { margin-left: 4px; }
+#resetAll { white-space: normal; }
 
 /* ---------------------------------------------------------------- prose -- */
 .prose { max-width: 760px; }
@@ -387,7 +389,7 @@ dialog h2 { margin-bottom: 8px; }
 }
 @media (max-width: 720px) {
   body { font-size: 16px; }
-  .grid2 { grid-template-columns: 1fr; }
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
   .topbar { gap: 8px; }
   .topbar-tools { margin-left: 0; width: 100%; }
   .event-pick { flex: 1; }
@@ -406,6 +408,15 @@ dialog h2 { margin-bottom: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 @media print {
+  /* Dark ink on white paper, whichever theme is on screen. */
+  :root, :root[data-theme] {
+    --bg: #fff; --bg-2: #fff; --panel: #fff; --panel-solid: #fff; --field: #fff;
+    --ink: #1f1a12; --ink-2: #3f372a; --dim: #6f6552; --line: rgba(138, 100, 18, .22); --line-2: rgba(138, 100, 18, .42);
+    --gold: #8a6412; --gold-2: #6d4c06; --red: #a8321f; --cyan: #1f7282; --green: #4d7328; --violet: #6448a0;
+    --focus: #a8321f; --shadow: none; --glow: none;
+    --msrf-normal: #1f7282; --msrf-important: #8a6412; --msrf-vortex: #a8321f; --alpha: #8a6412; --beta: #6448a0;
+    color-scheme: light;
+  }
   .topbar, .rail, .chart-panel .head-tools, .results-panel .head-tools, .toasts { display: none !important; }
   body { background: #fff; color: #000; }
   .screen { display: none !important; }

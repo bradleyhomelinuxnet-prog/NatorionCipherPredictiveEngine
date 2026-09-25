@@ -118,8 +118,17 @@
   };
 
   /* --------------------------------------------------------------- modal */
+  /* One dialog at a time. Its click handler is assigned rather than added and
+     is dropped on close, so a dialog that was cancelled can never act later.
+     Focus moves into the dialog, Tab stays inside it, and focus goes back to
+     where it was when the dialog closes. */
+  var openModal = null;
+  var FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
   UI.modal = function (title, bodyHtml, options) {
     options = options || {};
+    if (openModal) openModal.close();
+    var returnFocus = document.activeElement;
     var host = document.getElementById("modal");
     host.innerHTML =
       '<div class="modal-backdrop" data-close="1"></div>' +
@@ -134,17 +143,46 @@
       '</div>';
     host.classList.add("open");
 
-    function close() { host.classList.remove("open"); host.innerHTML = ""; document.removeEventListener("keydown", onKey); }
-    function onKey(event) { if (event.key === "Escape") close(); }
+    var handle = { close: close, host: host };
 
-    UI.on(host, "click", "[data-close]", close);
-    UI.on(host, "click", "[data-confirm]", function () {
-      if (options.onConfirm) options.onConfirm(host);
-      close();
-    });
+    function close() {
+      if (openModal !== handle) return;   // already closed, or replaced by onConfirm
+      openModal = null;
+      host.classList.remove("open");
+      host.innerHTML = "";
+      host.onclick = null;
+      document.removeEventListener("keydown", onKey);
+      if (returnFocus && returnFocus.focus && document.contains(returnFocus)) returnFocus.focus();
+    }
+
+    function onKey(event) {
+      if (event.key === "Escape") { close(); return; }
+      if (event.key !== "Tab") return;
+      var focusable = UI.$$(FOCUSABLE, host).filter(function (element) { return !element.disabled; });
+      if (!focusable.length) return;
+      var first = focusable[0], last = focusable[focusable.length - 1];
+      var inside = host.contains(document.activeElement);
+      if (!inside || (event.shiftKey && document.activeElement === first)) {
+        event.preventDefault(); (event.shiftKey ? last : first).focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault(); first.focus();
+      }
+    }
+
+    host.onclick = function (event) {
+      if (event.target.closest("[data-confirm]")) {
+        if (options.onConfirm) options.onConfirm(host);
+        close();
+      } else if (event.target.closest("[data-close]")) {
+        close();
+      }
+    };
     document.addEventListener("keydown", onKey);
-    UI.bindTooltips(host);
-    return { close: close, host: host };
+    openModal = handle;
+
+    var initial = host.querySelector("[data-confirm]") || host.querySelector("footer [data-close]");
+    if (initial) initial.focus();
+    return handle;
   };
 
   UI.confirm = function (title, message, onConfirm) {

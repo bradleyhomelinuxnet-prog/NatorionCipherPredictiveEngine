@@ -88,6 +88,10 @@
   };
 
   App.renderStatus = function () {
+    // Rebuilding the bar would throw the Current time field away mid-edit and
+    // send its caret back to the month; it catches up when the field is left.
+    var active = document.activeElement;
+    if (active && active.id === "now-date") return;
     var event = Store.currentEvent();
     var results = Store.results;
     var offset = Store.globalOptions.local_time_offset_in_millis;
@@ -252,8 +256,15 @@
         if (event.scope === C.EVENT_SCOPE__HH_MM) event.location_enabled = true;
       } else if (field === "scoring_system") event.scoring_system = target.value;
       else if (field === "lat" || field === "long") {
+        // Refuse what the .oph reader would refuse, so a saved file always reopens.
         var coordinate = parseFloat(target.value);
-        event[field] = isNaN(coordinate) ? 0 : T.roundLocation(coordinate);
+        if (!T.isValidLatOrLong(coordinate, field)) {
+          var limit = field === "lat" ? C.LAT_LIMIT : C.LONG_LIMIT;
+          UI.toast((field === "lat" ? "Latitude" : "Longitude") + " must be a number from −" + limit + " to " + limit + ".", "bad");
+          target.value = event[field];
+          return;
+        }
+        event[field] = T.roundLocation(coordinate);
         T.clearSunsetCache();
       } else if (field === "day_scope_start") {
         var parts = ("" + target.value).split(":");
@@ -264,6 +275,8 @@
       Store.commit("event-settings");
     });
     UI.on(hosts.eventSettings, "input", '[data-event-field="name"]', function (e, target) {
+      // Mirror the name into the tab as it is typed, but never keep an empty one.
+      if (!target.value.trim()) return;
       Store.currentEvent().name = target.value;
       Panels.renderEventBar(hosts.eventBar);
     });
@@ -322,11 +335,12 @@
       var text = Panels.fromInputDate(target.value);
       var parsed = T.parseCalendarDate(text, []);
       if (!parsed) return;
-      var wanted = Date.UTC(parsed.year, parsed.month - 1, parsed.day);
+      var wanted = T.utcMillis(parsed.year, parsed.month - 1, parsed.day);
       var todayUtc = T.floorToUtcMidnight(new Date()).getTime();
       Store.globalOptions.local_time_offset_in_millis = wanted - todayUtc;
       Store.commit("now");
     });
+    UI.on(hosts.status, "focusout", "#now-date", function () { setTimeout(App.renderStatus, 0); });
     UI.on(hosts.status, "click", '[data-action="reset-now"]', function () {
       Store.globalOptions.local_time_offset_in_millis = 0;
       Store.commit("now");
@@ -406,25 +420,39 @@
   App.openFile = function (file) {
     var reader = new FileReader();
     reader.onload = function () {
-      var parsed = Store.importOph("" + reader.result);
-      if (parsed.errors.length) {
-        UI.modal("Could not open " + file.name,
-          '<p>The file was rejected. Nothing in the current session has changed.</p><ul class="errors-list">' +
-          parsed.errors.slice(0, 40).map(function (error) { return "<li>" + UI.esc(error) + "</li>"; }).join("") +
-          '</ul>', {});
+      var text = "" + reader.result;
+      // A valid file replaces the whole session, so ask first when there are
+      // edits since the last save or open. A rejected file changes nothing.
+      if (Store.dirty && !File.parse(text, Store.globalOptions.file_input_validation_mode).errors.length) {
+        UI.modal("Replace the current session?",
+          "<p>Opening " + UI.esc(file.name) + " replaces every event in this session. " +
+          "Changes you have not saved as a .oph file will be lost.</p>",
+          { confirmLabel: "Open " + file.name, onConfirm: function () { App.importText(file, text); } });
         return;
       }
-      if (parsed.warnings.length) {
-        UI.modal("Opened " + file.name + " with warnings",
-          '<p>The events loaded. These operations were disabled because they are not valid formulas:</p><ul class="errors-list">' +
-          parsed.warnings.map(function (warning) { return "<li>" + UI.esc(warning) + "</li>"; }).join("") +
-          '</ul>', {});
-      } else {
-        UI.toast("Opened " + file.name + " — " + parsed.events.length + " event" + (parsed.events.length === 1 ? "" : "s") + ".", "ok");
-      }
+      App.importText(file, text);
     };
     reader.onerror = function () { UI.toast("Could not read " + file.name, "bad"); };
     reader.readAsText(file);
+  };
+
+  App.importText = function (file, text) {
+    var parsed = Store.importOph(text);
+    if (parsed.errors.length) {
+      UI.modal("Could not open " + file.name,
+        '<p>The file was rejected. Nothing in the current session has changed.</p><ul class="errors-list">' +
+        parsed.errors.slice(0, 40).map(function (error) { return "<li>" + UI.esc(error) + "</li>"; }).join("") +
+        '</ul>', {});
+      return;
+    }
+    if (parsed.warnings.length) {
+      UI.modal("Opened " + file.name + " with warnings",
+        '<p>The events loaded. These operations were disabled because they are not valid formulas:</p><ul class="errors-list">' +
+        parsed.warnings.map(function (warning) { return "<li>" + UI.esc(warning) + "</li>"; }).join("") +
+        '</ul>', {});
+    } else {
+      UI.toast("Opened " + file.name + " — " + parsed.events.length + " event" + (parsed.events.length === 1 ? "" : "s") + ".", "ok");
+    }
   };
 
   App.saveOph = function () {
@@ -520,6 +548,10 @@
 
     Store.recalculate();
     App.render("boot");
+
+    // The timeline draws its labels in the embedded fonts; draw again once
+    // they have loaded, or the first frame keeps the fallback face.
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { Chart.draw(); });
 
     // The status bar clock ticks; nothing else needs a timer.
     App.clockTimer = setInterval(function () {

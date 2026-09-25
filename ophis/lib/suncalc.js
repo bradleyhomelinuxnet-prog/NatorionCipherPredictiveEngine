@@ -1,4 +1,4 @@
-// Doug Koellmer: Ran npm install for following file:
+// Vendored via npm install from upstream:
 // https://github.com/mourner/suncalc/blob/master/suncalc.js
 // COMMIT: 7ccde2118968e21e47db573e34757258275943ae
 

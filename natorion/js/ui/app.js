@@ -57,14 +57,18 @@
     S.on("switch", function () { renderEventPicker(); NC.cipher.renderEvent(); if ($("opsBody").offsetParent) NC.opsView.render(); });
     S.on("dirty", function () { $("saveState").textContent = "Saving…"; $("saveState").dataset.dirty = "true"; });
     S.on("saved", function (ok) { $("saveState").textContent = ok ? "Saved" : "Not saved"; $("saveState").dataset.dirty = String(!ok); $("saveState").title = ok ? "Kept in this browser. Use Files → Save .oph to keep a copy." : "This browser is not letting the page store anything (private window?). Save a .oph file."; });
-    root.addEventListener("hashchange", function () { go(location.hash.slice(1), true); });
+    // Only a screen's name switches screens: the skip link's #main must not.
+    root.addEventListener("hashchange", function () { var h = location.hash.slice(1); if (SCREENS.indexOf(h) >= 0) go(h, true); });
     document.addEventListener("keydown", function (e) {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") { e.preventDefault(); NC.files.saveOph(); }
       else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "o") { e.preventDefault(); go("files"); $("fileInput").click(); }
     });
-    root.addEventListener("beforeunload", function () { S.persistNow(); });
+    // On the way out, save only a change still waiting to be saved (see store.flush).
+    root.addEventListener("pagehide", function () { S.flush(); });
+    document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") S.flush(); });
 
-    go(location.hash.slice(1) || S.state.settings.screen || "cipher", true);
+    var hash = location.hash.slice(1);
+    go(SCREENS.indexOf(hash) >= 0 ? hash : S.state.settings.screen || "cipher", true);
     S.runNow();
   }
 

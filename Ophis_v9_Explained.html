@@ -146,6 +146,7 @@
   .metric.small .v{font-size:15px;color:var(--cyan);font-family:'IBM Plex Mono',monospace;font-weight:500}
   .metric .lattice{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--rose);margin-top:2px;letter-spacing:.05em}
   .metric .lattice.hit{color:var(--gold2)}
+  .ops-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}  /* the table scrolls on a phone; the page does not */
   .ops-table{width:100%;border-collapse:collapse;font-size:13px;background:transparent;border:none;border-radius:0}
   .ops-table thead th{background:#05050a;border-bottom:1px solid var(--line);color:var(--gold);
     font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase}
@@ -671,6 +672,7 @@
       </div>
     </div>
 
+    <div class="ops-scroll">
     <table class="ops-table">
       <thead>
         <tr>
@@ -686,6 +688,7 @@
       </thead>
       <tbody id="ops-body"></tbody>
     </table>
+    </div>
     <p style="font-size:12px;color:var(--dim);margin-top:12px;font-style:italic">
       Note: DAYS scope discards HH:MM and lat/long (that's the shipping build's behaviour, gated by
       <code>FEATURE_FLAG__LOCK_DAY_SCOPE_TO_GMT = true</code>). Sunset-aware rounding only kicks in for HH:MM scope in
