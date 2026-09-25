@@ -13,10 +13,12 @@ on:
 permissions:
   contents: read
 
-# A newer push to the same branch supersedes the run in progress.
+# On a branch or a pull request, a newer push supersedes the run in progress.
+# On main a run that has started is never cancelled. (GitHub still keeps only
+# the newest of the runs waiting behind it.)
 concurrency:
   group: tests-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   natorion:
