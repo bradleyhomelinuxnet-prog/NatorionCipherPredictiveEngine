@@ -463,7 +463,7 @@ input[type="date"], input[type="time"] { font-family: var(--mono); font-size: 12
 .pill.op.alpha { color: var(--gold-2); border-color: color-mix(in srgb, var(--gold) 48%, transparent); background: color-mix(in srgb, var(--gold) 10%, transparent); }
 .pill.op.beta { color: var(--dim); }
 .pill.op.selected { outline: 1px solid var(--gold); background: color-mix(in srgb, var(--gold) 22%, transparent); }
-.pill .pill-sub { opacity: .62; font-size: 9.5px; }
+.pill .pill-sub { font-size: 9.5px; }
 .pill.msrf { margin-right: 3px; font-weight: 600; }
 .pill.msrf.msrf-normal { color: var(--cyan); border-color: color-mix(in srgb, var(--cyan) 45%, transparent); background: color-mix(in srgb, var(--cyan) 10%, transparent); }
 .pill.msrf.msrf-important { color: var(--gold-2); border-color: color-mix(in srgb, var(--gold) 55%, transparent); background: color-mix(in srgb, var(--gold) 14%, transparent); }
@@ -509,6 +509,8 @@ input[type="date"], input[type="time"] { font-family: var(--mono); font-size: 12
   font-size: 11px; color: var(--dim); cursor: pointer; user-select: none;
 }
 .chip input { position: absolute; opacity: 0; width: 0; height: 0; }
+/* The checkbox itself cannot be seen, so the chip shows its keyboard focus. */
+.chip:has(input:focus-visible) { outline: 2px solid var(--gold); outline-offset: 2px; }
 .chip:hover { border-color: var(--line-strong); color: var(--ink-2); }
 .chip.on { border-color: var(--gold); color: var(--gold-2); background: color-mix(in srgb, var(--gold) 10%, transparent); }
 .chip.disabled { opacity: .4; cursor: not-allowed; }

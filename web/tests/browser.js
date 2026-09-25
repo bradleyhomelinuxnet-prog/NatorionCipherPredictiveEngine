@@ -305,6 +305,10 @@ async function main() {
     check("the status bar is a named region", await page.getByRole("region", { name: "Status" }).count() === 1);
     check("the page has one top-level heading", await page.getByRole("heading", { level: 1 }).count() === 1);
     check("every column of the output table has a header", await page.$$eval(".output-table thead th", cells => cells.every(cell => cell.textContent.trim() !== "")));
+    await page.focus("#chart-options input");
+    await page.keyboard.press("Tab");
+    check("an overlay chip shows a focus ring when reached by keyboard",
+      await page.evaluate(() => { const chip = document.activeElement.closest(".chip"); return !!chip && getComputedStyle(chip).outlineStyle !== "none"; }));
 
     section("cycles and the Backtest");
     check("the Cycles panel is drawn", /Cycles/.test(await page.textContent("#panel-cycles")));

@@ -55,7 +55,7 @@
   --line-strong: rgba(74, 54, 26, .27);
   --ink: #1e1912;
   --ink-2: #463a2b;
-  --dim: #7a6d5a;
+  --dim: #6b5f4d;
   --gold: #98660b;
   --gold-2: #6d4705;
   --cyan: #12667b;
@@ -255,8 +255,8 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; line-h
 .cyc-verdict {
   border-left: 3px solid var(--line-strong); padding: 6px 10px; margin: 0 0 10px;
   background: var(--panel-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  /* --dim on --panel-2 is 4.49:1 in the light theme; a fifth of ink lifts
-     the quieter text in the box to 5.8:1 (light) and 6.4:1 (dark). */
+  /* --dim on --panel-2 is 5.5:1 in the light theme; a fifth of ink lifts
+     the quieter text in the box to 6.9:1 (light) and 6.4:1 (dark). */
   --cyc-quiet: color-mix(in srgb, var(--dim) 80%, var(--ink));
 }
 .cyc-verdict.v-some { border-left-color: var(--gold); }
@@ -305,7 +305,7 @@ a.btn { text-decoration: none; display: inline-flex; align-items: center; line-h
 .bt-table tr.bt-top td:nth-child(4) b { color: var(--green); }
 .bt-table tr.bt-hit td:nth-child(4) b { color: var(--gold-2); }
 /* Rows that are shown but not scored (not happened yet, or out of reach)
-   are quieter, but stay readable: --dim on the dialog is 4.9:1 (light) and
+   are quieter, but stay readable: --dim on the dialog is 6.1:1 (light) and
    5.4:1 (dark), and each says in words why it is not scored. */
 .bt-table tr.bt-future td, .bt-table tr.bt-outside td { color: var(--dim); }
 
