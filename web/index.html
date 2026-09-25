@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,6 +12,8 @@
 
 <link rel="stylesheet" href="css/app.css">
 <link rel="stylesheet" href="css/almanac.css">
+<!-- Not deferred: applies a saved theme before the first paint, so it never flashes. -->
+<script src="js/theme.js"></script>
 </head>
 <body>
 
@@ -30,8 +32,8 @@
     <button class="btn" data-action="save" data-tip="Save every event as .oph &middot; Ctrl+S">Save</button>
     <button class="btn" data-action="csv" data-tip="Export the current output as CSV">CSV</button>
     <button class="btn ghost" data-action="new" data-tip="Start a new session">New</button>
-    <button class="icon-btn" data-action="theme" data-tip="Light / dark">&#9681;</button>
-    <button class="icon-btn" data-action="about" data-tip="What this is and how it scores">?</button>
+    <button class="icon-btn" data-action="theme" data-tip="Light / dark" aria-label="Switch between light and dark">&#9681;</button>
+    <button class="icon-btn" data-action="about" data-tip="What this is and how it scores" aria-label="About Ophis Web">?</button>
   </div>
 </header>
 
@@ -54,7 +56,7 @@
         <span class="panel-note">wheel to zoom &middot; drag to pan &middot; double-click to fit</span>
       </header>
       <div class="chart-wrap">
-        <canvas id="chart-canvas" aria-label="Timeline of X-Dates and projected Z-Dates"></canvas>
+        <canvas id="chart-canvas" role="img" aria-label="Timeline of X-Dates and projected Z-Dates"></canvas>
       </div>
       <div id="chart-options" class="chart-options"></div>
       <div class="chart-legend">
@@ -87,7 +89,7 @@
 
 <input type="file" id="file-input" accept=".oph,application/json,text/plain" hidden>
 <div id="tooltip" class="tooltip" role="tooltip"></div>
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 <div id="modal" class="modal"></div>
 
 <!-- Optional data and astronomy, shared with the desktop build. The app checks

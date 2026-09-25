@@ -613,6 +613,8 @@
         errors.push("At least " + C.MINIMUM_OPERATIONS_REQUIRED + " valid Operation is required.");
       } else if (isoEvent.scope === C.EVENT_SCOPE__HH_MM && !T.sunsetAvailable()) {
         errors.push("HH:MM scope needs the sunset library (lib/astronomy.browser.min.js) — it did not load.");
+      } else if (isoEvent.scope === C.EVENT_SCOPE__HH_MM && !T.isValidLatAndLong(isoEvent.lat, isoEvent.long)) {
+        errors.push("HH:MM scope needs a latitude within ±" + C.LAT_LIMIT + " and a longitude within ±" + C.LONG_LIMIT + ".");
       } else {
         var spreadErrors = [];
         if (!Engine.validateXDateSpread(isoEvent, spreadErrors)) {

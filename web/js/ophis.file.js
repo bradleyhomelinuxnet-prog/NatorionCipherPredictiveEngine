@@ -343,7 +343,8 @@
   };
 
   F.safeFileName = function (name) {
-    return ("" + name).replace(/[^a-zA-Z0-9_.-]/g, "_").replace(/^[. ]+|[. ]+$/g, "").substring(0, 120) || "ophis";
+    // "Sample · four anchors" -> "Sample_four_anchors", not "Sample___four_anchors".
+    return ("" + name).replace(/[^a-zA-Z0-9_.-]+/g, "_").replace(/^[._ ]+|[._ ]+$/g, "").substring(0, 120) || "ophis";
   };
 
   root.Ophis.File = F;

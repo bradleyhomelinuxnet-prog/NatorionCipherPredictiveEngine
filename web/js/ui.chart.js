@@ -6,12 +6,12 @@
    every Z-Date it produced, and the Z-Dates themselves as stems whose height
    is the score and whose colour is the hit count — the app's own scale:
 
-       1–2 hits  ink      3 hits  cadmium yellow
+       1–2 hits  slate    3 hits  cadmium yellow
        4 hits    blue     5+      cadmium red
 
    Optional moon-phase and eclipse glyphs sit under the axis. Wheel zooms,
-   drag pans, double-click resets, hover explains, click selects the row in
-   the output table.
+   drag pans (mouse, finger or pen), double-click resets, hover explains,
+   click or tap selects the row in the output table.
    ========================================================================== */
 (function (root) {
   "use strict";
@@ -27,7 +27,8 @@
     view: null,         // { min, max } in millis
     hover: null,
     points: [],         // hit-test cache
-    dragging: null
+    dragging: null,
+    suppressClick: false  // a drag ends in a click; that click must not select
   };
 
   var HIT_COLORS = {
@@ -54,12 +55,16 @@
     Chart.canvas = canvas;
     Chart.ctx = canvas.getContext("2d");
 
-    canvas.addEventListener("mousemove", onMove);
-    canvas.addEventListener("mouseleave", function () {
+    /* Pointer events, so a finger or a pen pans the timeline as a mouse does.
+       app.css gives the canvas touch-action: pan-y, which leaves vertical
+       swipes to the page and hands horizontal drags to the chart. */
+    canvas.addEventListener("pointermove", onMove);
+    canvas.addEventListener("pointerleave", function () {
       Chart.hover = null; UI.hideTip(); Chart.draw();
     });
-    canvas.addEventListener("mousedown", onDown);
-    window.addEventListener("mouseup", onUp);
+    canvas.addEventListener("pointerdown", onDown);
+    canvas.addEventListener("pointerup", onUp);
+    canvas.addEventListener("pointercancel", onUp);
     canvas.addEventListener("wheel", onWheel, { passive: false });
     canvas.addEventListener("dblclick", function () { Chart.view = null; Chart.draw(); });
     canvas.addEventListener("click", onClick);
@@ -382,7 +387,9 @@
       var box = Chart.canvas.getBoundingClientRect();
       var span = view.max - view.min;
       var perPixel = span / Math.max(1, box.width - 32);
-      var delta = (domEvent.clientX - Chart.dragging.startX) * perPixel;
+      var dx = domEvent.clientX - Chart.dragging.startX;
+      if (Math.abs(dx) > 3) Chart.dragging.moved = true;
+      var delta = dx * perPixel;
       Chart.view = { min: Chart.dragging.min - delta, max: Chart.dragging.max - delta };
       Chart.draw();
       return;
@@ -435,19 +442,24 @@
   }
 
   function onDown(domEvent) {
+    if (domEvent.button !== 0) return;
     var view = currentView();
     if (!view) return;
-    Chart.dragging = { startX: domEvent.clientX, min: view.min, max: view.max };
+    Chart.dragging = { startX: domEvent.clientX, min: view.min, max: view.max, moved: false };
+    // Keep receiving the drag when the pointer leaves the canvas.
+    try { Chart.canvas.setPointerCapture(domEvent.pointerId); } catch (e) { /* not capturable */ }
     Chart.canvas.style.cursor = "grabbing";
   }
 
   function onUp() {
     if (!Chart.dragging) return;
+    Chart.suppressClick = Chart.dragging.moved;
     Chart.dragging = null;
     if (Chart.canvas) Chart.canvas.style.cursor = "grab";
   }
 
   function onClick(domEvent) {
+    if (Chart.suppressClick) { Chart.suppressClick = false; return; }
     var point = pick(domEvent);
     if (point && point.kind === "z") {
       Store.selection.zKey = (Store.selection.zKey === point.key) ? null : point.key;

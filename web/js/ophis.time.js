@@ -38,6 +38,15 @@
   T.roundTime = function (v) { return T.roundToPrecision(v, C.DECIMAL_PRECISION__TIME); };          // 2dp
   T.roundRotation = function (v) { return T.roundToPrecision(v, C.DECIMAL_PRECISION__AXIAL_ROTATIONS); }; // 1dp
   T.roundLocation = function (v) { return T.roundToPrecision(v, C.DECIMAL_PRECISION__LOCATION); };  // 1dp
+
+  /* ------------------------------------------------------ UTC builder --- */
+  /* Date.UTC() reads years 0–99 as 1900–1999, so 02/14/0033 would become
+     1933. Build on a four-digit year, then set the real one. */
+  T.utcMillis = function (year, monthIndex, day, hours, minutes, seconds, millis) {
+    var date = new Date(Date.UTC(2000, 0, 1, hours || 0, minutes || 0, seconds || 0, millis || 0));
+    date.setUTCFullYear(year, monthIndex, day);
+    return date.getTime();
+  };
   T.roundScore = function (v) { return T.roundToPrecision(v, C.DECIMAL_PRECISION__SCORE); };        // 2dp
 
   T.pad2 = function (n) { return n < 10 ? "0" + n : "" + n; };
@@ -100,7 +109,7 @@
   };
 
   T.daysInMonth = function (year, month) {
-    return new Date(Date.UTC(year, month, 0)).getUTCDate();
+    return new Date(T.utcMillis(year, month, 0)).getUTCDate();
   };
 
   /** "HH:MM" -> {hours, minutes} or null. */
@@ -163,7 +172,7 @@
     }
     var p = {};
     dtf.formatToParts(new Date(utcMillis)).forEach(function (part) { p[part.type] = part.value; });
-    var asUtc = Date.UTC(
+    var asUtc = T.utcMillis(
       parseInt(p.year, 10), parseInt(p.month, 10) - 1, parseInt(p.day, 10),
       parseInt(p.hour, 10) % 24, parseInt(p.minute, 10), parseInt(p.second, 10)
     );
@@ -174,7 +183,7 @@
 
   /** Wall-clock time in `timeZone` -> UTC millis. Two-pass, DST-safe. */
   T.wallTimeToUtcMillis = function (year, month, day, hours, minutes, timeZone) {
-    var naive = Date.UTC(year, month - 1, day, hours, minutes, 0, 0);
+    var naive = T.utcMillis(year, month - 1, day, hours, minutes, 0, 0);
     if (!timeZone || timeZone === "UTC") return naive;
     var guess = naive - zoneOffsetMillis(naive, timeZone);
     return naive - zoneOffsetMillis(guess, timeZone);
@@ -245,7 +254,9 @@
   };
 
   T.formatDateParts = function (w) {
-    return T.pad2(w.month) + C.DATE_DELIMITER + T.pad2(w.day) + C.DATE_DELIMITER + w.year;
+    // Years before 1000 keep four digits (0033), as the date format promises.
+    var year = w.year < 1000 ? ("000" + w.year).slice(-4) : "" + w.year;
+    return T.pad2(w.month) + C.DATE_DELIMITER + T.pad2(w.day) + C.DATE_DELIMITER + year;
   };
 
   /** "mm/dd/yyyy" for an instant, in the timezone at lat/long (UTC if unset). */
@@ -269,13 +280,13 @@
   T.weekdayShort = function (instant, timeZone) {
     var names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     var w = T.utcMillisToWallTime(instant.getTime(), timeZone || "UTC");
-    return names[new Date(Date.UTC(w.year, w.month - 1, w.day)).getUTCDay()];
+    return names[new Date(T.utcMillis(w.year, w.month - 1, w.day)).getUTCDay()];
   };
 
   /** Floor an instant to UTC midnight — what a DAYS-scope Z-Date snaps to. */
   T.floorToUtcMidnight = function (instant) {
     var w = T.utcMillisToWallTime(instant.getTime(), "UTC");
-    return new Date(Date.UTC(w.year, w.month - 1, w.day, 0, 0, 0, 0));
+    return new Date(T.utcMillis(w.year, w.month - 1, w.day, 0, 0, 0, 0));
   };
 
   T.roundToNearestMinute = function (instant) {

@@ -3,10 +3,10 @@
    parity.node.js — differential test: rewrite vs. the original v12 engine
    --------------------------------------------------------------------------
    The desktop renderer extracted from the .exe is plain, un-obfuscated script,
-   so it can be loaded into a Node VM context with a handful of browser stubs
-   and driven headless. That makes it an oracle: for each fixture event we run
-   BOTH engines and compare every Z-Date, score, hit count, MSRF match and sort
-   order.
+   so it can be loaded into Node (in Node's own realm, see §1) with a handful
+   of browser stubs and driven headless. That makes it an oracle: for each
+   fixture event we run BOTH engines and compare every Z-Date, score, hit
+   count, MSRF match and sort order.
 
        node web/tests/parity.node.js            # run
        node web/tests/parity.node.js --verbose  # show every compared field
@@ -258,7 +258,9 @@ function syntheticFixtures() {
       label: "T-Dates narrow the output",
       event: baseEvent({
         x_dates: dates(["01/01/2020", "07/19/2021", "02/06/2023"]),
-        t_dates: dates(["03/19/2027", "11/11/2027", "01/19/2028"]),
+        // Two T-Dates that are Z-Dates of this event and one that is not, so
+        // both engines have to keep exactly the two and drop the rest.
+        t_dates: dates(["11/10/2027", "12/22/2027", "01/19/2028"]),
         iso_event_filter_beyond_max_days: false
       })
     },

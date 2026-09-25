@@ -24,7 +24,8 @@
     if (parts.length !== 3) return "";
     var month = parseInt(parts[0], 10), day = parseInt(parts[1], 10), year = parseInt(parts[2], 10);
     if (isNaN(month) || isNaN(day) || isNaN(year)) return "";
-    return year + "-" + T.pad2(month) + "-" + T.pad2(day);
+    // <input type="date"> needs four year digits: 999 must be written 0999.
+    return ("000" + year).slice(-4) + "-" + T.pad2(month) + "-" + T.pad2(day);
   }
 
   function fromInputDate(value) {
@@ -44,12 +45,14 @@
     var html = '<div class="event-tabs" role="tablist">';
     Store.events.forEach(function (event, index) {
       var active = index === Store.currentEventIndex;
+      // data-tip holds HTML, and the browser decodes the attribute once before
+      // showTip() parses it, so the escaped name and notes are escaped again.
+      var tip = UI.esc(event.name) + (event.notes ? "<br><i>" + UI.esc(event.notes) + "</i>" : "");
       html += '<button role="tab" class="event-tab' + (active ? " active" : "") + '" data-event="' + index + '"' +
-        ' aria-selected="' + active + '" data-tip="' + UI.esc(event.name) +
-        (event.notes ? "<br><i>" + UI.esc(event.notes) + "</i>" : "") + '">' +
+        ' aria-selected="' + active + '" data-tip="' + UI.esc(tip) + '">' +
         '<span class="event-tab-ord">E' + (index + 1) + '</span>' + UI.esc(event.name) + '</button>';
     });
-    html += '<button class="event-tab add" data-action="add-event" data-tip="Add a new Iso-Event">+</button>';
+    html += '<button class="event-tab add" data-action="add-event" data-tip="Add a new Iso-Event" aria-label="Add a new event">+</button>';
     html += '</div>';
     host.innerHTML = html;
   };
@@ -88,9 +91,9 @@
           ' data-focus-key="' + kind + '-' + index + '-time" aria-label="time">' : "") +
         '<span class="weekday">' + UI.esc(weekday) + '</span>' +
         '<label class="tick" data-tip="Include this date in the calculation"><input type="checkbox" data-field="enabled"' +
-          (entry.enabled === false ? "" : " checked") + '><span></span></label>' +
-        '<button class="icon-btn" data-action="insert-date" data-tip="Insert a copy above">⤒</button>' +
-        '<button class="icon-btn danger" data-action="remove-date" data-tip="Delete this date">✕</button>' +
+          (entry.enabled === false ? "" : " checked") + ' aria-label="Include ' + UI.labelPlain(letter, index) + '"><span></span></label>' +
+        '<button class="icon-btn" data-action="insert-date" data-tip="Insert a copy above" aria-label="Insert a copy of ' + UI.labelPlain(letter, index) + ' above">⤒</button>' +
+        '<button class="icon-btn danger" data-action="remove-date" data-tip="Delete this date" aria-label="Delete ' + UI.labelPlain(letter, index) + '">✕</button>' +
         sunsetNote +
         '</li>';
     });
@@ -185,7 +188,7 @@
         '<button class="btn small ghost" data-action="ops-all-on" data-tip="Enable every operation">All</button>' +
         '<button class="btn small ghost" data-action="ops-all-off" data-tip="Disable every operation">None</button>' +
         '<button class="btn small ghost" data-action="reset-operations" data-tip="Restore the 16 shipped operations">Reset</button>' +
-        '<button class="icon-btn" data-action="operation-help" data-tip="Formula reference">?</button>' +
+        '<button class="icon-btn" data-action="operation-help" data-tip="Formula reference" aria-label="Formula reference">?</button>' +
       '</header>' +
       '<p class="panel-hint">Each formula turns an interval Y into a day-offset from X<sub>1</sub> or X<sub>2</sub>. ' +
       'Weight 1 = alpha, 0.5 = beta; the weight is what the hit contributes to a score.</p>' +
@@ -212,8 +215,8 @@
         '<input type="number" class="weight-input" step="0.5" min="0" value="' + UI.esc(operation.weight) + '"' +
           ' data-field="weight" data-focus-key="op-' + index + '-weight" data-tip="Weight — 1 is alpha, 0.5 is beta" aria-label="weight">' +
         '<label class="tick" data-tip="Enable this operation"><input type="checkbox" data-field="enabled"' +
-          (operation.enabled === false ? "" : " checked") + '><span></span></label>' +
-        '<button class="icon-btn danger" data-action="remove-operation" data-tip="Delete this operation">✕</button>' +
+          (operation.enabled === false ? "" : " checked") + ' aria-label="Enable ' + UI.labelPlain("O", index) + '"><span></span></label>' +
+        '<button class="icon-btn danger" data-action="remove-operation" data-tip="Delete this operation" aria-label="Delete ' + UI.labelPlain("O", index) + '">✕</button>' +
         (broken
           ? '<span class="operation-error">' + UI.esc(compiled.errors.join(" ")) + '</span>'
           : '<span class="operation-preview">' + UI.esc(preview) + '</span>') +
@@ -284,7 +287,8 @@
       }
       html += '<li class="filter-row' + (enabled ? " on" : "") + '">' +
         '<span class="row-label small">' + filter.id + '</span>' +
-        '<label class="tick"><input type="checkbox" data-filter="' + filter.key + '"' + (enabled ? " checked" : "") + '><span></span></label>' +
+        '<label class="tick"><input type="checkbox" data-filter="' + filter.key + '"' + (enabled ? " checked" : "") +
+          ' aria-label="Filter ' + UI.esc(filter.id) + '"><span></span></label>' +
         '<span class="filter-label" data-tip="' + UI.esc(filter.help) + '">Hide ' + labelHtml + '</span>' +
         '</li>';
     });
@@ -341,7 +345,7 @@
         '<div class="field-row">' +
           '<div class="field"><label for="event-daystart" data-tip="Shifts every Z-Date by this much before it is snapped to a day. Leave at 00:00 unless you know you need it.">Day start offset</label>' +
             '<input id="event-daystart" type="time" value="' + UI.esc(dayStartText) + '" data-event-field="day_scope_start"></div>' +
-          '<div class="field"><label>Day boundary</label><input type="text" value="UTC midnight" disabled></div>' +
+          '<div class="field"><label for="event-dayboundary">Day boundary</label><input id="event-dayboundary" type="text" value="UTC midnight" disabled></div>' +
         '</div>';
     }
 
@@ -362,10 +366,15 @@
       var isEclipse = option.kind === "eclipse";
       var disabled = isEclipse && !eclipsesReady;
       var on = event[option.key] === true;
+      // Moon marks go by the phase a date falls in; eclipses by distance.
+      var tip = disabled
+        ? "Eclipse tables (lib/*_eclipses_processed.js) did not load"
+        : option.kind === "moon"
+          ? "Mark X-Dates and Z-Dates that fall in the " + T.MOON_NAMES[option.phase] + " phase"
+          : "Mark X-Dates and Z-Dates within " + C.ECLIPSE_DATE_MATCH_TOLERANCE_IN_DAYS + " days of a " +
+            option.label.toLowerCase() + " eclipse";
       html += '<label class="chip' + (on ? " on" : "") + (disabled ? " disabled" : "") + '"' +
-        ' data-tip="' + (disabled
-          ? "Eclipse tables (lib/*_eclipses_processed.js) did not load"
-          : "Mark " + UI.esc(option.label) + " falling within " + C.LUNAR_DATE_MATCH_TOLERANCE_IN_DAYS + " day of an X-Date or Z-Date") + '">' +
+        ' data-tip="' + UI.esc(tip) + '">' +
         '<input type="checkbox" data-chart-option="' + option.key + '"' + (on ? " checked" : "") + (disabled ? " disabled" : "") + '>' +
         '<span class="chip-glyph">' + (option.kind === "moon" ? T.MOON_GLYPHS[option.phase] : "◐") + '</span>' +
         UI.esc(option.label) + '</label>';

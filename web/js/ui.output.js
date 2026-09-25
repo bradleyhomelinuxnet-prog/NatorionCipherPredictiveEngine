@@ -130,7 +130,7 @@
         var result = match.operation_result;
         return '<span class="pill op ' + (Engine.isAlpha(result.operation) ? "alpha" : "beta") +
           (Store.selection.operationHash === result.hash ? " selected" : "") + '"' +
-          ' data-op-hash="' + UI.esc(result.hash) + '" data-tip=\'' + operationTip(event, zStruct, match) + '\'>' +
+          ' data-op-hash="' + UI.esc(result.hash) + '" data-tip="' + UI.esc(operationTip(event, zStruct, match)) + '">' +
           UI.label("O", result.operation_ordinal) +
           '<span class="pill-sub">' + UI.label("X", match.y_struct.x_1_ordinal) + "→" + UI.label("X", match.y_struct.x_2_ordinal) + '</span>' +
           '</span>';
@@ -138,7 +138,7 @@
 
       var msrfPills = zStruct.msrf_match_structs.length
         ? zStruct.msrf_match_structs.map(function (match) {
-            return '<span class="pill msrf ' + match.css_class + '" data-tip=\'' + msrfTip(zStruct, match) + '\'>' +
+            return '<span class="pill msrf ' + match.css_class + '" data-tip="' + UI.esc(msrfTip(zStruct, match)) + '">' +
               match.msrf_number + '</span>';
           }).join("")
         : '<span class="muted">none</span>';
@@ -163,13 +163,19 @@
   /* Score heat as one of five steps, used for the intensity of the score chip.
      A class rather than an inline style, so the page needs no 'unsafe-inline'. */
   function heatStep(score, results) {
-    var max = 0;
-    results.z_keys_sorted.forEach(function (key) {
-      var value = results.z_structs[key].score;
-      if (value > max) max = value;
-    });
-    if (max <= 0) return 0;
-    return Math.max(0, Math.min(4, Math.round((score / max) * 4)));
+    // The top score is the same for every row, so it is found once per result
+    // set rather than once per row (a 2,600-row table spent a third of its
+    // render time here).
+    if (results.__maxScore === undefined) {
+      var max = 0;
+      results.z_keys_sorted.forEach(function (key) {
+        var value = results.z_structs[key].score;
+        if (value > max) max = value;
+      });
+      Object.defineProperty(results, "__maxScore", { value: max, enumerable: false });
+    }
+    if (results.__maxScore <= 0) return 0;
+    return Math.max(0, Math.min(4, Math.round((score / results.__maxScore) * 4)));
   }
   O.heatStep = heatStep;
 
@@ -192,7 +198,7 @@
       '<header class="panel-head">' +
         '<h2>' + UI.label("Z", zStruct.z_ordinal) + " · " + UI.esc(zStruct.z_readable_start) + '</h2>' +
         '<span class="spacer"></span>' +
-        '<button class="icon-btn" data-action="close-detail" data-tip="Close">✕</button>' +
+        '<button class="icon-btn" data-action="close-detail" data-tip="Close" aria-label="Close the derivation">✕</button>' +
       '</header>' +
       '<div class="detail-summary">' +
         '<div><span class="k">Score</span><span class="v">' + zStruct.score + '</span></div>' +
