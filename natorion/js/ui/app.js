@@ -14,7 +14,7 @@
     NC.chronView.active(name === "chronicon");
     if (name === "cipher") NC.chart.draw();
     if (location.hash.slice(1) !== name) history.replaceState(null, "", "#" + name);
-    S.state.settings.screen = name;
+    S.saveScreen(name);   // remembered at once: leaving the page saves only pending edits
     if (!noFocus) { var h = document.querySelector('.screen[data-active="true"] h1'); if (h) h.focus({ preventScroll: true }); root.scrollTo(0, 0); }
   }
 

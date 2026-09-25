@@ -63,6 +63,22 @@
   // this, not persistNow(): a second tab holding an older copy must not
   // overwrite, as it closes, what another tab has saved since.
   function flush() { if (saveTimer !== null) persistNow(); }
+  // The open screen is saved at once and on its own: read the stored copy,
+  // change only settings.screen, write it back. A full save here would put
+  // this tab's events over what another tab has saved since.
+  function saveScreen(name) {
+    state.settings.screen = name;
+    try {
+      var raw = root.localStorage.getItem(KEY);
+      if (!raw) { persistNow(); return; }   // nothing stored yet, so nothing to overwrite
+      var saved = JSON.parse(raw);
+      if (!saved || typeof saved !== "object") return;
+      if (!saved.settings || typeof saved.settings !== "object") saved.settings = {};
+      if (saved.settings.screen === name) return;
+      saved.settings.screen = name;
+      root.localStorage.setItem(KEY, JSON.stringify(saved));
+    } catch (e) { /* storage blocked, full or corrupt: the next full save carries it */ }
+  }
 
   function event() { return state.events[state.current]; }
 
@@ -125,7 +141,7 @@
 
   NC.store = {
     state: state, on: on, emit: emit, load: load, event: event, change: change, setSetting: setSetting, resetSettings: resetSettings,
-    select: select, replaceEvents: replaceEvents, persist: persist, persistNow: persistNow, flush: flush,
+    select: select, replaceEvents: replaceEvents, persist: persist, persistNow: persistNow, flush: flush, saveScreen: saveScreen,
     scheduleRun: scheduleRun, runNow: runNow, nowMs: nowMs, demoEvent: demoEvent
   };
 })(typeof window !== "undefined" ? window : globalThis);

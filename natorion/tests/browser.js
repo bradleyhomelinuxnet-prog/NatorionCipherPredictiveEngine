@@ -338,9 +338,9 @@ async function main() {
     await settle(page);
     check("events survive a reload", (await page.evaluate(() => NC.store.state.events.length)) === evCount);
     check("the place survives a reload", (await page.inputValue("#evLat")) === "29.98");
-    // Opened at an address fragment that is not a screen, the app shows the saved screen.
+    // Opened at an address fragment that is not a screen, the app shows the saved
+    // screen. Switching to it is enough to save it; no other change is needed.
     await go(page, "guide");
-    await page.evaluate(() => NC.store.persistNow());   // the screen is kept with the next save
     await page.goto("about:blank");
     await page.goto(PAGE + "#main");
     await settle(page);
