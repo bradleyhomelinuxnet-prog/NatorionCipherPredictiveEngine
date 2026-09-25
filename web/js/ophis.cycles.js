@@ -117,13 +117,24 @@
   function dayOfInstant(event, instant) {
     if (!isHHMM(event)) return dayNumber(instant);
     var opening = T.sunsetBefore(instant, event.lat, event.long);
-    return localDayNumber(event, opening || instant);
+    return opening ? dayOfSunset(event, opening) : localDayNumber(event, instant);
   }
   Cycles.dayOfInstant = dayOfInstant;
 
+  /**
+   * A sunset-day is named by the local date twelve hours before the sunset
+   * that opens it. Sunsets fall between about 14:00 and 01:00 local time, so
+   * this never crosses midnight. Naming it by the sunset's own date would give
+   * two sunset-days the same number wherever summer sunsets come just after
+   * midnight, as in Fairbanks or Reykjavik.
+   */
+  function dayOfSunset(event, sunset) {
+    return localDayNumber(event, new Date(sunset.getTime() - DAY / 2));
+  }
+
   /** The day of a Z-Date. In HH:MM scope its window opens at z_start, a sunset. */
   function dayOfZDate(event, zStruct) {
-    return isHHMM(event) ? localDayNumber(event, zStruct.z_start) : dayNumber(zStruct.z_start);
+    return isHHMM(event) ? dayOfSunset(event, zStruct.z_start) : dayNumber(zStruct.z_start);
   }
   Cycles.dayOfZDate = dayOfZDate;
 

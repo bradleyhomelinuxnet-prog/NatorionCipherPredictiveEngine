@@ -310,5 +310,26 @@ console.log("\nHH:MM scope: an event inside a projected sunset-to-sunset day");
   check("the next morning is still that day", st2.hit === true && st2.best.off === 0, morning.date + " " + morning.time);
 }
 
+console.log("\nHH:MM scope where summer sunsets come after midnight");
+{
+  // Fairbanks in July: the sun sets at 00:01 one night and at 23:58 the next,
+  // so two sunset-days open on the same local date. Each must still get its
+  // own number, or an event is taken for the same day as the one before it.
+  const e = JSON.parse(JSON.stringify(bradley));
+  e.scope = C.EVENT_SCOPE__HH_MM; e.lat = 64.8; e.long = -147.7; e.location_enabled = true; e.t_dates = [];
+  let t = Date.UTC(2006, 4, 1), last = null, repeats = 0, skips = 0;
+  for (let i = 0; i < 120; i++) {
+    const sunset = T.sunsetAfter(new Date(t), e.lat, e.long);
+    const day = Cycles.dayOfZDate(e, { z_start: sunset });
+    if (last !== null && day === last) repeats++;
+    if (last !== null && day > last + 1) skips++;
+    last = day; t = sunset.getTime() + 60000;
+  }
+  check("consecutive sunsets get consecutive day numbers, May to August", repeats === 0 && skips === 0, repeats + " repeats, " + skips + " skips");
+  e.x_dates = [T.newXDate("03/04/2001", "21:00"), T.newXDate("07/19/2003", "22:30"), T.newXDate("07/15/2006", "01:01"), T.newXDate("07/16/2006", "00:58")];
+  const st = Cycles.backtestEvent(e, { tolerance: 0, topN: 10 }).pop();
+  check("an event one sunset-day after the one before it is scored", st.inWindow === true, st.outside || "scored");
+}
+
 console.log("\n" + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);
