@@ -476,6 +476,7 @@
     function closeMenus() {
         if (openMenu) {
             openMenu.classList.remove('ophis-menu--open');
+            openMenu.querySelector('.ophis-menu-title').setAttribute('aria-expanded', 'false');
             openMenu = null;
         }
     }
@@ -487,6 +488,7 @@
         closeMenus();
         openMenu = menuElem;
         menuElem.classList.add('ophis-menu--open');
+        menuElem.querySelector('.ophis-menu-title').setAttribute('aria-expanded', 'true');
     }
 
     function renderMenuState() {
@@ -545,10 +547,12 @@
         return button;
     }
 
+    // The bar has no role="menubar": that role promises a Tab stop and arrow keys between the
+    // titles, and these titles have neither. Each title is a plain button that opens its menu
+    // and says whether the menu is open.
     function buildMenubar() {
         menubarElem = document.createElement('div');
         menubarElem.id = 'ophis-menubar';
-        menubarElem.setAttribute('role', 'menubar');
 
         MENU_TEMPLATE.forEach(function (menuSpec) {
             var menuElem = document.createElement('div');
@@ -559,6 +563,7 @@
             title.className = 'ophis-menu-title';
             title.textContent = menuSpec.label;
             title.setAttribute('aria-haspopup', 'true');
+            title.setAttribute('aria-expanded', 'false');
             title.tabIndex = -1;
             title.addEventListener('click', function (event) {
                 event.stopPropagation();
