@@ -23,7 +23,7 @@
     globalOptions: {
       local_time_offset_in_millis: 0,
       auto_recalculate: true,
-      theme: "dark",
+      theme: "light",
       file_input_validation_mode: C.DEFAULT_FILE_INPUT_VALIDATION_MODE,
       show_operations_column: true
     },

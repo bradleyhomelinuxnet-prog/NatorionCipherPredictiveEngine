@@ -491,7 +491,7 @@
     var restored = Store.load();
     if (!restored) Store.events = [App.sampleEvent()];
 
-    document.documentElement.setAttribute("data-theme", Store.globalOptions.theme || "dark");
+    document.documentElement.setAttribute("data-theme", Store.globalOptions.theme || "light");
 
     Chart.attach(document.getElementById("chart-canvas"));
     Store.subscribe(App.render);

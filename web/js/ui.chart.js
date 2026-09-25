@@ -37,11 +37,12 @@
     five: "rgb(210,43,43)"
   };
 
+  /* The theme may restyle the hit colours; the exe's own values are the fallback. */
   function hitColor(hits) {
-    if (hits >= 5) return HIT_COLORS.five;
-    if (hits === 4) return HIT_COLORS.four;
-    if (hits === 3) return HIT_COLORS.three;
-    return HIT_COLORS.low;
+    if (hits >= 5) return cssVar("--hit-5", HIT_COLORS.five);
+    if (hits === 4) return cssVar("--hit-4", HIT_COLORS.four);
+    if (hits === 3) return cssVar("--hit-3", HIT_COLORS.three);
+    return cssVar("--hit-low", HIT_COLORS.low);
   }
 
   function cssVar(name, fallback) {
@@ -135,7 +136,9 @@
     }
 
     var padLeft = 16, padRight = 16;
-    var axisY = Math.round(height * 0.62);
+    /* Leave only what sits below the axis — tick labels and one glyph row —
+       and give the rest of the height to the stems. */
+    var axisY = Math.round(Math.max(height * 0.62, height - 46));
     var topY = 24;
     var glyphY = axisY + 26;
 
@@ -147,7 +150,7 @@
     ctx.strokeStyle = line;
     ctx.lineWidth = 1;
     ctx.fillStyle = cssVar("--dim", "#888");
-    ctx.font = "10px ui-monospace, SFMono-Regular, Menlo, monospace";
+    ctx.font = "10px \"IBM Plex Mono\", ui-monospace, SFMono-Regular, Menlo, monospace";
     ctx.textAlign = "center";
 
     var ticks = niceTicks(view.min, view.max, Math.max(2, Math.floor(width / 110)));
@@ -299,7 +302,7 @@
         tier = (x - lastLabelX < 22) ? (tier + 1) % 3 : 0;
         lastLabelX = x;
 
-        ctx.font = "600 10px ui-sans-serif, system-ui, sans-serif";
+        ctx.font = "600 10px \"IBM Plex Sans\", ui-sans-serif, system-ui, sans-serif";
         ctx.textAlign = "center";
         ctx.fillStyle = gold;
         ctx.fillText("X" + (index + 1), x, axisY - 13 - tier * 11);
