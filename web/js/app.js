@@ -25,6 +25,8 @@
   var REFIT_REASONS = ["boot", "import", "events", "dates", "reset", "event-settings"];
 
   var hosts = {};
+  // How much of the top of the page the sticky bars cover (keepClearOfBars).
+  var barsCover = 0;
 
   /* ====================================================================== */
   /* Render                                                                 */
@@ -73,7 +75,7 @@
     // A freshly picked Z-Date should be readable without hunting for it.
     if (reason === "selection" && Store.selection.zKey && hosts.detail.classList.contains("open")) {
       var box = hosts.detail.getBoundingClientRect();
-      if (box.top > window.innerHeight - 80 || box.bottom < 80) {
+      if (box.top > window.innerHeight - 80 || box.bottom < barsCover + 80) {
         hosts.detail.scrollIntoView({ block: "nearest", behavior: "smooth" });
       }
     }
@@ -88,10 +90,12 @@
   };
 
   App.renderStatus = function () {
-    // Rebuilding the bar would throw the Current time field away mid-edit and
-    // send its caret back to the month; it catches up when the field is left.
+    // Rebuilding the bar would throw away whatever in it has focus: the
+    // Current time field mid-edit, sending its caret back to the month, or the
+    // reset button, dropping keyboard focus to the page. The bar catches up
+    // when focus leaves it.
     var active = document.activeElement;
-    if (active && active.id === "now-date") return;
+    if (active && hosts.status.contains(active)) return;
     var event = Store.currentEvent();
     var results = Store.results;
     var offset = Store.globalOptions.local_time_offset_in_millis;
@@ -109,7 +113,7 @@
     }
 
     pieces.push('<span class="spacer"></span>');
-    pieces.push('<span class="status-item' + (offset ? " shifted" : "") + '">Current time ' +
+    pieces.push('<span class="status-item' + (offset ? " shifted" : "") + '"><label for="now-date">Current time</label>' +
       '<input type="date" id="now-date" value="' + UI.esc(Panels.toInputDate(T.formatUtcDateOnly(now))) + '"' +
       ' data-tip="The date the F3/F4 filters treat as today. Shift it for backtesting.">' +
       (offset ? '<button class="btn small ghost" data-action="reset-now">reset</button>' : '') +
@@ -337,13 +341,28 @@
       if (!parsed) return;
       var wanted = T.utcMillis(parsed.year, parsed.month - 1, parsed.day);
       var todayUtc = T.floorToUtcMidnight(new Date()).getTime();
-      Store.globalOptions.local_time_offset_in_millis = wanted - todayUtc;
-      Store.commit("now");
+      Store.setNowOffset(wanted - todayUtc);
     });
-    UI.on(hosts.status, "focusout", "#now-date", function () { setTimeout(App.renderStatus, 0); });
-    UI.on(hosts.status, "click", '[data-action="reset-now"]', function () {
-      Store.globalOptions.local_time_offset_in_millis = 0;
-      Store.commit("now");
+    // renderStatus() leaves the bar alone while anything in it has focus, and
+    // catches up when focus leaves the bar. Moving between the field and the
+    // reset button is not leaving it, or the button would be rebuilt under the
+    // pointer and its click lost.
+    UI.on(hosts.status, "focusout", '#now-date, [data-action="reset-now"]', function (e) {
+      if (e.relatedTarget && hosts.status.contains(e.relatedTarget)) return;
+      setTimeout(App.renderStatus, 0);
+    });
+    // Pressing the button must not take focus from the field either: browsers
+    // that do not focus buttons on click (Safari, Firefox on macOS) blur the
+    // field with no relatedTarget.
+    UI.on(hosts.status, "mousedown", '[data-action="reset-now"]', function (e) { e.preventDefault(); });
+    UI.on(hosts.status, "click", '[data-action="reset-now"]', function (e, target) {
+      var fromKeyboard = document.activeElement === target;
+      // Let go of focus in the bar, or renderStatus() would not redraw it now.
+      if (hosts.status.contains(document.activeElement)) document.activeElement.blur();
+      Store.setNowOffset(0);
+      // The button is gone after the redraw; keep keyboard focus in the bar.
+      var again = fromKeyboard && document.getElementById("now-date");
+      if (again) again.focus();
     });
 
     /* ---- toolbar ---- */
@@ -361,7 +380,10 @@
     // The Chronicon opens as a separate window sized to sit beside this one, and
     // a second click brings that same window forward rather than opening another.
     // If a blocker refuses the window, the link itself still opens it in a tab.
+    // A modified or non-primary click (new tab, new window, download) is the
+    // operator asking for something else, so the browser keeps its default.
     UI.on(toolbar, "click", '[data-action="chronicon"]', function (event, link) {
+      if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
       var win = window.open(link.href, link.target, "popup=yes,width=1280,height=860");
       if (!win) return;
       event.preventDefault();
@@ -403,7 +425,10 @@
         domEvent.preventDefault(); document.getElementById("file-input").click(); return;
       }
       if (typing) return;
-      if (domEvent.key === "Escape") {
+      // Escape in a dialog belongs to the dialog (ui.dom.js), which closes and
+      // gives focus back. Clearing the selection as well would redraw the
+      // panels first and throw away the button that focus goes back to.
+      if (domEvent.key === "Escape" && !document.querySelector("#modal.open")) {
         Store.selection.zKey = null;
         Store.selection.operationHash = null;
         Store.notify("selection");
@@ -460,7 +485,7 @@
       ? "ophis-session"
       : File.safeFileName(Store.currentEvent().name || "ophis")) + ".oph";
     File.download(name, Store.exportOph(), "application/json");
-    Store.dirty = false;
+    Store.markSaved();
     UI.toast("Saved " + name, "ok");
   };
 
@@ -521,6 +546,33 @@
   /* Boot                                                                   */
   /* ====================================================================== */
 
+  /**
+   * The sticky bars cover the top of the page. The top bar grows as it wraps
+   * on a narrow screen, and neither bar sticks on a short one (app.css), so
+   * measure how much they cover and keep it current. app.css turns it into
+   * scroll padding, so a field reached by keyboard, or a panel scrolled into
+   * view, lands below the bars rather than underneath.
+   */
+  function keepClearOfBars() {
+    var bars = [document.querySelector(".topbar"), hosts.status].filter(Boolean);
+    function measure() {
+      var covered = 0;
+      bars.forEach(function (bar) {
+        var style = window.getComputedStyle(bar);
+        if (style.position === "sticky") covered = Math.max(covered, (parseFloat(style.top) || 0) + bar.offsetHeight);
+      });
+      barsCover = covered;
+      document.documentElement.style.setProperty("--bars-cover", covered ? (covered + 8) + "px" : "0px");
+    }
+    measure();
+    if (window.ResizeObserver) {
+      var observer = new window.ResizeObserver(measure);
+      bars.forEach(function (bar) { observer.observe(bar); });
+    }
+    // A change of height alone does not resize the bars, but can unstick them.
+    window.addEventListener("resize", measure);
+  }
+
   App.boot = function () {
     hosts = {
       eventBar: document.getElementById("event-bar"),
@@ -545,6 +597,7 @@
     Chart.attach(document.getElementById("chart-canvas"));
     Store.subscribe(App.render);
     wire();
+    keepClearOfBars();
 
     Store.recalculate();
     App.render("boot");

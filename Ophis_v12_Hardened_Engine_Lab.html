@@ -82,6 +82,7 @@
   operation, and it <b>rejects</b> injection payloads that <code>new&nbsp;Function()</code> would execute. Open it; the tests run themselves.</p>
 </header>
 
+<main>
 <section>
   <div class="sec-no">§A · Results</div>
   <h2>Self-checking scoreboard</h2>
@@ -128,6 +129,7 @@
 <code class="cm"># Grammar:  expr := term (('+'|'-') term)*   term := factor (('*'|'/') factor)*</code>
 <code class="cm">#           factor := number | 'Y' | CONST | func '(' expr ')' | '(' expr ')' | '-' factor</code></pre>
 </section>
+</main>
 
 <footer>
   <b>Ophis v12 · Hardened Engine Lab.</b> Proof-of-fix companion to the Reverse-Engineering Report (§7/§8). Implements the

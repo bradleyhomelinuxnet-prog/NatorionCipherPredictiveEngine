@@ -1,9 +1,10 @@
 # Runs every test suite on every push and pull request.
 #   natorion — the stand-alone self-check, the browser test in headless
 #              Chromium, and the parity test against the original Ophis v12 source.
-#   web      — Ophis Web's unit tests, the cycle-echo and backtest tests, and
-#              its differential test against the same original engine, plus
-#              500 random events (seeded, so a failure reproduces).
+#   web      — Ophis Web's unit tests, the cycle-echo and backtest tests, its
+#              differential test against the same original engine plus 500
+#              random events (seeded, so a failure reproduces), and the page
+#              itself in headless Chromium.
 name: Tests
 
 on:
@@ -13,10 +14,12 @@ on:
 permissions:
   contents: read
 
-# A newer push to the same branch supersedes the run in progress.
+# On a branch or a pull request, a newer push supersedes the run in progress.
+# On main a run that has started is never cancelled. (GitHub still keeps only
+# the newest of the runs waiting behind it.)
 concurrency:
   group: tests-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   natorion:
@@ -39,8 +42,8 @@ jobs:
         run: node natorion/tests/parity.js 300
 
   web:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -52,3 +55,10 @@ jobs:
         run: node web/tests/cycles.node.js
       - name: Parity with the original v12 engine, plus 500 random events
         run: node web/tests/parity.node.js --fuzz 500 --seed 138 --quiet
+      - name: Install Playwright Chromium
+        run: npx --yes playwright@1.56.1 install --with-deps chromium
+      - name: Browser test
+        # Playwright is installed outside the checkout, so nothing lands in web/.
+        run: |
+          npm i --no-save --no-audit --no-fund --prefix "$RUNNER_TEMP/pw" playwright@1.56.1
+          NODE_PATH="$RUNNER_TEMP/pw/node_modules" node web/tests/browser.js

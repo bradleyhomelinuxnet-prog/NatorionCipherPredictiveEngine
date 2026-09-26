@@ -143,13 +143,25 @@ refused, not the exact sentence.
 
 ### 5 · Years 0–99 are the years written
 
-Both builds accept a year of up to four digits, so `02/14/0033` is a valid
-X-Date. The desktop app then projects it as **2033**: its date library reads
-a year below 100 as two digits. This build projects it as the year 33, and
-writes such years back with four digits (`0033`). Every fixture and every
-random event in the parity run is dated well after year 99, so the two
-engines still agree on all of them; `web/tests/unit.js` pins this build's
-side of the difference.
+`02/14/0033` is a valid X-Date in both builds, but they read it differently.
+The desktop app's date library does not take a year below 100 as written:
+
+- years 32–99 are read as two digits: `0033` is **2033** and `0050` is 1950;
+- years 13–31 are refused (`02/14/0013` gives "Problem parsing xDate");
+- years 1–12 come out with the fields moved around: `02/14/0001` is 2 January
+  2014.
+
+This build reads every year as written, so `02/14/0033` is the year 33. It
+writes such years with four digits (`0033`): in the Z-Dates, in the CSV, and
+in any X- or T-Date entered through its date fields. A date read from a file
+keeps the text it had. The desktop app reads `0033`, `033` and `33` alike
+(all as 2033), so the extra digits change nothing when it opens a file saved
+here. Neither build goes past the year 9999: both read `07/04/12026` as
+4 July 9999.
+
+Every fixture and every random event in the parity run is dated well after
+year 99, so the two engines still agree on all of them; `web/tests/unit.js`
+pins this build's side of the difference.
 
 ---
 

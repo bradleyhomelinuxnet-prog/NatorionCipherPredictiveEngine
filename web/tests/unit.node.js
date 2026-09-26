@@ -20,6 +20,13 @@ const scope = {
 };
 scope.globalThis = scope;
 scope.window = scope;
+// ophis.store.js keeps the session in localStorage; an in-memory one stands in.
+const stored = new Map();
+scope.localStorage = {
+  getItem: (key) => (stored.has(key) ? stored.get(key) : null),
+  setItem: (key, value) => { stored.set(key, String(value)); },
+  removeItem: (key) => { stored.delete(key); }
+};
 const ctx = vm.createContext(scope);
 
 function load(rel) {
@@ -37,6 +44,9 @@ function load(rel) {
   "web/js/ophis.time.js",
   "web/js/ophis.engine.js",
   "web/js/ophis.file.js",
+  "web/js/ophis.store.js",
+  "web/js/ui.dom.js",
+  "web/js/ui.panels.js",
   "web/tests/unit.js"
 ].forEach(load);
 

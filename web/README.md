@@ -47,9 +47,9 @@ the `.oph` format.
 | **Timeline** | X-Dates on a time axis, an arc from each anchor to every date it produced, stems whose height is the score and whose colour is the hit count. Wheel zooms, drag pans (mouse, finger or pen), double-click fits, click or tap selects. Optional moon-phase and eclipse markers. |
 | **Output** | One row per projected day. Click a column to sort, click a row for the full derivation, hover any pill to see the arithmetic behind it. |
 | **Operations** | The formula table. Edit, weight, enable, add, reset. Errors show inline as you type. |
-| **Filters** | The eight output filters, with live counts of shown-of-generated. When every Z-Date is filtered out, the output names the filter hiding the most and offers to turn it off. |
-| **Cycles** | Cycle echoes: Z-Dates that sit a whole number of Metonic (19-year) or 138-year cycles from an X-Date, each count set against what chance alone would give. It reads the engine's results and never changes them. |
-| **Backtest** | Would the cast have projected your later events from your earlier ones? Each step is measured against a random date in the same window. |
+| **Filters** | The eight output filters, with live counts of shown-of-generated. When every Z-Date is filtered out, the output names the filter (or the T-Dates) whose removal alone would bring back the most, with a button to turn that filter off; when no single one does, it says several are hiding them together. |
+| **Cycles** | Cycle echoes: Z-Dates that sit a whole number of Metonic (19-year) or 138-year cycles from an X-Date, each count set against what chance alone would give. It reads the engine's results and never changes them. Its settings are kept in this browser, not in the `.oph` file. |
+| **Backtest** | Would the cast have projected your later events from your earlier ones? Each step is measured against chance near the real date: how much of the 60 days either side of it the projections happen to cover. A random date anywhere in the years ahead would flatter the cast, since projections crowd the weeks after the last event, and so do real events. One known limit: when events are only weeks apart, the top-10 verdict is a little generous (noise dated about a month apart is called above chance about 7% of the time, not 5%); the verdict on all projections stays fair. Events still in the future, or beyond the projection horizon, are shown but not scored. |
 | **Chronicon ↗** | Opens the Natorion app's Chronicon (clocks, cycles, calendars) in its own window; nothing of it is loaded into Ophis Web. |
 
 Keyboard: `Ctrl/Cmd+O` open, `Ctrl/Cmd+S` save, `Esc` clear the selection.
@@ -110,7 +110,9 @@ Four files from `../lib/`, shared with the desktop build, are loaded if present:
 
 Everything else — moon phases, all Days-scope arithmetic, the whole engine — is
 self-contained. To move `web/` somewhere else on its own, copy those four files
-next to it and point the four `<script>` tags at them.
+next to it and point the four `<script>` tags at them. The **Chronicon ↗** link
+points at `../natorion/`, so it works only where that folder sits beside `web/`,
+as it does in this repository and on the published site.
 
 ---
 
@@ -119,6 +121,7 @@ next to it and point the four `<script>` tags at them.
 ```bash
 node web/tests/unit.node.js                              # behaviour tests
 node web/tests/cycles.node.js                            # cycle echoes and the backtest; chance figures checked by simulation
+node web/tests/browser.js                                # the page in headless Chromium: dialogs, tooltips, focus, sticky bars, touch, theme, phone width
 node web/tests/parity.node.js                            # differential against the original v12 engine
 node web/tests/parity.node.js --fuzz 500 --seed 138      # plus 500 random events, reproducibly
 ```
@@ -128,8 +131,9 @@ compares both engines field by field over 29 fixtures, including every `.oph` in
 the repository; `--fuzz N` adds N randomised events, and `--seed` makes them
 repeatable. Current state: all pass, with one named and fully-explained
 divergence. See [docs/PARITY.md](docs/PARITY.md). GitHub Actions runs the unit
-tests, the cycle tests and the seeded fuzz run on every push
-(`.github/workflows/tests.yml`).
+tests, the cycle tests, the seeded fuzz run and the browser test on every push
+(`.github/workflows/tests.yml`). The browser test needs Playwright with
+Chromium (`npm i playwright && npx playwright install --with-deps chromium`).
 
 The same behaviour tests run in the browser at `web/tests/index.html`, which
 also has a box for trying formulas — including injection payloads — by hand.

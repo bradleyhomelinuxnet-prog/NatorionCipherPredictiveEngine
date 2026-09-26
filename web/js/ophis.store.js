@@ -61,10 +61,13 @@
     return Store.results;
   };
 
-  /** Mutate, recompute (if auto), persist, then tell the UI. */
+  /** Mutate, recompute (if auto), persist, then tell the UI.
+      `dirty` means edits a .oph file does not hold yet, so opening a file asks
+      first. options.edit === false marks a change that is not one: picking
+      another event, the Current time override, a new empty session. */
   Store.commit = function (reason, options) {
     options = options || {};
-    Store.dirty = true;
+    if (options.edit !== false) Store.dirty = true;
     if (Store.globalOptions.auto_recalculate || options.force) Store.recalculate();
     Store.save();
     Store.notify(reason || "commit");
@@ -82,9 +85,16 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         events: Store.events,
         currentEventIndex: Store.currentEventIndex,
-        globalOptions: Store.globalOptions
+        globalOptions: Store.globalOptions,
+        dirty: Store.dirty          // unsaved edits are still unsaved after a reload
       }));
     } catch (e) { /* private mode, quota — the app still works, just forgets */ }
+  };
+
+  /** The session has just been written out as a .oph file. */
+  Store.markSaved = function () {
+    Store.dirty = false;
+    Store.save();
   };
 
   Store.load = function () {
@@ -102,6 +112,8 @@
       if (!parsed.events.length) return false;
       Store.events = parsed.events;
       Store.currentEventIndex = Math.min(saved.currentEventIndex || 0, parsed.events.length - 1);
+      // A session stored before this flag was kept may hold unsaved edits.
+      Store.dirty = saved.dirty !== false;
       Object.keys(Store.globalOptions).forEach(function (key) {
         if (saved.globalOptions && saved.globalOptions[key] !== undefined) {
           Store.globalOptions[key] = saved.globalOptions[key];
@@ -146,7 +158,13 @@
   Store.selectEvent = function (index) {
     Store.currentEventIndex = index;
     Store.selection = { zKey: null, operationHash: null, yOrdinal: null };
-    Store.commit("events", { force: true });
+    Store.commit("events", { force: true, edit: false });   // a .oph does not record which event is open
+  };
+
+  /** The Current time override: how the session is read, not part of it. */
+  Store.setNowOffset = function (millis) {
+    Store.globalOptions.local_time_offset_in_millis = millis;
+    Store.commit("now", { edit: false });
   };
 
   /* ------------------------------------------------------- date actions */
@@ -258,7 +276,7 @@
     Store.currentEventIndex = 0;
     Store.selection = { zKey: null, operationHash: null, yOrdinal: null };
     Store.dirty = false;
-    Store.commit("reset", { force: true });
+    Store.commit("reset", { force: true, edit: false });   // an empty session holds nothing to lose
   };
 
   root.Ophis.Store = Store;

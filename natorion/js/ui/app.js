@@ -14,7 +14,7 @@
     NC.chronView.active(name === "chronicon");
     if (name === "cipher") NC.chart.draw();
     if (location.hash.slice(1) !== name) history.replaceState(null, "", "#" + name);
-    S.state.settings.screen = name;
+    S.saveScreen(name);   // remembered at once: leaving the page saves only pending edits
     if (!noFocus) { var h = document.querySelector('.screen[data-active="true"] h1'); if (h) h.focus({ preventScroll: true }); root.scrollTo(0, 0); }
   }
 
@@ -27,6 +27,22 @@
     var dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : !matchMedia("(prefers-color-scheme: light)").matches;
     S.setSetting("theme", dark ? "light" : "dark");
     applyTheme();
+  }
+
+  // Above 720 px the top bar is sticky, and a control that takes keyboard focus
+  // could be left underneath it. natorion.css turns the bar's height into
+  // scroll padding, so the browser brings such a control out below it. The bar
+  // wraps onto a second row on narrower screens or with a long event name, so
+  // it is measured, not assumed.
+  function keepClearOfBar() {
+    var bar = document.querySelector(".topbar");
+    function measure() {
+      var sticky = getComputedStyle(bar).position === "sticky";
+      document.documentElement.style.setProperty("--bar-cover", sticky ? (bar.offsetHeight + 8) + "px" : "0px");
+    }
+    measure();
+    if (root.ResizeObserver) new root.ResizeObserver(measure).observe(bar);
+    root.addEventListener("resize", measure);
   }
 
   function renderEventPicker() {
@@ -43,6 +59,7 @@
   function start() {
     S.load();
     applyTheme();
+    keepClearOfBar();
     NC.cipher.init(); NC.opsView.init(); NC.chronView.init(); NC.files.init();
     renderMsrfSets();
     renderEventPicker();

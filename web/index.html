@@ -18,12 +18,12 @@
 <body>
 
 <header class="topbar">
-  <div class="brand">
+  <h1 class="brand">
     <span class="brand-mark" aria-hidden="true">&#9737;</span>
     <span class="brand-text">
       <b>OPHIS</b><span class="brand-sub">web · v12 engine</span>
     </span>
-  </div>
+  </h1>
 
   <div id="event-bar" class="event-bar"></div>
 
@@ -32,20 +32,20 @@
     <button class="btn" data-action="save" data-tip="Save every event as .oph &middot; Ctrl+S">Save</button>
     <button class="btn" data-action="csv" data-tip="Export the current output as CSV">CSV</button>
     <button class="btn ghost" data-action="new" data-tip="Start a new session">New</button>
+    <button class="btn" data-action="backtest" data-tip="Would the cast have projected your later events from your earlier ones? Measured against chance.">Backtest</button>
     <!-- The Chronicon is a separate instrument (the Natorion app). It opens in its own
          window beside this one; nothing of it is loaded into Ophis. -->
-    <button class="btn" data-action="backtest" data-tip="Would the cast have projected your later events from your earlier ones? Measured against chance.">Backtest</button>
     <a class="btn chron-link" data-action="chronicon" href="../natorion/index.html#chronicon" target="natorion-chronicon" rel="noopener" data-tip="Open the Chronicon &mdash; clocks, cycles and calendars &mdash; in its own window">Chronicon &#8599;</a>
     <button class="icon-btn" data-action="theme" data-tip="Light / dark" aria-label="Switch between light and dark">&#9681;</button>
     <button class="icon-btn" data-action="about" data-tip="What this is and how it scores" aria-label="About Ophis Web">?</button>
   </div>
 </header>
 
-<div id="statusbar" class="statusbar"></div>
+<section id="statusbar" class="statusbar" aria-label="Status"></section>
 
 <main class="layout">
 
-  <aside class="rail rail-left">
+  <aside class="rail rail-left" aria-label="Dates and event">
     <section id="panel-xdates" class="panel"></section>
     <section id="panel-intervals" class="panel"></section>
     <section id="panel-tdates" class="panel collapsed-ok"></section>
@@ -78,7 +78,7 @@
     <section id="panel-detail" class="panel panel-detail"></section>
   </section>
 
-  <aside class="rail rail-right">
+  <aside class="rail rail-right" aria-label="Operations, filters and cycles">
     <section id="panel-operations" class="panel"></section>
     <section id="panel-filters" class="panel"></section>
     <section id="panel-cycles" class="panel panel-cycles"></section>
@@ -93,7 +93,7 @@
 </footer>
 
 <input type="file" id="file-input" accept=".oph,application/json,text/plain" hidden>
-<div id="tooltip" class="tooltip" role="tooltip"></div>
+<div id="tooltip" class="tooltip" role="tooltip" aria-hidden="true"></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <div id="modal" class="modal"></div>
 

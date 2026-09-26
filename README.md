@@ -69,6 +69,7 @@ node natorion/tests/parity.js 300     # against the original v12 code: the sampl
 # Ophis Web
 node web/tests/unit.node.js                            # behaviour tests, no dependencies
 node web/tests/cycles.node.js                          # cycle echoes and the backtest, no dependencies
+node web/tests/browser.js                              # the page in headless Chromium (needs Playwright)
 node web/tests/parity.node.js --fuzz 500 --seed 138    # against the original v12 code, plus 500 random events
 ```
 

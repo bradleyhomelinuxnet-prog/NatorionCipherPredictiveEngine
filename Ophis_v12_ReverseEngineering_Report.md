@@ -277,7 +277,7 @@ You’ve been rebuilding Ophis as **single-file, dependency-free** HTML apps. Fi
 **Two real issues to fix before it ships as a portfolio piece:**
 
 1. **`new Function()` on user formula input** (`PSYFR1.html:739`, `NatoriOphis.html:533`, and even the `OPHIS.html:991` demo). Guarded only by a regex character-allowlist (`:736–737`) — a denylist, not a sandbox. In a browser (no Node) the blast radius is the page itself, so it’s **self-XSS**, but it’s the same anti-pattern the report criticises in the parent app.
-2. **Unescaped `innerHTML` of the anchor `label`** (`PSYFR1.html:960`, op label `:981`). `a.label` comes straight from the input (`:970`) with no escaping — a label like `<img src=x onerror=…>` executes. User-controlled, and it round-trips through saved/imported JSON config.
+2. **Unescaped `innerHTML` of the anchor `label`** (`PSYFR1.html:961`, op label `:982`). `a.label` comes straight from the input (`:971`) with no escaping — a label like `<img src=x onerror=…>` executes. User-controlled, and it round-trips through saved/imported JSON config.
 
 Neither is a network-exfil risk in an offline page, but both are the exact “derived text → live compiler / innerHTML” smell your report calls out — fixing them makes the portfolio story *“I found these classes of bug and then didn’t commit them myself.”*
 

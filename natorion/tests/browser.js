@@ -3,7 +3,8 @@
    and checks what a person would do with it — every screen, the projection,
    opening a v12 file (and refusing one with no events), managing events,
    pasting dates, editing operations, the Chronicon bridge, the skip link,
-   exports, HH:MM scope, persistence, the timeline and phone width.
+   focus under the sticky top bar, exports, HH:MM scope, persistence, the
+   timeline and phone width.
 
      node natorion/tests/browser.js                 # run the checks
      node natorion/tests/browser.js --shots out/    # also save screenshots
@@ -274,6 +275,35 @@ async function main() {
     check("the skip link keeps the Chronicon screen", await page.evaluate(() => location.hash === "#main" && document.querySelector('.screen[data-active="true"]').dataset.screen === "chronicon"));
     await shot(page, "chronicon-2040", { fullPage: true });
 
+    console.log("keyboard focus and the sticky top bar");
+    // Tab to the Month field while it lies under the bar: the page must scroll
+    // it into view below the bar. At 800 px the bar wraps onto a second row.
+    const underBar = [];
+    for (const width of [1440, 800]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+      await page.evaluate(() => {
+        const bar = document.querySelector(".topbar"), month = document.getElementById("chMonth");
+        scrollBy(0, month.getBoundingClientRect().top - (bar.offsetHeight - month.offsetHeight) / 2);
+        document.getElementById("chYear").focus({ preventScroll: true });
+      });
+      await page.keyboard.press("Tab");
+      underBar.push(await page.evaluate(w => {
+        const bar = document.querySelector(".topbar").getBoundingClientRect(), f = document.activeElement, r = f.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return { width: w, barBottom: Math.round(bar.bottom), focused: f.id, top: Math.round(r.top), clear: r.top >= bar.bottom && hit === f };
+      }, width));
+    }
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    check("a field tabbed to under the top bar is scrolled clear of it, with the bar on one row or two", underBar.every(u => u.focused === "chMonth" && u.clear), JSON.stringify(underBar));
+    // The bar's own controls are on screen already: moving focus along them
+    // must not scroll the page.
+    const footY = await page.evaluate(() => { scrollTo(0, document.documentElement.scrollHeight); return Math.round(scrollY); });
+    await page.evaluate(() => document.querySelector(".topbar button, .topbar select").focus());
+    for (let i = 0; i < 4; i++) await page.keyboard.press("Tab");
+    const alongBar = await page.evaluate(() => ({ y: Math.round(scrollY), inBar: document.querySelector(".topbar").contains(document.activeElement) }));
+    check("focus moving along the top bar leaves the page where it was", footY > 0 && alongBar.inBar && alongBar.y === footY, footY + " -> " + JSON.stringify(alongBar));
+
     console.log("exports");
     await go(page, "files");
     const shown = await page.evaluate(() => ({ n: NC.store.state.results.sorted.length, first: NC.time.msToDateString(NC.store.state.results.sorted[0].start, NC.store.state.results.zone), dates: NC.store.state.events.map(e => e.x_dates.map(d => d.date)) }));
@@ -338,9 +368,9 @@ async function main() {
     await settle(page);
     check("events survive a reload", (await page.evaluate(() => NC.store.state.events.length)) === evCount);
     check("the place survives a reload", (await page.inputValue("#evLat")) === "29.98");
-    // Opened at an address fragment that is not a screen, the app shows the saved screen.
+    // Opened at an address fragment that is not a screen, the app shows the saved
+    // screen. Switching to it is enough to save it; no other change is needed.
     await go(page, "guide");
-    await page.evaluate(() => NC.store.persistNow());   // the screen is kept with the next save
     await page.goto("about:blank");
     await page.goto(PAGE + "#main");
     await settle(page);

@@ -61,7 +61,7 @@
   .hs .n{font-family:'Cinzel',serif;font-weight:800;font-size:23px;color:var(--gold2)}
   .hs .l{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:2px}
 
-  section{padding:clamp(24px,4vw,40px) 0;border-top:1px solid var(--line);scroll-margin-top:60px}
+  section{padding:clamp(24px,4vw,40px) 0;border-top:1px solid var(--line);scroll-margin-top:calc(var(--nav-h,50px) + 10px)}
   .sec-no{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.3em;color:var(--red);text-transform:uppercase}
   h2{font-family:'Cinzel',serif;font-weight:600;font-size:clamp(22px,4vw,33px);margin:.1em 0 .5em;color:var(--gold2);line-height:1.06}
   h3{font-family:'Cinzel',serif;font-weight:600;font-size:19px;color:var(--ink);margin:1.4em 0 .3em}
@@ -369,7 +369,7 @@ npx asar extract extracted/app.asar extracted/unpacked_full</code></pre>
     <li><b>Lock down webPreferences:</b> <code>nodeIntegration:false</code>, <code>contextIsolation:true</code> (explicit), <code>sandbox:true</code>, keep the preload.</li>
     <li><b>Validate every IPC path.</b> Confine <code>autoSaveToFile</code> writes to an allowed directory; reject absolute paths and <code>..</code> traversal; prefer routing saves through <code>dialog.showSaveDialog</code> like <code>saveFileAs</code> already does.</li>
     <li><b>Tighten the CSP.</b> Drop <code>'unsafe-eval'</code> (possible once the parser lands) and move inline handlers out to drop <code>'unsafe-inline'</code>.</li>
-    <li><b>HTML-escape user text in the rewrites.</b> One <code>esc()</code> helper on every <code>innerHTML</code> interpolation of the anchor <code>label</code> / notes (<code>PSYFR1.html:960, 981</code>).</li>
+    <li><b>HTML-escape user text in the rewrites.</b> One <code>esc()</code> helper on every <code>innerHTML</code> interpolation of the anchor <code>label</code> / notes (<code>PSYFR1.html:961, 982</code>).</li>
     <li><b>De-dupe the twins.</b> <code>PSYFR1.html</code> ≡ <code>Natori-On-PSYFR-Main-UI.html</code>; keep one as source of truth, generate the other.</li>
   </ul>
   <div class="note-card"><h4>Portfolio angle</h4><p>The rewrites (PSYFR / Natori) are already a cohesive, dependency-free, offline single-file UI — genuinely portfolio-grade. Fixing their own <code>new Function</code> + label-<code>innerHTML</code> smells makes the story land: <em>“I found these bug classes in the target, then made sure not to ship them myself.”</em> Commit the un-obfuscated <code>src/</code>, this report, a <code>METHOD.md</code> from §2, and a <code>SECURITY.md</code> from §6 — and keep the 100 MB <code>.exe</code> out of git.</p></div>
@@ -396,6 +396,11 @@ $('themeBtn').onclick=()=>applyTheme(_root.getAttribute('data-theme')==='light'?
 $('tsUp').onclick=()=>{_zoom=Math.min(1.5,Math.round((_zoom+0.1)*10)/10);applyZoom(_zoom);};
 $('tsDown').onclick=()=>{_zoom=Math.max(0.8,Math.round((_zoom-0.1)*10)/10);applyZoom(_zoom);};
 $('tsReset').onclick=()=>{_zoom=1;applyZoom(_zoom);};
+// The sticky nav wraps onto more rows on a narrow screen or at a larger text size. Tell the
+// sections its height, so a section link lands with the heading below the nav, not under it.
+const _nav=document.querySelector('nav.top');
+function measureNav(){_root.style.setProperty('--nav-h',_nav.offsetHeight+'px');}
+measureNav();if(window.ResizeObserver)new ResizeObserver(measureNav).observe(_nav);else addEventListener('resize',measureNav);
 </script>
 </body>
 </html>

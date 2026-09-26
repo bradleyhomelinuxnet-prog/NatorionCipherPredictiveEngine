@@ -19,9 +19,13 @@
 
    2. The backtest. Stand on the day of an earlier known event, give the
       engine only the events up to then, and ask whether it would have
-      projected the next one. The control is a random date in the same
-      window: the fraction of that window the projections happen to cover
-      is the chance of a hit by luck alone.
+      projected the next one. The control is chance near the real date: the
+      share of the days within LOCAL_CONTROL_DAYS of it that the projections
+      happen to cover is the chance of a hit by luck alone.
+
+   Days are counted the way the engine keys Z-Dates: the UTC calendar day in
+   Days scope, and in HH:MM scope the sunset-to-sunset day, named by the local
+   date of the sunset that opens it.
    ========================================================================== */
 (function (root) {
   "use strict";
@@ -56,6 +60,30 @@
 
   Cycles.DEFAULTS = { metonic: true, phoenix: true, tolerance: 2, backtestTolerance: 1, topN: 10, allEvents: false };
 
+  /* The values each setting may take. Settings are read back from browser
+     storage, where a hand-edited or damaged entry could hold anything; a
+     tolerance of a million days would stall every render. */
+  Cycles.CHOICES = { tolerance: [1, 2, 3], backtestTolerance: [0, 1, 3, 7] };
+  Cycles.TOP_N_MAX = 50;
+
+  function validSetting(key, value) {
+    if (typeof Cycles.DEFAULTS[key] === "boolean") return typeof value === "boolean";
+    if (Cycles.CHOICES[key]) return Cycles.CHOICES[key].indexOf(value) >= 0;
+    if (key === "topN") return typeof value === "number" && value % 1 === 0 && value >= 1 && value <= Cycles.TOP_N_MAX;
+    return false;
+  }
+
+  /** Every setting, each one kept only if it is one of its allowed values. */
+  Cycles.sanitizeSettings = function (saved) {
+    var source = (saved && typeof saved === "object" && !Array.isArray(saved)) ? saved : {};
+    var out = {};
+    Object.keys(Cycles.DEFAULTS).forEach(function (key) {
+      var value = Object.prototype.hasOwnProperty.call(source, key) ? source[key] : undefined;
+      out[key] = validSetting(key, value) ? value : Cycles.DEFAULTS[key];
+    });
+    return out;
+  };
+
   function definition(id) {
     for (var i = 0; i < Cycles.DEFINITIONS.length; i++) if (Cycles.DEFINITIONS[i].id === id) return Cycles.DEFINITIONS[i];
     return null;
@@ -70,6 +98,46 @@
   function dayNumber(instant) { return Math.floor(instant.getTime() / DAY); }
   Cycles.dayNumber = dayNumber;
 
+  function isHHMM(event) { return event.scope === C.EVENT_SCOPE__HH_MM; }
+
+  /** Day number of the local calendar date of an instant, at the event's place. */
+  function localDayNumber(event, instant) {
+    var zone = T.isValidLatAndLong(event.lat, event.long) ? T.timezoneAt(event.lat, event.long) : T.browserTimezone();
+    var wall = T.utcMillisToWallTime(instant.getTime(), zone);
+    return Math.round(T.utcMillis(wall.year, wall.month - 1, wall.day) / DAY);
+  }
+
+  /**
+   * The day a moment belongs to. Days scope: its UTC calendar day, like a
+   * Z-Date's. HH:MM scope: the sunset-to-sunset day opened by the latest
+   * sunset at or before it, which is the sunset that opens the Z-Date window
+   * the moment falls in, so an event inside a projected window is on that
+   * Z-Date's day.
+   */
+  function dayOfInstant(event, instant) {
+    if (!isHHMM(event)) return dayNumber(instant);
+    var opening = T.sunsetBefore(instant, event.lat, event.long);
+    return opening ? dayOfSunset(event, opening) : localDayNumber(event, instant);
+  }
+  Cycles.dayOfInstant = dayOfInstant;
+
+  /**
+   * A sunset-day is named by the local date twelve hours before the sunset
+   * that opens it. Sunsets fall between about 14:00 and 01:00 local time, so
+   * this never crosses midnight. Naming it by the sunset's own date would give
+   * two sunset-days the same number wherever summer sunsets come just after
+   * midnight, as in Fairbanks or Reykjavik.
+   */
+  function dayOfSunset(event, sunset) {
+    return localDayNumber(event, new Date(sunset.getTime() - DAY / 2));
+  }
+
+  /** The day of a Z-Date. In HH:MM scope its window opens at z_start, a sunset. */
+  function dayOfZDate(event, zStruct) {
+    return isHHMM(event) ? dayOfSunset(event, zStruct.z_start) : dayNumber(zStruct.z_start);
+  }
+  Cycles.dayOfZDate = dayOfZDate;
+
   /** Moon ages within this many days of each other count as the same phase. */
   var SAME_MOON_DAYS = 1.5;
   function sameMoon(a, b) {
@@ -83,7 +151,7 @@
     (event.x_dates || []).forEach(function (xDate, index) {
       if (xDate.enabled !== true) return;
       var instant = T.xDateToInstant(event.scope, xDate, event.lat, event.long, []);
-      if (instant) out.push({ index: index, xDate: xDate, instant: instant, day: dayNumber(instant) });
+      if (instant) out.push({ index: index, xDate: xDate, instant: instant, day: dayOfInstant(event, instant) });
     });
     out.sort(function (a, b) { return a.day - b.day || a.index - b.index; });
     return out;
@@ -94,9 +162,10 @@
 
   /**
    * P(at least `observed` successes) when trial i succeeds with probability
-   * probs[i], independently. Exact, by building the whole distribution.
+   * probs[i], independently. Exact, by building the whole distribution:
+   * O(n²), which is fine for a backtest's few dozen steps.
    */
-  function tailProbability(probs, observed) {
+  function poissonBinomialTail(probs, observed) {
     if (observed <= 0) return 1;
     var dist = [1];
     probs.forEach(function (p) {
@@ -111,9 +180,36 @@
     for (var j = observed; j < dist.length; j++) tail += dist[j];
     return Math.min(1, Math.max(0, tail));
   }
-  Cycles.tailProbability = tailProbability;
+  Cycles.poissonBinomialTail = poissonBinomialTail;
 
-  function repeat(p, n) { var a = []; for (var i = 0; i < n; i++) a.push(p); return a; }
+  /**
+   * The same when every trial has the same probability p: the binomial tail,
+   * in O(n). Each term is built in logs, so nothing underflows when n runs to
+   * thousands of Z-Dates.
+   */
+  function binomialTail(n, p, observed) {
+    if (observed <= 0) return 1;
+    if (observed > n || !(p > 0)) return 0;
+    if (p >= 1) return 1;
+    var logP = Math.log(p), logQ = Math.log1p(-p);
+    var logChoose = 0;                     // log C(n, j), starting at j = 0
+    var tail = 0;
+    for (var j = 0; j <= n; j++) {
+      if (j >= observed) tail += Math.exp(logChoose + j * logP + (n - j) * logQ);
+      if (j < n) logChoose += Math.log((n - j) / (j + 1));
+    }
+    return Math.min(1, Math.max(0, tail));
+  }
+  Cycles.binomialTail = binomialTail;
+
+  /** P(at least `observed` successes), taking the O(n) path when it can. */
+  function tailProbability(probs, observed) {
+    if (!probs.length) return observed <= 0 ? 1 : 0;
+    var p = probs[0];
+    for (var i = 1; i < probs.length; i++) if (probs[i] !== p) return poissonBinomialTail(probs, observed);
+    return binomialTail(probs.length, p, observed);
+  }
+  Cycles.tailProbability = tailProbability;
 
   /** Plain-English reading of a p-value, deliberately conservative. */
   Cycles.verdict = function (observed, expected, pValue, trials) {
@@ -194,7 +290,7 @@
     var minDay = Infinity, maxDay = -Infinity;
     keys.forEach(function (key) {
       var z = zStructs[key];
-      var day = dayNumber(z.z_start);
+      var day = dayOfZDate(event, z);
       if (day < minDay) minDay = day;
       if (day > maxDay) maxDay = day;
       var echoes = echoesOfDay(day, z.z_start, xs, defs, tolerance);
@@ -209,7 +305,7 @@
       var p = echoCoverage(minDay, maxDay, xs, defs, tolerance) / spanDays;
       var observed = out.list.length;
       var expected = keys.length * p;
-      var pValue = tailProbability(repeat(p, keys.length), observed);
+      var pValue = binomialTail(keys.length, p, observed);
       out.summary = {
         observed: observed, expected: expected, trials: keys.length, chancePerDate: p, pValue: pValue,
         verdict: Cycles.verdict(observed, expected, pValue, keys.length)
@@ -257,20 +353,45 @@
 
   /* --------------------------------------------------------------- backtest */
 
-  function horizonDays(event, lastKnownDay, keptDays) {
+  /**
+   * Chance is judged near the event, not across the whole horizon. The
+   * projections are not spread evenly over the years ahead: they crowd the
+   * weeks and months after the last known event, and so do real next events.
+   * Measured against a random date anywhere in the seven-year horizon, series
+   * of pure-noise dates came out "above chance" in up to a third of cases, and
+   * in most of them with the horizon filter off. Asking instead how much of the
+   * days either side of the real date the projections happen to cover compares
+   * like with like: the same noise is then flagged no more often than a fair
+   * test allows (web/tests/cycles.node.js checks this). The verdicts hardly
+   * move between 30 and 90 days; 60 holds a representative stretch of
+   * projections while still following how their density changes.
+   *
+   * One known limit: when events are only weeks apart, the top-N figure is a
+   * little generous. Noise with gaps of 30 days on average was called "above
+   * chance" in about 7% of 960 series, not 5%, while the any-hit figure stayed
+   * fair. A window scaled to the typical gap between the events would correct
+   * it.
+   */
+  var LOCAL_CONTROL_DAYS = 60;
+  Cycles.LOCAL_CONTROL_DAYS = LOCAL_CONTROL_DAYS;
+
+  /** How far ahead the engine was allowed to project, and what set that limit. */
+  function horizonOf(event, lastKnownDay, keptDays) {
     if (Engine.filterEnabled(event, "iso_event_filter_beyond_max_days")) {
       var filter = null;
       C.FILTERS.forEach(function (f) { if (f.key === "iso_event_filter_beyond_max_days") filter = f; });
       var value = filter ? Engine.filterValue(event, filter) : null;
-      if (typeof value === "number" && value > 0) return value;
+      if (typeof value === "number" && value > 0) return { days: value, by: "filter" };
     }
-    if (!keptDays.length) return 0;
-    return Math.max.apply(null, keptDays) - lastKnownDay;
+    // Without that filter, the horizon is simply the furthest projection.
+    var furthest = keptDays.reduce(function (max, d) { return d > max ? d : max; }, lastKnownDay);
+    return { days: furthest - lastKnownDay, by: "projections" };
   }
 
   function coverageOf(days, from, to, tolerance) {
     var covered = new Set();
     days.forEach(function (d) {
+      if (d + tolerance < from || d - tolerance > to) return;
       for (var day = d - tolerance; day <= d + tolerance; day++) if (day >= from && day <= to) covered.add(day);
     });
     return covered.size;
@@ -295,14 +416,16 @@
       trial.t_dates = [];
 
       var lastKnown = known[known.length - 1];
-      // Standing on the day of the last known event: "now" is that day.
-      var results = Engine.run(trial, { nowInstant: new Date(lastKnown.day * DAY) });
+      // Standing at the last known event: "now" is that moment.
+      var results = Engine.run(trial, { nowInstant: lastKnown.instant });
       var step = {
         eventName: event.name,
         knownCount: known.length,
         knownIndices: known.map(function (x) { return x.index; }),
         targetIndex: target.index,
         targetInstant: target.instant,
+        // The date as the X-Date gives it, so the table shows what was entered.
+        targetLabel: target.xDate.date + (isHHMM(event) ? " " + target.xDate.time : ""),
         lastKnownInstant: lastKnown.instant
       };
 
@@ -318,18 +441,19 @@
       ranked.forEach(function (key, i) { rankOf[key] = i + 1; });
 
       var targetDay = target.day;
-      var keptDays = kept.map(function (key) { return dayNumber(results.z_structs[key].z_start); });
-      var topDays = ranked.slice(0, topN).map(function (key) { return dayNumber(results.z_structs[key].z_start); });
+      var keptDays = kept.map(function (key) { return dayOfZDate(trial, results.z_structs[key]); });
+      var topDays = ranked.slice(0, topN).map(function (key) { return dayOfZDate(trial, results.z_structs[key]); });
 
+      var horizon = horizonOf(trial, lastKnown.day, keptDays);
       var from = lastKnown.day + 1;
-      var to = lastKnown.day + horizonDays(trial, lastKnown.day, keptDays);
+      var to = lastKnown.day + horizon.days;
       var windowDays = Math.max(0, to - from + 1);
 
       var best = null;
       var nearest = null;
-      kept.forEach(function (key) {
+      kept.forEach(function (key, i) {
         var z = results.z_structs[key];
-        var off = dayNumber(z.z_start) - targetDay;
+        var off = keptDays[i] - targetDay;
         if (nearest === null || Math.abs(off) < Math.abs(nearest.off)) nearest = { key: key, off: off, rank: rankOf[key] };
         if (Math.abs(off) <= tolerance && (!best || rankOf[key] < best.rank)) {
           best = { key: key, off: off, rank: rankOf[key], score: z.score, hits: z.hit_count, date: z.z_readable_start };
@@ -340,13 +464,31 @@
       step.windowFrom = from;
       step.windowTo = to;
       step.windowDays = windowDays;
+      step.horizonBy = horizon.by;
       step.inWindow = targetDay >= from && targetDay <= to;
+      // Why a target could not be scored: on the day the cast stands on, or
+      // past the horizon (set by the "Hide beyond N days" filter, or else by
+      // the furthest projection).
+      if (!step.inWindow) step.outside = targetDay < from ? "same-day" : (horizon.by === "filter" ? "beyond-filter" : "beyond-projections");
       step.hit = !!best;
       step.topHit = !!best && best.rank <= topN;
       step.best = best;
       step.nearest = nearest;
-      step.chanceHit = windowDays ? coverageOf(keptDays, from, to, tolerance) / windowDays : 0;
-      step.chanceTop = windowDays ? coverageOf(topDays, from, to, tolerance) / windowDays : 0;
+
+      // The control: how much of the days around the real date the
+      // projections cover (see LOCAL_CONTROL_DAYS), for any hit and for a hit
+      // among the top N.
+      var controlFrom = Math.max(from, targetDay - LOCAL_CONTROL_DAYS);
+      var controlTo = Math.min(to, targetDay + LOCAL_CONTROL_DAYS);
+      var controlDays = step.inWindow ? controlTo - controlFrom + 1 : 0;
+      step.controlFrom = controlFrom;
+      step.controlTo = controlTo;
+      step.controlDays = controlDays;
+      step.chanceHit = controlDays ? coverageOf(keptDays, controlFrom, controlTo, tolerance) / controlDays : 0;
+      step.chanceTop = controlDays ? coverageOf(topDays, controlFrom, controlTo, tolerance) / controlDays : 0;
+      // The share of the whole horizon covered: the control this used before.
+      // Not scored; kept so the calibration test can show it understates luck.
+      step.chanceHitHorizon = windowDays ? coverageOf(keptDays, from, to, tolerance) / windowDays : 0;
       steps.push(step);
     }
     return steps;

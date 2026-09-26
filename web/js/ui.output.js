@@ -34,12 +34,14 @@
     var alpha = Engine.isAlpha(operation);
 
     var anchorLabel = UI.label("X", result.operation.anchor === C.STARTING_X1 ? yStruct.x_1_ordinal : yStruct.x_2_ordinal);
-    var display = Expr.display(operation.equation)
-      .replace("X1", anchorLabel).replace("X2", anchorLabel);
+    // The formula is text and is escaped once; the anchor label is markup
+    // (X<sub>3</sub>) and goes in after that, so it is not escaped with it.
+    var formula = Expr.display(operation.equation);
+    var display = UI.esc(formula).replace("X1", anchorLabel).replace("X2", anchorLabel);
 
     // The same formula with Y and the constants filled in, so the arithmetic
     // can be checked by eye — this is what the desktop tooltip shows too.
-    var withY = display.split("+").slice(1).join("+").replace(/Y/g, UI.decimal(yStruct.rotation_count_y));
+    var withY = formula.split("+").slice(1).join("+").replace(/Y/g, UI.decimal(yStruct.rotation_count_y));
     Object.keys(C.CONSTANT_VALUES).forEach(function (name) {
       withY = withY.split(name).join("" + C.CONSTANT_VALUES[name]);
     });
@@ -50,7 +52,7 @@
       ["Type", '<span class="' + (alpha ? "alpha" : "beta") + '">' + (alpha ? "Alpha" : "Beta") + " operation</span>"],
       ["Label", UI.label("O", result.operation_ordinal)],
       ["Pair", UI.label("X", yStruct.x_1_ordinal) + " → " + UI.label("X", yStruct.x_2_ordinal)],
-      ["Formula", "Z-Date = " + UI.esc(display)],
+      ["Formula", "Z-Date = " + display],
       ["Y", UI.label("X", yStruct.x_1_ordinal) + " → " + UI.label("X", yStruct.x_2_ordinal) + " = " + UI.days(yStruct.rotation_count_y)],
       ["Z-Value", UI.esc(withY) + " = " + UI.days(result.z_value)],
       ["Z", anchorLabel + " → Z-Date = " + UI.days(result.rotation_count_z)],
@@ -87,8 +89,18 @@
    * the event in turn, and the one that brings back the most is named, with a
    * button that turns it off. Reading only: the event itself is not touched
    * until the button is pressed.
+   *
+   * That costs up to nine engine runs, so the answer is kept for as long as
+   * the results it explains: re-renders for a selection or a toggle reuse it,
+   * and a new cast replaces the results object and with it the answer.
    */
+  var hiding = { results: null, html: "" };
   function whatIsHiding(event, results) {
+    if (hiding.results !== results) hiding = { results: results, html: explainHiding(event, results) };
+    return hiding.html;
+  }
+
+  function explainHiding(event, results) {
     if (!results || !results.total_z_dates) return "";
     var now = Store.nowInstant();
     var best = null;
@@ -106,7 +118,8 @@
       trial(function (copy) { copy.t_dates = []; }, "the T-Dates (only Z-Dates on a T-Date are shown)", "");
     }
     if (!best) return '<p class="empty-why muted">No single filter explains it; several are hiding Z-Dates together.</p>';
-    return '<p class="empty-why">Turning off <b>' + UI.esc(best.label) + '</b> would show <b>' + best.shown + '</b>.' +
+    // The sentence is one span, so the row's flex gap falls only before the button.
+    return '<p class="empty-why"><span>Turning off <b>' + UI.esc(best.label) + '</b> would show <b>' + best.shown + '</b>.</span>' +
       (best.action ? ' <button class="btn small" ' + best.action + '>Turn it off</button>' : "") + '</p>';
   }
 
@@ -141,7 +154,7 @@
       return;
     }
 
-    var html = head + '<div class="table-scroll"><table class="output-table"><thead><tr><th class="ord"></th>';
+    var html = head + '<div class="table-scroll"><table class="output-table"><thead><tr><th class="ord"><span class="sr-only">Z#</span></th>';
     SORT_COLUMNS.forEach(function (column) {
       var active = sortType === column.type;
       html += '<th class="sortable col-' + column.type + (active ? " active" : "") + '" data-sort="' + column.type + '"' +
