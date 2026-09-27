@@ -57,6 +57,7 @@ malicious .oph  →  operation string hits new Function()  →  renderer code ex
 | `*.oph` | Sample Ophis files. Both parity tests also run them as fixtures. |
 | `chronicon-clocks-calendrics.txt`, `ophis-xtras.txt`, `PSYFR.jpg` | Source material: the Chronicon page the clocks were built from, ten extra operations (numbered 17–26), and the PSYFR poster. |
 | [`.github/`](.github/) | The Pages and Tests workflows, and Dependabot for the actions they use. |
+| [`tools/`](tools/) | `ComfyUI-Local-Setup.ps1`: a Windows PowerShell script that installs Python, PyTorch and ComfyUI for a chosen backend (`cuda`, `directml`, `xpu` or `cpu`) and writes a launcher. Not part of the study, and not run in the environment that wrote it; read it before running it. |
 
 ## Tests
 
