@@ -12,7 +12,7 @@ A white-box reverse-engineering study of **Ophis v12**, an offline Electron date
 
 | App | What it is | Open |
 |---|---|---|
-| **Natorion Cipher** · [`natorion/`](natorion/) | The flagship: the Ophis v12 engine rebuilt front-end-only and joined to the Chronicon's clocks, cycles and calendars. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/) · [quick start](natorion/README.md) · [manual](natorion/MANUAL.md) |
+| **Natorion Cipher** · [`natorion/`](natorion/) | The flagship: the Ophis v12 engine rebuilt front-end-only and joined to the Chronicon's clocks, cycles and calendars, with a Studio that writes an animated-documentary production package (script, look cards, image and animation prompts, thumbnail, upload text) from the numbers. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/) · [quick start](natorion/README.md) · [manual](natorion/MANUAL.md) |
 | **Ophis Web** · [`web/`](web/) | The same v12 engine with a new interface and no Chronicon: plain HTML, CSS and JavaScript, no build step. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/web/) · [README](web/README.md) · [how it works](web/docs/ENGINE.md) |
 | **Ophis v12, in a browser** · [`ophis/`](ophis/) | The original `.exe`'s own renderer, copied out of `app.asar`, with Electron replaced by a small browser bridge. It behaves like the desktop app, including its `new Function()` evaluator, so open only `.oph` files you trust. The bridge saves only to files you pick, or as a download. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/ophis/) · [README](ophis/README.md) |
 
@@ -57,6 +57,7 @@ malicious .oph  →  operation string hits new Function()  →  renderer code ex
 | `*.oph` | Sample Ophis files. Both parity tests also run them as fixtures. |
 | `chronicon-clocks-calendrics.txt`, `ophis-xtras.txt`, `PSYFR.jpg` | Source material: the Chronicon page the clocks were built from, ten extra operations (numbered 17–26), and the PSYFR poster. |
 | [`.github/`](.github/) | The Pages and Tests workflows, and Dependabot for the actions they use. |
+| [`tools/`](tools/) | `ComfyUI-Local-Setup.ps1`: a Windows PowerShell script that installs Python, PyTorch and ComfyUI for a chosen backend (`cuda`, `directml`, `xpu` or `cpu`) and writes a launcher. Not part of the study, and not run in the environment that wrote it; read it before running it. |
 
 ## Tests
 

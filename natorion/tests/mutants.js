@@ -47,7 +47,10 @@ const MUTANTS = [
   ["bridge-month-off", "js/ui/chronicon-view.js", "setAstro(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());", "setAstro(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());"],
   ["hash-listener-gone", "js/ui/app.js", 'root.addEventListener("hashchange", function () { var h = location.hash.slice(1); if (SCREENS.indexOf(h) >= 0) go(h, true); });', ""],
   ["select-noop", "js/ui/app.js", "S.select(parseInt(this.value, 10));", "S.scheduleRun(true);"],
-  ["msrf-sets-empty", "js/ui/app.js", 'D.fill($("msrfSets"), [p("Vortex, within 0.1", C.MSRF_VORTEX), p("Important", C.MSRF_IMPORTANT), p("Normal", C.MSRF_NORMAL)]);', 'D.fill($("msrfSets"), [p("Vortex, within 0.1", []), p("Important", []), p("Normal", [])]);']
+  ["msrf-sets-empty", "js/ui/app.js", 'D.fill($("msrfSets"), [p("Vortex, within 0.1", C.MSRF_VORTEX), p("Important", C.MSRF_IMPORTANT), p("Normal", C.MSRF_NORMAL)]);', 'D.fill($("msrfSets"), [p("Vortex, within 0.1", []), p("Important", []), p("Normal", [])]);'],
+  ["studio-no-tag", "js/studio/studio.js", "      parts.push(STYLE_TAG);\n", ""],
+  ["studio-wrong-cta", "js/studio/studio.js", 'var CTA = "Subscribe for more stories from history brought to life.";', 'var CTA = "Subscribe for more.";'],
+  ["studio-batches-of-six", "js/studio/studio.js", "for (var i = 0; i < list.length; i += 5) out.push(list.slice(i, i + 5));", "for (var i = 0; i < list.length; i += 6) out.push(list.slice(i, i + 6));"]
 ];
 
 const base = fs.mkdtempSync(path.join(os.tmpdir(), "natorion-mutants-"));

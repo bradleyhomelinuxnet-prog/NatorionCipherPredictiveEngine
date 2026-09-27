@@ -4,8 +4,8 @@
 "use strict";
 const vm = require("vm"), fs = require("fs"), path = require("path");
 const APP = path.resolve(__dirname, "..");
-["js/vendor/astronomy.min.js", "js/vendor/tz-lookup.js", "js/data/eclipses.js", "js/engine/core.js", "js/engine/expr.js", "js/engine/time.js",
- "js/engine/sky.js", "js/engine/engine.js", "js/engine/oph.js", "js/chronicon/chronicon.js"].forEach(f => vm.runInThisContext(fs.readFileSync(path.join(APP, f), "utf8"), { filename: f }));
+["js/vendor/astronomy.min.js", "js/vendor/tz-lookup.js", "js/data/eclipses.js", "js/data/places.js", "js/engine/core.js", "js/engine/expr.js", "js/engine/time.js",
+ "js/engine/sky.js", "js/engine/engine.js", "js/engine/oph.js", "js/chronicon/chronicon.js", "js/studio/studio.js"].forEach(f => vm.runInThisContext(fs.readFileSync(path.join(APP, f), "utf8"), { filename: f }));
 const NC = globalThis.NC, C = NC.C;
 
 let pass = 0, fail = 0;
@@ -69,6 +69,34 @@ check("JDN of 2000-01-01", NC.chron.jdn(2000, 1, 1), 2451545);
 check("palindromic date 02/02/2020", NC.chron.resonance(Date.UTC(2020, 1, 2), Date.UTC(2020, 0, 1)).palindrome, true);
 check("full moon of 2026-09-26", new Date(NC.sky.moonPhasesBetween(Date.UTC(2026, 8, 20), Date.UTC(2026, 9, 1), [NC.sky.PHASES[4]])[0].ms).toISOString().slice(0, 10), "2026-09-26");
 check("total solar eclipse 2027-08-02 is in the table", NC.sky.eclipses().solar.some(e => e.total && new Date(e.ms).toISOString().slice(0, 10) === "2027-08-02"), true);
+
+console.log("studio");
+const NOW = Date.UTC(2026, 8, 23, 12);
+const six = NC.oph.newEvent("Six anchors");
+six.x_dates = ["07/04/2026", "08/20/2026", "03/09/2027", "03/16/2027", "08/19/2027", "04/01/2028"].map(d => ({ date: d, time: "00:00", enabled: true }));
+const sixRes = NC.engine.run(six, { nowMs: NOW }), plan = NC.studio.build(six, sixRes, { length: 10 });
+check("a 10-minute cut meets the brief: 1,600–1,750 words, 65–80 paragraphs of 15–40 words, three etymologies, three today anchors, the CTA, the tag on every image, no shot twice running, no banned phrase", plan.checks.ok || plan.checks, true);
+check("the hook drops into the first date and plants the strongest day within three paragraphs", (plan.script[0].text.includes("4 July 2026") && plan.script.slice(0, 3).some(p => p.text.includes(plan.star.date))) || plan.script.slice(0, 3).map(p => p.text), true);
+check("one image per paragraph, in batches of five", [plan.images === plan.paragraphs, plan.clips === plan.paragraphs, plan.batches === Math.ceil(plan.paragraphs / 5)], [true, true, true]);
+check("an image carries the chronicler's whole look card wherever she appears", plan.imagePrompts.filter(im => im.prompt.includes("THE CHRONICLER")).every(im => im.prompt.includes(plan.cast[0].card)), true);
+check("the look cards keep the brief's defining features", plan.cast.every(c => /oversized/.test(c.card) && /rosy pink/.test(c.card) && /dot eyes/.test(c.card)), true);
+check("the last clip returns to the first frame", /resolves back to the opening image of clip 1/.test(plan.clipPrompts[plan.clipPrompts.length - 1].prompt), true);
+check("the same event gives the same package", NC.studio.toMarkdown(NC.studio.build(six, sixRes, { length: 10 })) === NC.studio.toMarkdown(plan), true);
+check("a variation changes the words, not the numbers", (() => { const v = NC.studio.build(six, sixRes, { length: 10, variation: 7 }); return [v.star.date === plan.star.date, v.script.map(p => p.text).join() !== plan.script.map(p => p.text).join()]; })(), [true, true]);
+check("all three lengths meet the brief for the demo, a sunset-scope copy and a two-date copy", (() => {
+  const hh = Object.assign({}, six, { scope: C.SCOPE.HH_MM, lat: 29.98, long: 31.13, location_enabled: true });
+  const two = Object.assign({}, six, { x_dates: six.x_dates.slice(0, 2) });
+  const bad = [];
+  [["days", six], ["sunset", hh], ["two", two]].forEach(([l, e]) => [5, 10, 15].forEach(L => { const p = NC.studio.build(e, NC.engine.run(e, { nowMs: NOW }), { length: L }); if (!p || !p.checks.ok) bad.push(l + " " + L + (p ? " " + JSON.stringify(p.checks) : " null")); }));
+  return bad;
+})(), []);
+check("formulas are spoken in words", NC.studio.describeEquation("X2+oph_flip(oph_round(Y))"), "Y with its digits reversed");
+check("… including ones it has never seen", NC.studio.describeEquation("X1+oph_sqrt(Y)x19"), "the square root of Y times 19");
+check("a package needs projections", NC.studio.build(six, Object.assign({}, sixRes, { zs: [], byDate: [] }), { length: 10 }), null);
+check("the markdown holds the script, the cards, every image with its tag, the thumbnail and the upload text", (() => {
+  const md = NC.studio.toMarkdown(plan);
+  return [/^§1 /m.test(md), (md.match(/Look Card:/g) || []).length === plan.cast.length, (md.match(/NOT anime\./g) || []).length === plan.images + 1, /^FINAL TITLE: /m.test(md), md.includes(NC.studio.CTA)];
+})(), [true, true, true, true, true]);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

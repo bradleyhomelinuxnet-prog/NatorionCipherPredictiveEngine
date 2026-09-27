@@ -1,6 +1,6 @@
 # Natorion Cipher — Quick start
 
-**Natorion Cipher** is a date-projection tool that runs in your web browser. You give it two or more dates that matter to you; it counts the days between them, runs those counts through sixteen number formulas, and lists the future dates they point to, strongest first. It also includes **the Chronicon**, a page of live clocks, long historical cycles, the moon, and nineteen calendars.
+**Natorion Cipher** is a date-projection tool that runs in your web browser. You give it two or more dates that matter to you; it counts the days between them, runs those counts through sixteen number formulas, and lists the future dates they point to, strongest first. It also includes **the Chronicon**, a page of live clocks, long historical cycles, the moon, and nineteen calendars, and **the Studio**, which writes a production package for an animated history documentary from the numbers: the script, the character look cards, an image and an animation prompt for every paragraph, the thumbnail and the upload text.
 
 It rebuilds **Ophis v12** (the Windows desktop app also called PSYFR) as a plain web page. Nothing to install, no account, and nothing leaves your computer. Opened from a copy of its folder, it needs no internet at all.
 
@@ -71,13 +71,14 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 
 ---
 
-## 5. The five screens
+## 5. The six screens
 
 | Screen | Use it to… |
 |---|---|
 | **Cipher** | Enter dates, see and sort the projections. The main screen. |
 | **Operations** | See or edit the sixteen formulas, add the ten "extras", test a formula. |
 | **Chronicon** | Look at any day in history on every calendar and cycle. Read the Dossier — the written chapters on the Stone, Petrie ↔ Breshears and the 138-faced year. Send a day to your X-Dates, or open a Z-Date here. |
+| **Studio** | Turn the event into an animated-documentary production package: a 5-, 10- or 15-minute voiceover script in numbered paragraphs, look cards for the characters, an image prompt and an animation prompt for every paragraph in batches of five, a thumbnail, and the title, description and tags. Copy each step or save it all as one Markdown file. |
 | **Files** | Open, save, export, manage several events, copy settings between them. |
 | **Guide** | The short version of how the scoring works. |
 
@@ -104,9 +105,10 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 
 - Pure front end: `index.html` + `css/` + `js/`. No build step, no server, no framework. Works from `file://`.
 - The engine re-derives the Ophis v12 source in this repo (`../src`). **`tests/parity.js`** runs the original v12 code and this engine side by side on the sample files and on randomly generated events — Days and HH:MM scope, T-Dates, every filter, disabled and unreadable dates, both scoring systems, all five sorts, extra and duplicate operations, "today" placed inside the date range — comparing every Z-Date, score, hit count, MSRF match and contributing operation. Last runs: **1,003 of 1,003** identical (seed 138) and **403 of 403** (seed 19). The one known class of difference is time-zone *data*: v12 ships 2023 zone rules, the browser's are current, so a place whose rules changed since (Kazakhstan moved to UTC+5 in 2024) shows local times an hour apart in HH:MM scope while the instants and scores still match.
-- **`tests/self-check.js`** runs 34 checks without the original source.
-- **`tests/browser.js`** drives the real app in headless Chromium: every screen, a known projection with a known score, opening v9 and v12 files, refusing a document with no events, duplicating and deleting events around the open one, pasting dates, editing operations, the Chronicon bridge and Dossier, the skip link, keyboard focus kept clear of the sticky top bar, the three exports, HH:MM scope, persistence across a reload, the timeline, and phone widths with no sideways scrolling. It fails on any script error and on any unexpected dialog. 72 checks.
-- **`tests/mutants.js`** proves the browser test can fail: it breaks the app in 30 deliberate ways (a save that drops every X-Date, a CSV with no rows, a frozen clock, a chart that draws nothing, sunsets at midnight, a parser that lets names through …) and runs the browser test against each. It catches 29; the thirtieth is a CSS rule that other rules already make redundant.
+- **`tests/self-check.js`** runs 47 checks without the original source, thirteen of them on the Studio: that the demo, a sunset-scope copy and a two-date copy meet the brief at all three lengths (the word and paragraph counts, 15–40 words a paragraph, three etymology drops, three "still exists today" anchors, the closing call to subscribe, the style tag on every image, no shot type twice running, no banned phrase), that the same event gives the same package, and that a variation changes the words but not the numbers.
+- **`tests/browser.js`** drives the real app in headless Chromium: every screen, a known projection with a known score, opening v9 and v12 files, refusing a document with no events, duplicating and deleting events around the open one, pasting dates, editing operations, the Chronicon bridge and Dossier, the Studio (the plan, the numbered script, the 15-minute cut, image prompts in batches of five each ending with the style tag, the clips, the upload text, the saved Markdown, renaming the chronicler), the skip link, keyboard focus kept clear of the sticky top bar, the three exports, HH:MM scope, persistence across a reload, the timeline, and phone widths with no sideways scrolling. It fails on any script error and on any unexpected dialog. 86 checks.
+- **`tests/mutants.js`** proves the browser test can fail: it breaks the app in 33 deliberate ways (a save that drops every X-Date, a CSV with no rows, a frozen clock, a chart that draws nothing, sunsets at midnight, a parser that lets names through, image prompts without the style tag, the wrong call to subscribe, batches of six …) and runs the browser test against each. It catches 32; the other is a CSS rule that other rules already make redundant.
+- **`js/studio/studio.js`** writes the documentary package as pure functions of the event, its results and four settings: a seeded choice among phrasings, sections filled to the brief's word budgets from the event's own numbers, paragraphs balanced to its counts, and one image and one animation prompt per paragraph. Nothing in it fetches, and nothing is generated by a model.
 - Formulas are parsed by a small grammar. They are never executed as code, which closes the code-execution hole in v12's shared `.oph` files. Nothing from a file is ever inserted into the page as HTML.
 
 ```bash
