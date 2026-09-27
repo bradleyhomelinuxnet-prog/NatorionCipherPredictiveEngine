@@ -3,7 +3,7 @@
   "use strict";
   var NC = root.NC || (root.NC = {});
   var C = NC.C, D = NC.dom, S = NC.store, $ = D.$, el = D.el;
-  var SCREENS = ["cipher", "operations", "chronicon", "files", "guide"];
+  var SCREENS = ["cipher", "operations", "chronicon", "studio", "files", "guide"];
 
   function go(name, noFocus) {
     if (SCREENS.indexOf(name) < 0) name = "cipher";
@@ -11,6 +11,7 @@
     Array.prototype.forEach.call($("tabs").querySelectorAll("button"), function (b) { if (b.dataset.screen === name) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
     if (name === "operations") NC.opsView.render();
     if (name === "files") NC.files.render();
+    if (name === "studio") NC.studioView.render();
     NC.chronView.active(name === "chronicon");
     if (name === "cipher") NC.chart.draw();
     if (location.hash.slice(1) !== name) history.replaceState(null, "", "#" + name);
@@ -60,7 +61,7 @@
     S.load();
     applyTheme();
     keepClearOfBar();
-    NC.cipher.init(); NC.opsView.init(); NC.chronView.init(); NC.files.init();
+    NC.cipher.init(); NC.opsView.init(); NC.chronView.init(); NC.files.init(); NC.studioView.init();
     renderMsrfSets();
     renderEventPicker();
     NC.cipher.renderEvent();

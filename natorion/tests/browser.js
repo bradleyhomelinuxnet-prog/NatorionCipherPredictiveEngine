@@ -121,7 +121,7 @@ async function main() {
     check("the timeline is drawn (inked pixels)", (await inked()) > 5000, await inked());
     await shot(page, "cipher");
 
-    for (const s of ["operations", "chronicon", "files", "guide"]) {
+    for (const s of ["operations", "chronicon", "studio", "files", "guide"]) {
       await go(page, s);
       const visible = await page.$eval(`.screen[data-screen="${s}"]`, n => n.dataset.active === "true" && n.offsetHeight > 0);
       check("the " + s + " screen opens", visible);
@@ -275,6 +275,46 @@ async function main() {
     check("the skip link keeps the Chronicon screen", await page.evaluate(() => location.hash === "#main" && document.querySelector('.screen[data-active="true"]').dataset.screen === "chronicon"));
     await shot(page, "chronicon-2040", { fullPage: true });
 
+    console.log("the Studio");
+    await go(page, "studio");
+    await page.waitForTimeout(300);
+    const planOf = () => page.evaluate(() => { const p = NC.studioView.plan(); return p && { length: p.length, words: p.words, paragraphs: p.paragraphs, images: p.images, batches: p.batches, ok: p.checks.ok, checks: p.checks }; });
+    const p10 = await planOf();
+    check("the Studio writes a plan from the open event", !!p10 && /words/.test(await text(page, "#stPlan")), JSON.stringify(p10));
+    check("the 10-minute cut meets the brief, every check passing", !!p10 && p10.length === 10 && p10.ok, JSON.stringify(p10 && p10.checks));
+    check("the script lists every paragraph, numbered", !!p10 && (await page.$$eval("#stBody .script-list li", l => l.length)) === p10.paragraphs && /^§1 /.test(await text(page, "#stBody .script-list li")));
+    await page.click('#stLength button[data-v="15"]');
+    await page.waitForTimeout(300);
+    const p15 = await planOf();
+    check("the 15-minute cut is longer and still meets the brief", !!p15 && p15.length === 15 && p15.ok && p15.paragraphs > p10.paragraphs, JSON.stringify(p15 && p15.checks));
+    await page.click('#stLength button[data-v="10"]');
+    await page.waitForTimeout(300);
+    await page.click('#stSteps button[data-v="images"]');
+    check("images come in batches of five", (await page.$$eval("#stBody .prompt-card", c => c.length)) === 5 && /^Batch 1 of \d+$/.test(await text(page, "#stBatchLabel")), await text(page, "#stBatchLabel"));
+    check("every image prompt on screen ends with the style tag", await page.$$eval("#stBody .prompt", (ps, t) => ps.length === 5 && ps.every(p => p.textContent.endsWith(t)), await page.evaluate(() => NC.studio.STYLE_TAG)));
+    await page.click("#stNext");
+    check("Next shows the second batch", /^Batch 2 of/.test(await text(page, "#stBatchLabel")) && /^IMAGE 6 /.test(await text(page, "#stBody .prompt-card h3")), await text(page, "#stBatchLabel"));
+    await page.click('#stSteps button[data-v="clips"]');
+    const clipsText = await text(page, "#stBody");
+    check("clips carry a duration and the model", /Duration: \d+ seconds/.test(clipsText) && /Seedance 2\.5/.test(clipsText));
+    await page.click('#stSteps button[data-v="upload"]');
+    const seoTitle = await text(page, "#stBody .prompt-card .prompt"), uploadText = await text(page, "#stBody");
+    check("the upload title is under 60 characters", seoTitle.length > 0 && seoTitle.length < 60, seoTitle);
+    check("the description carries timestamps and the disclaimer", /0:00 — /.test(uploadText) && /educational and entertainment/.test(uploadText));
+    const [mdDl] = await Promise.all([page.waitForEvent("download"), page.click("#stSave")]);
+    const mdPath = path.join(tmp, mdDl.suggestedFilename());
+    await mdDl.saveAs(mdPath);
+    const md = fs.readFileSync(mdPath, "utf8");
+    check("Save .md downloads the package: the script, the look cards, every image with its tag, the CTA", /\.md$/.test(mdDl.suggestedFilename()) && /^§1 /m.test(md) && /Look Card:/.test(md) && (md.match(/NOT anime\./g) || []).length === p10.images + 1 && md.includes("Subscribe for more stories from history brought to life."), mdDl.suggestedFilename());
+    await page.fill("#stAnchor", "Meton");
+    await page.dispatchEvent("#stAnchor", "change");
+    await page.waitForTimeout(200);
+    await page.click('#stSteps button[data-v="cast"]');
+    check("naming the chronicler renames the look card and the narration", /METON — THE CHRONICLER/.test(await text(page, "#stBody")) && (await page.evaluate(() => NC.studioView.plan().script[0].text.includes("Meton"))));
+    await page.fill("#stAnchor", "");
+    await page.dispatchEvent("#stAnchor", "change");
+    await go(page, "chronicon");
+
     console.log("keyboard focus and the sticky top bar");
     // Tab to the Month field while it lies under the bar: the page must scroll
     // it into view below the bar. At 800 px the bar wraps onto a second row.
@@ -388,7 +428,7 @@ async function main() {
     await prepare(phone);
     const mp = await phone.newPage();
     watchErrors(mp, errors);
-    for (const s of ["cipher", "operations", "chronicon", "files", "guide"]) {
+    for (const s of ["cipher", "operations", "chronicon", "studio", "files", "guide"]) {
       await mp.goto(PAGE + "#" + s);
       if (s === "cipher") await settle(mp); else await mp.waitForTimeout(400);
       const on = await mp.evaluate(() => (document.querySelector('.screen[data-active="true"]') || {}).dataset.screen);

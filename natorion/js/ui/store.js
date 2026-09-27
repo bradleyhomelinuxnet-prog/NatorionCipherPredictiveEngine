@@ -18,10 +18,12 @@
   }
 
   function defaultSettings() {
-    return { theme: "", autoRun: true, todayOverride: "", minify: false, openHow: "replace", validation: C.VALIDATION.LOOSE, fileName: "natorion", screen: "cipher" };
+    return { theme: "", autoRun: true, todayOverride: "", minify: false, openHow: "replace", validation: C.VALIDATION.LOOSE, fileName: "natorion", screen: "cipher",
+      studioLength: 10, studioVariation: 1, studioEra: "", studioTitle: "", studioAnchor: "" };
   }
   // Settings with a fixed set of values: a saved value outside the set is ignored.
-  var CHOICES = { theme: ["", "light", "dark"], openHow: ["replace", "append"], validation: Object.keys(C.VALIDATION).map(function (k) { return C.VALIDATION[k]; }) };
+  var CHOICES = { theme: ["", "light", "dark"], openHow: ["replace", "append"], validation: Object.keys(C.VALIDATION).map(function (k) { return C.VALIDATION[k]; }),
+    studioLength: [5, 10, 15], studioEra: ["", "ancient", "medieval", "golden"] };
 
   var state = {
     events: [demoEvent()],

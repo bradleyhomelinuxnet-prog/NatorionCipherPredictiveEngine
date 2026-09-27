@@ -12,7 +12,7 @@ A white-box reverse-engineering study of **Ophis v12**, an offline Electron date
 
 | App | What it is | Open |
 |---|---|---|
-| **Natorion Cipher** · [`natorion/`](natorion/) | The flagship: the Ophis v12 engine rebuilt front-end-only and joined to the Chronicon's clocks, cycles and calendars. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/) · [quick start](natorion/README.md) · [manual](natorion/MANUAL.md) |
+| **Natorion Cipher** · [`natorion/`](natorion/) | The flagship: the Ophis v12 engine rebuilt front-end-only and joined to the Chronicon's clocks, cycles and calendars, with a Studio that writes an animated-documentary production package (script, look cards, image and animation prompts, thumbnail, upload text) from the numbers. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/) · [quick start](natorion/README.md) · [manual](natorion/MANUAL.md) |
 | **Ophis Web** · [`web/`](web/) | The same v12 engine with a new interface and no Chronicon: plain HTML, CSS and JavaScript, no build step. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/web/) · [README](web/README.md) · [how it works](web/docs/ENGINE.md) |
 | **Ophis v12, in a browser** · [`ophis/`](ophis/) | The original `.exe`'s own renderer, copied out of `app.asar`, with Electron replaced by a small browser bridge. It behaves like the desktop app, including its `new Function()` evaluator, so open only `.oph` files you trust. The bridge saves only to files you pick, or as a download. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/ophis/) · [README](ophis/README.md) |
 

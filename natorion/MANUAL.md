@@ -23,8 +23,8 @@ This manual assumes you have never used Ophis, never written a formula, and just
 15. [Opening, saving and exporting](#15-opening-saving-and-exporting)
 16. [The Chronicon](#16-the-chronicon)
 17. [Resonance marks: palindromes, 19 and 138](#17-resonance-marks-palindromes-19-and-138)
-18. [Settings, keyboard and phone use](#18-settings-keyboard-and-phone-use)
-19. [Troubleshooting and questions](#19-troubleshooting-and-questions)
+18. [The Studio: a documentary from the numbers](#18-the-studio-a-documentary-from-the-numbers)
+19. [Settings, keyboard, phone use and troubleshooting](#19-settings-keyboard-phone-use-and-troubleshooting)
 
 ---
 
@@ -70,7 +70,7 @@ If double-clicking opens something other than a browser, right-click the file, c
 Along the top:
 
 - **NATORION** — the name.
-- **Cipher · Operations · Chronicon · Files · Guide** — the five screens.
+- **Cipher · Operations · Chronicon · Studio · Files · Guide** — the six screens.
 - **Event picker** (drop-down, top right) — switch between events, or pick **+ New event**.
 - **Saved** — your work is stored in this browser. It says "Saving…" for a moment after each change.
 - **◐** — switch between dark and light.
@@ -400,7 +400,33 @@ Mirrors turn up everywhere once you look: 19 and 91, 138 and 831. Formula #2, `o
 
 ---
 
-## 18. Settings, keyboard and phone use
+## 18. The Studio: a documentary from the numbers
+
+The **Studio** screen turns the open event into a production package for an animated history video in the painterly style of a European animated feature: a voiceover script, look cards for the characters, one image prompt for every paragraph, one animation prompt for every image, a thumbnail prompt, and the title, description and tags for the upload. No model writes any of it. The script is prose templates filled with the event's own numbers — the dates, the day-counts, the formulas that land, the special numbers, the moons and eclipses, the Chronicon's calendars and cycles — so the same event always gives the same package, and it never leaves your browser.
+
+**The plan.** Choose a length: **5 min** (800–875 words, 35–40 paragraphs), **10 min** (1,600–1,750 words, 65–80 paragraphs) or **15 min** (2,400–2,625 words, 95–120 paragraphs), at 160–175 spoken words a minute. The cards show the word and paragraph counts, the images and clips, the batches of five, and the strongest Z-Date, which is the film's climax. Beneath them sit the timestamps of the five sections and four checks against the brief: the counts, three etymology drops and three "still exists today" anchors, the closing call to subscribe, the banned phrases, the style tag on every image, and no shot type twice running. A ✕ names exactly what fell short.
+
+- **Working title** — the name used in the script and the upload text. Empty means the event's name.
+- **Chronicler** — the film's anchor character, who keeps the ledger. Empty means Natori.
+- **Era palette** — the wardrobe, the settings and the colours: Ancient / Mediterranean, Medieval European or Golden Age / Renaissance. Left alone, the year of the first X-Date decides.
+- **Variation** — 1 to 19. Each picks different phrasings; the numbers never change.
+
+**The steps** follow the brief's order, and each has a **Copy** button:
+
+1. **Script** — only the spoken narration, numbered §1, §2 …, every paragraph 15–40 words, one scene each. It opens on the first X-Date, plants the strongest projected day within three paragraphs, walks through the anchors, the formulas and the Chronicon, climbs the Z-Dates from weakest to strongest, opens the strongest one in full, and closes on the page it opened on, ending with "Subscribe for more stories from history brought to life."
+2. **Look cards** — a fixed description of each character: the Chronicler, the Surveyor, the Astronomer, the Watchman at Sunset in HH:MM scope, and the crowd. Each is pasted word for word into every image where the character appears, so they look the same in every frame.
+3. **Images** — one prompt per paragraph in batches of five, each ending with the mandatory style tag. **Next 5 ›** moves to the next batch.
+4. **Clips** — one motion-only animation prompt per image for Seedance 2.5, 5–10 seconds each, batched the same way. The last clip returns to the first frame, so the film closes where it began.
+5. **Thumbnail** — one prompt: bold text, the date range, the Chronicler in a dramatic pose.
+6. **Upload** — the title (under 60 characters), the description with timestamps, and 15–20 tags.
+
+**Save .md** writes the whole package as one Markdown file, and **Copy all** copies it. Paste the prompts into whichever image and video models you use; they were written for Seedream or GPT Image stills and Seedance 2.5 motion.
+
+> The Studio presents the Archaix chronology as the Chronicon does: a thesis for study and worldbuilding, not established history, and the script says so. The chronicler at the desk is a dramatization; every number is the app's own.
+
+---
+
+## 19. Settings, keyboard, phone use and troubleshooting
 
 **Files → Settings:**
 
@@ -423,9 +449,7 @@ Mirrors turn up everywhere once you look: 19 and 91, 138 and 831. Formula #2, `o
 
 **Light and dark:** the **◐** button. The app follows your device's setting until you choose.
 
----
-
-## 19. Troubleshooting and questions
+**Troubleshooting and questions:**
 
 **"At least 2 X-Dates are required."** Add a second date and make sure both are ticked.
 
@@ -450,6 +474,8 @@ Mirrors turn up everywhere once you look: 19 and 91, 138 and 831. Formula #2, `o
 **Does it send anything anywhere?** No. It runs entirely in your browser. The only outside request is for the display fonts, and the app works without them.
 
 **Does it predict the future?** It is a study instrument for the number patterns in Jason Breshears' work. It shows where those patterns point; it makes no claim that they predict anything.
+
+**The Studio says "Seed the anchors first."** It writes from the Cipher's results, so it needs an event that projects: two or more X-Dates, ticked, and at least one working formula. If every projection is hidden by the filters, the Studio reads the full cast instead and says so in its checks.
 
 ---
 

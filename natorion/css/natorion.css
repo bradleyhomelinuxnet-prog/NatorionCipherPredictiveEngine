@@ -346,6 +346,42 @@ tbody tr { transition: background .1s; }
 .pal { color: var(--gold-2); }
 .numbers p { font-size: 15px; color: var(--ink-2); }
 
+/* --------------------------------------------------------------- studio -- */
+.studio-controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; }
+.studio-controls .field { margin: 0; }
+.studio-controls .field.grow { flex: 1 1 220px; }
+.studio-controls #stAnchor { width: 150px; }
+.studio-controls #stVariation { width: 70px; }
+.plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 14px; }
+.stat { border: 1px solid var(--line); border-radius: var(--r-s); padding: 9px 11px; border-top: 2px solid var(--gold); min-width: 0; }
+.stat .name { font: 10px var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.stat .big { font: 600 22px/1.2 var(--f-display); color: var(--gold-2); margin: 3px 0; overflow-wrap: anywhere; }
+.stat .meta { font-size: 13px; color: var(--dim); }
+#stSections { margin: 10px 0 0; color: var(--dim); overflow-wrap: anywhere; }
+.checks-list { list-style: none; padding: 0; margin: 8px 0 0; font-family: var(--f-mono); font-size: 12px; color: var(--dim); }
+.checks-list li { margin: 3px 0; overflow-wrap: anywhere; }
+.checks-list li.bad { color: var(--red); }
+.batch-nav { display: inline-flex; align-items: center; gap: 8px; }
+.studio-body { margin-top: 6px; }
+.script-list { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 10px; }
+.script-list li { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 8px; font-size: 17px; color: var(--ink); }
+.script-list .sn { font: 600 12px var(--f-mono); color: var(--red); padding-top: 5px; }
+.script-list .meta { display: block; font: 11px var(--f-mono); color: var(--dim); margin-top: 2px; letter-spacing: .06em; }
+.prompt-card { border: 1px solid var(--line); border-radius: var(--r-s); padding: 12px 14px; margin-top: 12px; }
+.prompt-card h3 { margin: 0 0 6px; }
+.prompt-card .line { font-style: italic; color: var(--ink-2); margin: 0 0 8px; }
+.prompt-card .prompt { font: 13px/1.5 var(--f-mono); color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; padding: 10px 12px; background: rgba(216, 169, 67, .06); border-left: 3px solid var(--red); border-radius: var(--r-s); }
+.prompt-card .foot { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 8px; font: 11px var(--f-mono); color: var(--dim); letter-spacing: .06em; }
+.prompt-card .foot button { margin-left: auto; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; padding: 0; list-style: none; }
+.tag-list li { font: 12px var(--f-mono); border: 1px solid var(--line-2); border-radius: 12px; padding: 3px 9px; color: var(--gold-2); }
+.upload-desc { white-space: pre-wrap; font-size: 16px; color: var(--ink-2); margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 720px) {
+  .script-list li { grid-template-columns: 40px minmax(0, 1fr); font-size: 16px; }
+  .studio-controls #stAnchor, .studio-controls .field { width: 100%; }
+  .prompt-card .foot button { margin-left: 0; }
+}
+
 /* ---------------------------------------------------------------- files -- */
 .drop.dragging { box-shadow: 0 0 0 2px var(--gold), var(--glow); }
 .report { margin-top: 10px; font-family: var(--f-mono); font-size: 12px; }

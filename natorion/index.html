@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Natorion Cipher</title>
-<meta name="description" content="Natorion Cipher: a front-end rebuild of the Ophis v12 date-projection engine, joined to the Chronicon calendrics and clocks.">
+<meta name="description" content="Natorion Cipher: a front-end rebuild of the Ophis v12 date-projection engine, joined to the Chronicon calendrics and clocks, with a Studio that writes an animated-documentary production package from the numbers.">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#08080d" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f3ede0" media="(prefers-color-scheme: light)">
@@ -40,6 +40,7 @@
     <button type="button" data-screen="cipher" aria-current="page">Cipher</button>
     <button type="button" data-screen="operations">Operations</button>
     <button type="button" data-screen="chronicon">Chronicon</button>
+    <button type="button" data-screen="studio">Studio</button>
     <button type="button" data-screen="files">Files</button>
     <button type="button" data-screen="guide">Guide</button>
   </nav>
@@ -444,6 +445,72 @@
     </div>
   </section>
 
+  <!-- ============================================================ STUDIO -->
+  <section class="screen" data-screen="studio" aria-labelledby="h-studio">
+    <div class="page wide">
+      <p class="eyebrow">The documentary</p>
+      <h1 id="h-studio" tabindex="-1">Studio</h1>
+      <p class="lede">A production package for an animated history documentary, written from the open event's numbers and the Chronicon: a numbered voiceover script, character look cards, an image prompt for every paragraph, an animation prompt for every image, a thumbnail and the upload text. No model writes any of it; it is arithmetic and prose templates, here in your browser.</p>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Production plan</h2>
+          <div class="head-tools">
+            <button type="button" class="ghost" id="stCopyAll" title="Copy the whole package as Markdown">Copy all</button>
+            <button type="button" id="stSave" title="Save the whole package as a Markdown file">Save .md</button>
+          </div>
+        </div>
+        <div class="studio-controls">
+          <div class="field"><span>Length</span>
+            <div class="seg" id="stLength" role="radiogroup" aria-label="Video length">
+              <button type="button" role="radio" data-v="5">5 min</button>
+              <button type="button" role="radio" data-v="10">10 min</button>
+              <button type="button" role="radio" data-v="15">15 min</button>
+            </div>
+          </div>
+          <label class="field grow"><span>Working title</span><input id="stTitle" type="text" maxlength="80" placeholder="the event's name" autocomplete="off"></label>
+          <label class="field"><span>Chronicler</span><input id="stAnchor" type="text" maxlength="40" placeholder="Natori" autocomplete="off"></label>
+          <label class="field"><span>Era palette</span>
+            <select id="stEra">
+              <option value="">From the first date</option>
+              <option value="ancient">Ancient / Mediterranean</option>
+              <option value="medieval">Medieval European</option>
+              <option value="golden">Golden Age / Renaissance</option>
+            </select>
+          </label>
+          <label class="field"><span>Variation</span><input id="stVariation" type="number" min="1" max="19" step="1" value="1"></label>
+        </div>
+        <div class="plan-grid" id="stPlan"></div>
+        <p class="mono small" id="stSections"></p>
+        <ul class="checks-list" id="stChecks" aria-label="Checks against the brief"></ul>
+        <div class="empty" id="stEmpty" hidden></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div class="seg" id="stSteps" role="radiogroup" aria-label="Step">
+            <button type="button" role="radio" data-v="script">Script</button>
+            <button type="button" role="radio" data-v="cast">Look cards</button>
+            <button type="button" role="radio" data-v="images">Images</button>
+            <button type="button" role="radio" data-v="clips">Clips</button>
+            <button type="button" role="radio" data-v="thumbnail">Thumbnail</button>
+            <button type="button" role="radio" data-v="upload">Upload</button>
+          </div>
+          <div class="head-tools">
+            <div class="batch-nav" id="stBatchNav" hidden>
+              <button type="button" class="ghost" id="stPrev">‹ Previous</button>
+              <span class="mono small" id="stBatchLabel" aria-live="polite"></span>
+              <button type="button" class="ghost" id="stNext">Next 5 ›</button>
+            </div>
+            <button type="button" class="ghost" id="stCopyStep">Copy this step</button>
+          </div>
+        </div>
+        <div id="stBody" class="studio-body"></div>
+      </div>
+      <p class="fine">The chronology is the Archaix thesis of Jason Breshears, presented as a study and worldbuilding instrument, not as established history. The chronicler on screen is a dramatization; every date, day-count, score and calendar reading is the Cipher's and the Chronicon's, as computed. Paste the prompts into the image and video models of your choosing; they were written for Seedream or GPT Image stills and Seedance 2.5 motion.</p>
+    </div>
+  </section>
+
   <!-- ============================================================= FILES -->
   <section class="screen" data-screen="files" aria-labelledby="h-files">
     <div class="page">
@@ -591,6 +658,7 @@
 <script src="js/engine/oph.js"></script>
 <script src="js/chronicon/chronicon.js"></script>
 <script src="js/chronicon/dossier.js"></script>
+<script src="js/studio/studio.js"></script>
 <script src="js/ui/dom.js"></script>
 <script src="js/ui/store.js"></script>
 <script src="js/ui/chart.js"></script>
@@ -598,6 +666,7 @@
 <script src="js/ui/operations.js"></script>
 <script src="js/ui/chronicon-view.js"></script>
 <script src="js/ui/files.js"></script>
+<script src="js/ui/studio-view.js"></script>
 <script src="js/ui/app.js"></script>
 </body>
 </html>
