@@ -26,8 +26,19 @@ param(
                                             # check the current one at pytorch.org → Get Started
 )
 
-$ErrorActionPreference = "Stop"
+# Windows PowerShell 5.1 turns anything a native program writes to stderr into an error when
+# $ErrorActionPreference is Stop, and git, pip and py all write to stderr in normal use. So the
+# preference stays Continue, and Run() fails a step on the program's exit code instead.
+$ErrorActionPreference = "Continue"
 function Step($msg) { Write-Host "`n== $msg" -ForegroundColor Cyan }
+function Run([string]$Exe, [string[]]$Arguments) {
+  & $Exe @Arguments
+  if ($LASTEXITCODE -ne 0) { throw "$Exe $($Arguments -join ' ') failed (exit code $LASTEXITCODE). Fix what it reported above and rerun." }
+}
+function Test-Py312 {
+  # cmd swallows the launcher's stderr; the exit code and the version line decide.
+  try { $v = & cmd /c "py -3.12 --version 2>nul"; return ($LASTEXITCODE -eq 0 -and "$v" -match "^Python 3\.12") } catch { return $false }
+}
 
 Step "Graphics adapters on this machine"
 Get-CimInstance Win32_VideoController | Select-Object Name, DriverVersion | Format-Table -AutoSize
@@ -44,17 +55,16 @@ if ($Backend -eq "cuda") {
 }
 
 Step "1/6  Python 3.12"
-$havePy = (Get-Command py -ErrorAction SilentlyContinue) -and (py -3.12 --version 2>$null)
-if (-not $havePy) {
-  winget install --id Python.Python.3.12 -e --source winget --accept-package-agreements --accept-source-agreements
+if (-not (Test-Py312)) {
+  Run "winget" @("install", "--id", "Python.Python.3.12", "-e", "--source", "winget", "--accept-package-agreements", "--accept-source-agreements")
   Write-Host "Python installed. Close and reopen PowerShell, then rerun this script with the same -Backend." -ForegroundColor Yellow
   exit 0
 }
-py -3.12 --version
+Run "py" @("-3.12", "--version")
 
 Step "2/6  Git"
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-  winget install --id Git.Git -e --source winget --accept-package-agreements --accept-source-agreements
+  Run "winget" @("install", "--id", "Git.Git", "-e", "--source", "winget", "--accept-package-agreements", "--accept-source-agreements")
   Write-Host "Git installed. Close and reopen PowerShell, then rerun this script with the same -Backend." -ForegroundColor Yellow
   exit 0
 }
@@ -62,25 +72,25 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 Step "3/6  ComfyUI"
 New-Item -ItemType Directory -Force -Path $Root | Out-Null
 $comfy = Join-Path $Root "ComfyUI"
-if (-not (Test-Path (Join-Path $comfy "main.py"))) { git clone https://github.com/comfyanonymous/ComfyUI.git $comfy } else { git -C $comfy pull --ff-only }
+if (-not (Test-Path (Join-Path $comfy "main.py"))) { Run "git" @("clone", "https://github.com/comfyanonymous/ComfyUI.git", $comfy) } else { Run "git" @("-C", $comfy, "pull", "--ff-only") }
 
 Step "4/6  Virtual environment + PyTorch ($Backend)"
 $venv = Join-Path $comfy "venv"
-if (-not (Test-Path (Join-Path $venv "Scripts\python.exe"))) { py -3.12 -m venv $venv }
+if (-not (Test-Path (Join-Path $venv "Scripts\python.exe"))) { Run "py" @("-3.12", "-m", "venv", $venv) }
 $python = Join-Path $venv "Scripts\python.exe"
-& $python -m pip install --upgrade pip
+Run $python @("-m", "pip", "install", "--upgrade", "pip")
 switch ($Backend) {
-  "cuda"     { & $python -m pip install torch torchvision torchaudio --index-url "https://download.pytorch.org/whl/$Cuda" }
-  "xpu"      { & $python -m pip install torch torchvision torchaudio --index-url "https://download.pytorch.org/whl/xpu" }
-  "cpu"      { & $python -m pip install torch torchvision torchaudio --index-url "https://download.pytorch.org/whl/cpu" }
-  "directml" { & $python -m pip install torch-directml }   # brings the torch build it needs; the rest comes with the requirements
+  "cuda"     { Run $python @("-m", "pip", "install", "torch", "torchvision", "torchaudio", "--index-url", "https://download.pytorch.org/whl/$Cuda") }
+  "xpu"      { Run $python @("-m", "pip", "install", "torch", "torchvision", "torchaudio", "--index-url", "https://download.pytorch.org/whl/xpu") }
+  "cpu"      { Run $python @("-m", "pip", "install", "torch", "torchvision", "torchaudio", "--index-url", "https://download.pytorch.org/whl/cpu") }
+  "directml" { Run $python @("-m", "pip", "install", "torch-directml") }   # brings the torch build it needs; the rest comes with the requirements
 }
-& $python -m pip install -r (Join-Path $comfy "requirements.txt")
+Run $python @("-m", "pip", "install", "-r", (Join-Path $comfy "requirements.txt"))
 
 Step "5/6  ComfyUI-Manager (installs other custom nodes from inside the UI)"
 $mgr = Join-Path $comfy "custom_nodes\ComfyUI-Manager"
-if (-not (Test-Path $mgr)) { git clone https://github.com/ltdrdata/ComfyUI-Manager.git $mgr } else { git -C $mgr pull --ff-only }
-if (Test-Path (Join-Path $mgr "requirements.txt")) { & $python -m pip install -r (Join-Path $mgr "requirements.txt") }
+if (-not (Test-Path $mgr)) { Run "git" @("clone", "https://github.com/ltdrdata/ComfyUI-Manager.git", $mgr) } else { Run "git" @("-C", $mgr, "pull", "--ff-only") }
+if (Test-Path (Join-Path $mgr "requirements.txt")) { Run $python @("-m", "pip", "install", "-r", (Join-Path $mgr "requirements.txt")) }
 
 Step "6/6  Verify the backend from inside the venv"
 switch ($Backend) {
