@@ -86,6 +86,11 @@ async function settle(page) {
 }
 const text = (page, sel) => page.textContent(sel).then(t => (t || "").replace(/\s+/g, " ").trim());
 const go = async (page, screen) => { await page.click(`#tabs button[data-screen="${screen}"]`); await page.waitForTimeout(150); };
+// Wait until the page has rendered. The clock prepare() installs turns
+// requestAnimationFrame into a timer, which can fire before the browser
+// renders; a new ResizeObserver reports at the next real rendering update,
+// after that update's resize events and the observers the app made earlier.
+const rendered = page => page.evaluate(() => new Promise(r => { const ro = new ResizeObserver(() => { ro.disconnect(); r(); }); ro.observe(document.documentElement); }));
 
 async function main() {
   const browser = await chromium.launch({ headless: !HEADED });
@@ -321,7 +326,7 @@ async function main() {
     const underBar = [];
     for (const width of [1440, 800]) {
       await page.setViewportSize({ width, height: 1000 });
-      await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+      await rendered(page);   // app.js measures the bar as the page renders at the new width
       await page.evaluate(() => {
         const bar = document.querySelector(".topbar"), month = document.getElementById("chMonth");
         scrollBy(0, month.getBoundingClientRect().top - (bar.offsetHeight - month.offsetHeight) / 2);
