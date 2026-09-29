@@ -299,7 +299,7 @@ A formula always starts with **`X1+`** (count from the earlier date of the pair)
 | `^` | power: `Y^2` is Y squared |
 | `%` | remainder |
 | `( )` | grouping |
-| `OPH_PI` `OPH_PHI` `OPH_CRV` `OPH_HEP` | 3.14, 1.618, 5.08, 7.01 |
+| a constant, by name | one of the twenty in the table below |
 | `oph_round(…)` | round to a whole number |
 | `oph_flip(…)` | reverse the digits: 138 → 831 |
 | `oph_sqrt` `oph_abs` `oph_floor` `oph_ceil` `oph_log` `oph_exp` `oph_sin` `oph_cos` `oph_tan` | the usual maths |
@@ -310,7 +310,35 @@ Examples:
 X2+Y x 2.718             X2 plus Y times e
 X1+oph_sqrt(Y) x 19      X1 plus the square root of Y, times 19
 X2+oph_flip(Y) / 2       X2 plus half of Y reversed
+X1+Y x OPH_JUPSAT        X1 plus Y times 19.86, the great conjunction
 ```
+
+The constants, as the screen lists them (click a name there to try it):
+
+| Name | Value | What it is |
+|---|---|---|
+| `OPH_PI` | 3.14 | π as spoken |
+| `OPH_PHI` | 1.618 | φ, the golden ratio |
+| `OPH_CRV` | 5.08 | curvature, π × φ |
+| `OPH_HEP` | 7.01 | the hepta-cycle |
+| `OPH_SAROS` | 6585.3211 | the Saros eclipse cycle, in days (18.03 years) |
+| `OPH_INEX` | 10571.95 | the Inex eclipse cycle, in days (28.94 years) |
+| `OPH_LUNATION` | 29.530588853 | the mean synodic month, in days |
+| `OPH_YEAR_TROPICAL` | 365.24219 | tropical year, in days |
+| `OPH_YEAR_SIDEREAL` | 365.256363 | sidereal year, in days |
+| `OPH_YEAR_ANOMALISTIC` | 365.259636 | anomalistic year, in days |
+| `OPH_YEAR_IDEAL` | 360 | the ideal year of the thesis |
+| `OPH_SOTHIC` | 1461 | the Egyptian Sothic cycle, in years |
+| `OPH_PRECESSION` | 25772 | one precession of the equinoxes, in years |
+| `OPH_JUPSAT` | 19.86 | Jupiter–Saturn great conjunction, in years |
+| `OPH_SATURN` | 29.4571 | Saturn return, in years |
+| `OPH_JUPITER` | 11.862 | Jupiter return, in years |
+| `OPH_URANUS` | 84.0205 | Uranus return, in years |
+| `OPH_CHIRON` | 50.42 | Chiron return, in years |
+| `OPH_E` | 2.718281828459045 | Euler's number |
+| `OPH_TAU` | 6.283185307179586 | τ, one full turn in radians |
+
+The first four are the original program's. The other sixteen are Natorion's, shared with the single-file build: a file that uses one of them opens here but not in Ophis v12, which does not know the name.
 
 The formula must give a number above zero when Y is 10, or it is flagged.
 

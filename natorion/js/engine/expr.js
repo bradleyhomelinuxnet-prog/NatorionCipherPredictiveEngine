@@ -4,7 +4,7 @@
    Ophis v12 compiled every operation string with new Function(), after
    checking a *different*, stripped copy of it with math.js. A crafted .oph
    could therefore run code. Here one parser both validates and evaluates, and
-   it knows only: numbers, Y, the four OPH_ constants, the oph_* functions,
+   it knows only: numbers, Y, the OPH_ constants (C.CONSTANTS), the oph_* functions,
    + - * / % ^, unary signs and brackets. Anything else is a parse error.
 
    Two deliberate differences from the original, both bug fixes:
@@ -15,6 +15,8 @@
   var NC = root.NC || (root.NC = {});
   var C = NC.C;
   function isFunc(name) { return Object.prototype.hasOwnProperty.call(NC.FUNCS, name); }
+  // Longest names first, so a name can never be eaten by a shorter one it contains.
+  var CONSTANTS_LONGEST_FIRST = C.CONSTANT_NAMES.slice().sort(function (a, b) { return b.length - a.length || (a < b ? -1 : 1); });
 
   /* Mirror of normalizeOperationEquationString(): drop spaces, read the
      lower-case x as multiply, substitute constant values. Function names are
@@ -25,7 +27,7 @@
     var s = String(text).split(" ").join("");
     C.FUNCTION_NAMES.forEach(function (n) { s = s.split(n).join(n.toUpperCase()); });
     s = s.split("x").join("*");
-    C.CONSTANT_NAMES.forEach(function (n) { s = s.split(n).join(String(C[n])); });
+    CONSTANTS_LONGEST_FIRST.forEach(function (n) { s = s.split(n).join(String(C[n])); });
     C.FUNCTION_NAMES.forEach(function (n) { s = s.split(n.toUpperCase()).join(n); });
     return s;
   }
@@ -51,7 +53,7 @@
         var w = /^[A-Za-z_][A-Za-z0-9_]*/.exec(src.slice(i))[0];
         if (w !== "Y" && !isFunc(w)) {
           if (/^X\d$/.test(w)) throw new Error("X1/X2 may appear only at the start, as 'X1+' or 'X2+'.");
-          throw new Error("Unknown name '" + w + "'. Allowed: Y, OPH_PI, OPH_PHI, OPH_CRV, OPH_HEP and the oph_ functions.");
+          throw new Error("Unknown name '" + w + "'. Allowed: Y, the OPH_ constants on the Operations screen, and the oph_ functions.");
         }
         out.push({ t: "id", v: w, p: i }); i += w.length; continue;
       }
@@ -104,7 +106,7 @@
         if (t.v === "Y") return { op: "Y" };
         if (isFunc(t.v)) { eat("("); var arg = expr(); eat(")"); return { op: "fn", name: t.v, a: arg }; }
         if (/^X\d$/.test(t.v)) throw new Error("X1/X2 may appear only at the start, as 'X1+' or 'X2+'.");
-        throw new Error("Unknown name '" + t.v + "'. Allowed: Y, OPH_PI, OPH_PHI, OPH_CRV, OPH_HEP and the oph_ functions.");
+        throw new Error("Unknown name '" + t.v + "'. Allowed: Y, the OPH_ constants on the Operations screen, and the oph_ functions.");
       }
       if (t.t === "end") throw new Error("The equation ends too early.");
       throw new Error("Unexpected '" + t.t + "' at position " + (t.p + 1) + ".");

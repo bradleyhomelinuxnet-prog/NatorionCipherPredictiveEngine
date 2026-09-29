@@ -191,6 +191,7 @@
         '<span class="count' + (live < 1 ? " warn" : "") + '">' + live + " of " + event.operations.length + '</span>' +
         '<span class="spacer"></span>' +
         '<button class="btn small" data-action="add-operation" data-tip="Add an operation">+ Add</button>' +
+        '<button class="btn small ghost" data-action="add-extra-operations" data-tip="Add the ten extra operations (17–26 of the Ophis extras list)">Extras</button>' +
         '<button class="btn small ghost" data-action="ops-all-on" data-tip="Enable every operation">All</button>' +
         '<button class="btn small ghost" data-action="ops-all-off" data-tip="Disable every operation">None</button>' +
         '<button class="btn small ghost" data-action="reset-operations" data-tip="Restore the 16 shipped operations">Reset</button>' +
@@ -239,6 +240,11 @@
       rows += '<tr><td class="lbl">' + UI.label("O", index) + '</td><td class="mono">' + UI.esc(op.equation) +
         '</td><td>' + UI.esc(op.note) + '</td></tr>';
     });
+    var extras = "";
+    C.EXTRA_OPERATIONS.forEach(function (op, index) {
+      extras += '<tr><td class="lbl">' + UI.label("O", C.DEFAULT_OPERATIONS.length + index) + '</td><td class="mono">' + UI.esc(op.equation) +
+        '</td><td>' + UI.esc(op.note) + '</td></tr>';
+    });
 
     UI.modal("Formula reference", '' +
       '<p>An operation is arithmetic over <b>Y</b>, the interval in days, anchored on one of the two X-Dates in the pair. ' +
@@ -258,6 +264,10 @@
       '</tbody></table>' +
       '<h3>The shipped set</h3>' +
       '<table class="doc-table"><tbody>' + rows + '</tbody></table>' +
+      '<h3>The extras</h3>' +
+      '<p>Ten more from the Ophis extras list, numbered on from the sixteen. They are not part of v12 and are all beta. ' +
+      'The <b>Extras</b> button adds whichever of them are not in the list yet.</p>' +
+      '<table class="doc-table"><tbody>' + extras + '</tbody></table>' +
       '<p class="fineprint">Formulas are parsed into an expression tree and walked — never compiled or evaluated as code. ' +
       'Anything outside this vocabulary is a syntax error.</p>', {});
   };

@@ -27,6 +27,11 @@ check("must start X1+ or X2+", z("Y*2", 1), "Must start with 'X1 + …' or 'X2 +
 check("must be positive at Y=10", z("X1+Y-20", 1), "Z-value must resolve to a number > 0.");
 check("duplicates are caught", NC.expr.compileOperation("X2 + Y x OPH_PHI", 1, [{ equation: "X2+YxOPH_PHI" }]).errors[0], "Identical to Operation 1; each Operation must be unique.");
 check("sixteen defaults, all on", [C.DEFAULT_OPERATIONS.length, C.DEFAULT_OPERATIONS.every(o => o.enabled)], [16, true]);
+check("twenty constants, the original four first and unchanged", [C.CONSTANTS.length, C.CONSTANTS.slice(0, 4).map(c => c.name + "=" + c.value)], [20, ["OPH_PI=3.14", "OPH_PHI=1.618", "OPH_CRV=5.08", "OPH_HEP=7.01"]]);
+check("every constant substitutes by name", C.CONSTANTS.every(c => C[c.name] === c.value && NC.expr.normalize("X1+Yx" + c.name) === "X1+Y*" + c.value), true);
+check("a new constant computes", z("X2+Y/OPH_YEAR_IDEAL", 720), 2);
+check("e", z("X1+YxOPH_E", 100), 271.83);
+check("the Studio speaks the new names", NC.studio.describeEquation("X1+YxOPH_SAROS/OPH_INEX"), "Y times the Saros over the Inex");
 
 console.log("MSRF");
 const m = v => { const r = NC.msrfMatch(v); return r ? r.cls.key + ":" + r.number : null; };

@@ -11,6 +11,7 @@
   "use strict";
 
   var C = root.Ophis.C;
+  var Expr = root.Ophis.Expr;
   var T = root.Ophis.Time;
   var Engine = root.Ophis.Engine;
   var File = root.Ophis.File;
@@ -245,6 +246,20 @@
   Store.resetOperations = function () {
     Store.currentEvent().operations = C.defaultOperations();
     Store.commit("operations");
+  };
+
+  /* Append the extras that are not already in the list, compared as the
+     normalised equation ("X1+Y x 1.38" counts as present). Returns how many
+     were added; nothing is committed when that is none. */
+  Store.addExtraOperations = function () {
+    var event = Store.currentEvent();
+    var have = event.operations.map(function (op) { return Expr.normalize(op.equation, true); });
+    var added = 0;
+    C.extraOperations().forEach(function (op) {
+      if (have.indexOf(Expr.normalize(op.equation, true)) < 0) { event.operations.push(op); added++; }
+    });
+    if (added > 0) Store.commit("operations");
+    return added;
   };
 
   Store.setAllOperations = function (enabled) {

@@ -121,6 +121,14 @@
       assert.eq(operations[15].equation, "X2+YxOPH_HEP");
       assert.ok(operations.every(function (op) { return op.enabled === true; }));
     });
+
+    test("the extras are the ten of the Ophis extras list, all beta", function () {
+      var extras = C.extraOperations();
+      assert.eq(extras.length, 10);
+      assert.eq(extras[0].equation, "X1+Yx2.718");
+      assert.eq(extras[9].equation, "X2+Yx0.360");
+      assert.ok(extras.every(function (op) { return op.weight === C.POINTS__BETA_OPERATION_MATCH && op.enabled === true; }));
+    });
   });
 
   /* ====================================================================== */
@@ -129,6 +137,15 @@
       C.defaultOperations().forEach(function (op) {
         var compiled = Expr.compile(op.equation);
         assert.ok(compiled.ok, op.equation + " failed: " + compiled.errors.join(" "));
+      });
+    });
+
+    test("every extra operation compiles, and none repeats a shipped one", function () {
+      var shipped = C.defaultOperations().map(function (op) { return Expr.normalize(op.equation, true); });
+      C.extraOperations().forEach(function (op) {
+        var compiled = Expr.compile(op.equation);
+        assert.ok(compiled.ok, op.equation + " failed: " + compiled.errors.join(" "));
+        assert.ok(shipped.indexOf(compiled.normalized) < 0, op.equation + " repeats a shipped operation");
       });
     });
 
@@ -761,6 +778,20 @@
         } catch (e) { /* no storage here */ }
       }
     }
+
+    test("the extras are added once, however often they are asked for", function () {
+      withSession(function () {
+        assert.eq(Store.currentEvent().operations.length, 16);
+        assert.eq(Store.addExtraOperations(), 10);
+        assert.eq(Store.currentEvent().operations.length, 26);
+        assert.eq(Store.addExtraOperations(), 0, "a second click adds nothing");
+        Store.currentEvent().operations[16].equation = "X1+Y x 2.718";   // spelled differently, still the same operation
+        assert.eq(Store.addExtraOperations(), 0, "a respelt extra still counts as present");
+        assert.eq(Store.currentEvent().operations.length, 26);
+        Store.resetOperations();
+        assert.eq(Store.currentEvent().operations.length, 16);
+      });
+    });
 
     test("an edit marks the session unsaved; switching events, Current time and New do not", function () {
       withSession(function () {

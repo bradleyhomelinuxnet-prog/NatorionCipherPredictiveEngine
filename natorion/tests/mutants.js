@@ -20,6 +20,7 @@ const only = process.argv[2] || "";
 const MUTANTS = [
   ["append-flatten", "js/ui/dom.js", "if (Array.isArray(c)) { append(node, c); return; }", ""],
   ["parser-allows-names", "js/engine/expr.js", "function isFunc(name) { return Object.prototype.hasOwnProperty.call(NC.FUNCS, name); }", "function isFunc(name) { return true; }"],
+  ["constants-not-substituted", "js/engine/expr.js", "CONSTANTS_LONGEST_FIRST.forEach(function (n) { s = s.split(n).join(String(C[n])); });", ""],
   ["score-sort-inverted", "js/engine/engine.js", 'if (kind === SORT.SCORE) { va = a.score; vb = b.score; order = "desc"; }', 'if (kind === SORT.SCORE) { va = a.score; vb = b.score; order = "asc"; }'],
   ["score-tiebreak-gone", "js/engine/engine.js", "if (sortType === SORT.SCORE && a.score === b.score) kind = a.hits === b.hits ? SORT.DATE : SORT.HIT_COUNT;", ""],
   ["search-noop", "js/ui/cipher.js", "rows = rows.filter(function (t) {", "rows = rows.filter(function (t) { return true;"],

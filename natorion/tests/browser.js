@@ -228,6 +228,12 @@ async function main() {
     await page.click("#opsExtras");
     const after = await counts();
     check("the extras add ten operations, switched on", after[0] - before[0] === 10 && after[1] - before[1] === 10, before + " → " + after);
+    const constRows = await page.$$eval("#constBody tr[data-name]", r => r.length);
+    check("twenty constants are listed", constRows === 20, String(constRows));
+    await page.click('#constBody tr[data-name="OPH_YEAR_IDEAL"] button');
+    check("clicking a constant tries it", await page.$eval("#tryEq", e => e.value) === "X1+YxOPH_YEAR_IDEAL" && /Z = 4320 /.test(await text(page, "#tryOut")), await text(page, "#tryOut"));
+    await page.fill("#tryEq", "X2+Y/OPH_YEAR_IDEAL"); await page.fill("#tryY", "720");
+    check("a new constant computes in the try-it box", /X2\+Y\/360[\s\S]*Z = 2 /.test(await text(page, "#tryOut")), await text(page, "#tryOut"));
 
     console.log("sorting and searching");
     await go(page, "cipher");
