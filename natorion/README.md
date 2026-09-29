@@ -76,7 +76,7 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 | Screen | Use it to… |
 |---|---|
 | **Cipher** | Enter dates, see and sort the projections. The main screen. |
-| **Operations** | See or edit the sixteen formulas, add the ten "extras", test a formula. |
+| **Operations** | See or edit the sixteen formulas, add the ten "extras", try a formula with any of the twenty constants. |
 | **Chronicon** | Look at any day in history on every calendar and cycle. Read the Dossier — the written chapters on the Stone, Petrie ↔ Breshears and the 138-faced year. Send a day to your X-Dates, or open a Z-Date here. |
 | **Studio** | Turn the event into an animated-documentary production package: a 5-, 10- or 15-minute voiceover script in numbered paragraphs, look cards for the characters, an image prompt and an animation prompt for every paragraph in batches of five, a thumbnail, and the title, description and tags. Copy each step or save it all as one Markdown file. |
 | **Files** | Open, save, export, manage several events, copy settings between them. |

@@ -62,6 +62,22 @@
       (m ? "\nMSRF " + m.cls.name.toLowerCase() + " match: " + m.number + " (×" + m.cls.mult + ")" : "\nno MSRF match");
   }
 
+  /* The constants panel: every name the grammar knows, grouped, with a
+     button that drops "X1+Yx<name>" into the try-it box. */
+  function renderConstants() {
+    var rows = [], group = null;
+    C.CONSTANTS.forEach(function (c) {
+      if (c.group !== group) { group = c.group; rows.push(el("tr.group", {}, [el("th", { colspan: "3", text: group })])); }
+      rows.push(el("tr", { data: { name: c.name } }, [
+        el("th", {}, [el("button.const-name", { type: "button", text: c.name, title: "Try X1+Yx" + c.name, onclick: function () { $("tryEq").value = "X1+Yx" + c.name; tryIt(); $("tryEq").focus(); } })]),
+        el("td.num.mono", { text: String(c.value) }),
+        el("td", { text: c.note })
+      ]));
+    });
+    D.fill($("constBody"), rows);
+    $("constCount").textContent = C.CONSTANTS.length + " names";
+  }
+
   function init() {
     $("opsAdd").addEventListener("click", function () { S.change(function () { ops().push({ equation: "X1+Y", weight: C.POINTS_BETA, enabled: true }); }); render(); var ins = $("opsBody").querySelectorAll('input[type="text"]'); if (ins.length) { ins[ins.length - 1].focus(); ins[ins.length - 1].select(); } });
     $("opsDefaults").addEventListener("click", function () {
@@ -75,6 +91,7 @@
     });
     $("tryEq").addEventListener("input", tryIt);
     $("tryY").addEventListener("input", tryIt);
+    renderConstants();
     tryIt();
   }
 

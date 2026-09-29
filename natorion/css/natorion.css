@@ -293,6 +293,10 @@ tbody tr { transition: background .1s; }
 .kv td { padding: 5px 8px; }
 .try-out { display: block; margin-top: 8px; padding: 10px 12px; border-radius: var(--r-s); background: rgba(216, 169, 67, .06); border: 1px solid var(--line); min-height: 42px; white-space: pre-wrap; }
 .try-out.bad { color: var(--red); }
+.table-wrap.const-wrap { max-height: none; }   /* a reference list: no scroll trap */
+.const-table tr.group th { padding-top: 12px; font: 10.5px var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.const-table .const-name { background: none; border: 0; padding: 0; font: inherit; font-family: var(--f-mono); color: var(--gold-2); cursor: pointer; }
+.const-table .const-name:hover { text-decoration: underline; }
 
 /* ----------------------------------------------------------- chronicon -- */
 .clocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--gap); margin-bottom: var(--gap); }

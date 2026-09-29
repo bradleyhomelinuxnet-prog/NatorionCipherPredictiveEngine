@@ -198,13 +198,11 @@
       </div>
       <div class="grid2">
         <div class="panel">
-          <h2>Constants</h2>
-          <table class="kv"><tbody>
-            <tr><th><code>OPH_PI</code></th><td>3.14</td><td>π as spoken</td></tr>
-            <tr><th><code>OPH_PHI</code></th><td>1.618</td><td>φ, the golden ratio</td></tr>
-            <tr><th><code>OPH_CRV</code></th><td>5.08</td><td>curvature, π × φ</td></tr>
-            <tr><th><code>OPH_HEP</code></th><td>7.01</td><td>the hepta-cycle</td></tr>
-          </tbody></table>
+          <h2>Constants <small id="constCount"></small></h2>
+          <div class="table-wrap const-wrap">
+            <table class="kv const-table"><tbody id="constBody"></tbody></table>
+          </div>
+          <p class="hint">The first four are the original program's. The other sixteen are Natorion's, shared with the single-file build; a file that uses one of them opens here but not in Ophis v12, which does not know the name. Click a name to try it.</p>
         </div>
         <div class="panel">
           <h2>Grammar</h2>

@@ -54,7 +54,36 @@
     OPH_CRV: 5.08,              // pi x phi, rounded
     OPH_HEP: 7.01
   };
-  C.CONSTANT_NAMES = ["OPH_PI", "OPH_PHI", "OPH_CRV", "OPH_HEP"];
+
+  // Every name an equation may use. The first four are the original
+  // program's (the values just above, which the parity test pins). The other
+  // sixteen are Natorion's, shared with the single-file build; Ophis v12 does
+  // not know them, so a file that uses one opens here but not there.
+  // `spoken` is how the Studio reads the name aloud.
+  C.CONSTANTS = [
+    { name: "OPH_PI", value: C.OPH_PI, group: "The original four", note: "π as spoken", spoken: "pi", original: true },
+    { name: "OPH_PHI", value: C.OPH_PHI, group: "The original four", note: "φ, the golden ratio", spoken: "phi", original: true },
+    { name: "OPH_CRV", value: C.OPH_CRV, group: "The original four", note: "curvature, π × φ", spoken: "5.08", original: true },
+    { name: "OPH_HEP", value: C.OPH_HEP, group: "The original four", note: "the hepta-cycle", spoken: "7.01", original: true },
+    { name: "OPH_SAROS", value: 6585.3211, group: "Eclipse cycles, in days", note: "the Saros: eclipses repeat after 18.03 years", spoken: "the Saros" },
+    { name: "OPH_INEX", value: 10571.95, group: "Eclipse cycles, in days", note: "the Inex, the Saros's complement, 28.94 years", spoken: "the Inex" },
+    { name: "OPH_LUNATION", value: 29.530588853, group: "Eclipse cycles, in days", note: "the mean synodic month", spoken: "a lunation" },
+    { name: "OPH_YEAR_TROPICAL", value: 365.24219, group: "Year lengths, in days", note: "tropical year, equinox to equinox", spoken: "a tropical year" },
+    { name: "OPH_YEAR_SIDEREAL", value: 365.256363, group: "Year lengths, in days", note: "sidereal year, against the stars", spoken: "a sidereal year" },
+    { name: "OPH_YEAR_ANOMALISTIC", value: 365.259636, group: "Year lengths, in days", note: "anomalistic year, perihelion to perihelion", spoken: "an anomalistic year" },
+    { name: "OPH_YEAR_IDEAL", value: 360, group: "Year lengths, in days", note: "the ideal year of the thesis", spoken: "an ideal year" },
+    { name: "OPH_SOTHIC", value: 1461, group: "Long cycles, in years", note: "the Egyptian Sothic cycle", spoken: "the Sothic cycle" },
+    { name: "OPH_PRECESSION", value: 25772, group: "Long cycles, in years", note: "one precession of the equinoxes", spoken: "one precession" },
+    { name: "OPH_JUPSAT", value: 19.86, group: "Long cycles, in years", note: "Jupiter–Saturn great conjunction", spoken: "a great conjunction" },
+    { name: "OPH_SATURN", value: 29.4571, group: "Planetary returns, in years", note: "Saturn return", spoken: "a Saturn return" },
+    { name: "OPH_JUPITER", value: 11.862, group: "Planetary returns, in years", note: "Jupiter return", spoken: "a Jupiter return" },
+    { name: "OPH_URANUS", value: 84.0205, group: "Planetary returns, in years", note: "Uranus return", spoken: "a Uranus return" },
+    { name: "OPH_CHIRON", value: 50.42, group: "Planetary returns, in years", note: "Chiron return", spoken: "a Chiron return" },
+    { name: "OPH_E", value: 2.718281828459045, group: "Mathematics", note: "Euler's number", spoken: "e" },
+    { name: "OPH_TAU", value: 6.283185307179586, group: "Mathematics", note: "τ, one full turn in radians", spoken: "tau" }
+  ];
+  C.CONSTANT_NAMES = C.CONSTANTS.map(function (c) { return c.name; });
+  C.CONSTANTS.forEach(function (c) { C[c.name] = c.value; });
 
   // NOTE (kept from source): 21 and 76 sit inside the vortex tolerance of 21.7
   // and 76.2. They were removed, then restored "after discussion with Jason".

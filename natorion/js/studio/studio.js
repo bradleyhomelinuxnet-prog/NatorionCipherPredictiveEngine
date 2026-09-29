@@ -189,12 +189,15 @@
     "(Y/2.0)xOPH_CRV": "half of Y times 5.08", "YxOPH_PHI": "Y times phi", "YxOPH_PI": "Y times pi",
     "YxOPH_CRV": "Y times 5.08", "YxOPH_HEP": "Y times 7.01"
   };
+  // Constant names read aloud, longest first, so no name is eaten by a shorter one it contains.
+  var SPOKEN_CONSTANTS = C.CONSTANTS.slice().sort(function (a, b) { return b.name.length - a.name.length; });
   function describeEquation(equation) {
     var body = String(equation || "").replace(/\s+/g, "").replace(/^X[12]\+/, "");
     if (KNOWN[body]) return KNOWN[body];
     var s = body.replace(/oph_([a-z]+)/g, function (_, n) { return "§" + n + "§"; });
-    s = s.replace(/\(Y\/2\.0\)/g, "half of Y").replace(/OPH_PI/g, "pi").replace(/OPH_PHI/g, "phi").replace(/OPH_CRV/g, "5.08").replace(/OPH_HEP/g, "7.01");
+    s = s.replace(/\(Y\/2\.0\)/g, "half of Y");
     s = s.replace(/[x*]/g, " times ").replace(/\//g, " over ").replace(/\^/g, " to the power ").replace(/%/g, " modulo ").replace(/\+/g, " plus ").replace(/-/g, " minus ");
+    SPOKEN_CONSTANTS.forEach(function (c) { s = s.split(c.name).join(c.spoken); });
     s = s.replace(/§([a-z]+)§/g, function (_, n) { return n === "flip" ? "the reverse of " : n === "round" ? "the rounding of " : n === "sqrt" ? "the square root of " : n + " of "; });
     return s.replace(/\(\s*/g, "(").replace(/\s*\)/g, ")").replace(/\(Y\)/g, "Y").replace(/\s+/g, " ").trim();
   }
