@@ -246,6 +246,28 @@
     });
   };
 
+  /* The ten "extra" operations of the Ophis extras list (ophis-xtras.txt,
+     where they are numbered 17–26). Not part of v12: plain multipliers, all
+     beta, appended on request by the Extras button. */
+  C.EXTRA_OPERATIONS = [
+    { equation: "X1+Yx2.718", weight: B, note: "Y x e + X1" },
+    { equation: "X2+Yx2.718", weight: B, note: "Y x e + X2" },
+    { equation: "X1+Yx1.38", weight: B, note: "Y x 1.38 + X1 (the Phoenix cycle, 138, over 100)" },
+    { equation: "X2+Yx1.38", weight: B, note: "Y x 1.38 + X2 (the Phoenix cycle, 138, over 100)" },
+    { equation: "X1+Yx5.52", weight: B, note: "Y x 5.52 + X1 (138 x 4, over 100)" },
+    { equation: "X2+Yx5.52", weight: B, note: "Y x 5.52 + X2 (138 x 4, over 100)" },
+    { equation: "X1+(Y/2.0)x5.52", weight: B, note: "Y / 2 x 5.52 + X1" },
+    { equation: "X1+Yx2.178", weight: B, note: "Y x 2.178 + X1 (the vortex number 217.8, over 100)" },
+    { equation: "X2+Yx2.178", weight: B, note: "Y x 2.178 + X2 (the vortex number 217.8, over 100)" },
+    { equation: "X2+Yx0.360", weight: B, note: "Y x 0.360 + X2 (360, over 1000)" }
+  ];
+
+  C.extraOperations = function () {
+    return C.EXTRA_OPERATIONS.map(function (op) {
+      return { equation: op.equation, weight: op.weight, enabled: true };
+    });
+  };
+
   /* --- display -------------------------------------------------------- */
   C.DATE_DELIMITER = "/";
   C.X_DATE_DISPLAY_FORMAT = "mm/dd/yyyy";

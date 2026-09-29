@@ -215,6 +215,11 @@
       Store.removeOperation(parseInt(target.closest(".operation-row").getAttribute("data-index"), 10));
     });
     UI.on(hosts.operations, "click", '[data-action="add-operation"]', function () { Store.addOperation(); });
+    UI.on(hosts.operations, "click", '[data-action="add-extra-operations"]', function () {
+      var added = Store.addExtraOperations();
+      if (added > 0) UI.toast(added + " extra operation" + (added === 1 ? "" : "s") + " added, switched on.", "ok");
+      else UI.toast("The extras are already in the list.");
+    });
     UI.on(hosts.operations, "click", '[data-action="ops-all-on"]', function () { Store.setAllOperations(true); });
     UI.on(hosts.operations, "click", '[data-action="ops-all-off"]', function () { Store.setAllOperations(false); });
     UI.on(hosts.operations, "click", '[data-action="reset-operations"]', function () {
