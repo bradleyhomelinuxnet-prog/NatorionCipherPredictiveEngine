@@ -456,10 +456,10 @@ function drawXAxis(chart) {
 
     var drawContext = chart.canvas.getContext("2d");
 
-    drawContext.fillStyle = "white";
+    drawContext.fillStyle = "#0e1420";
     drawContext.fillRect(0, 0, chart.canvas.width, chart.canvas.height);
 
-    drawContext.strokeStyle = "black";
+    drawContext.strokeStyle = "#9fb0cc";
     drawContext.setLineDash([]);
     drawContext.lineWidth = 2;
     drawContext.beginPath();
@@ -647,6 +647,7 @@ function newChart() {
                         ticks: {
                             // padding:100,
                             beginAtZero: true,
+                            color: "#9fb0cc",
                             sampleSize: 1,
                             // display: false
                             minRotation: 45,
