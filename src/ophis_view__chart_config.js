@@ -9,7 +9,7 @@ var Z_DATE_SYMBOL_SIZE_DIV_2 = Z_DATE_SYMBOL_SIZE / 2.0;
 
 // var CHART_COLOR__GRID_LINE = "#E5E5E5";
 var CHART_COLOR__GRID_LINE = "#00000000";
-var CHART_COLOR__AXIS_LINE = "black";
+var CHART_COLOR__AXIS_LINE = "#9fb0cc";
 var CHART_GRID_LINE_WIDTH = 2;
 
 var CHART_CURVE_WIDTH__ONE_HIT = 1;
@@ -24,7 +24,7 @@ var CHART_CURVE_WIDTH__INDIVIDUAL_HIGHLIGHTING = 5;
 var CHART_CURVE_WIDTH__HIT_TESTING = 7;
 
 // These must be in rgba so that alpha can be dynamically set.
-var CHART_CURVE_COLOR__ONE_HIT = "rgba(0,0,0,1.0)";
+var CHART_CURVE_COLOR__ONE_HIT = "rgba(170,186,210,1.0)";
 var CHART_CURVE_COLOR__TWO_HITS = CHART_CURVE_COLOR__ONE_HIT;
 var CHART_CURVE_COLOR__THREE_HITS = "rgb(253, 218, 13,1.0)"; //cadmium yellow
 var CHART_CURVE_COLOR__FOUR_HITS = "rgb(0, 150, 255, 1.0)"; //bright blue
