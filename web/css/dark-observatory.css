@@ -1,0 +1,73 @@
+/* ==========================================================================
+   dark-observatory.css — Ophis Web "Dark Observatory" skin
+   --------------------------------------------------------------------------
+   Loaded LAST (after app.css and almanac.css). It only retunes the DARK
+   theme's design tokens to the Dark Observatory palette (slate · cyan ·
+   amber) and adds a little glow. Every component and the timeline chart
+   already read these tokens, so nothing else needs touching, and the light
+   "almanac" theme is left exactly as it was — one toggle away.
+
+   Revert: remove this file's <link> from index.html (and restore the
+   data-theme="light" default if you prefer light on load).
+   ========================================================================== */
+
+/* Retune the dark palette. Overrides app.css's bare :root (same names, loaded
+   later) and the explicit dark selector, so dark mode is Dark Observatory. */
+:root,
+:root[data-theme="dark"] {
+  --bg:          #0e1420;
+  --bg-2:        #0d1524;
+  --panel:       #141d2d;
+  --panel-2:     #1b2740;
+  --raised:      #243352;
+  --line:        rgba(154, 180, 214, .12);
+  --line-strong: rgba(154, 180, 214, .22);
+  --ink:         #e7eef8;
+  --ink-2:       #c9d4e4;
+  --dim:         #7e90ac;
+  --gold:        #f5b63d;   /* warm highlight (scores, active, hover)   */
+  --gold-2:      #ffcf6b;
+  --cyan:        #35d0d6;   /* primary accent (structure, chart today)  */
+  --red:         #ff5c5c;
+  --green:       #38e07e;
+  --violet:      #c08bff;
+  --chart-line:  rgba(53, 208, 214, .10);
+  --chart-axis:  rgba(159, 176, 204, .50);
+  --moon:        #aeb9c4;
+  --shadow:      0 14px 34px rgba(0, 0, 0, .55);
+  color-scheme: dark;
+}
+
+/* --- cyan-forward structure, amber-forward highlights (the chosen look) --- */
+:root[data-theme="dark"] .brand-mark,
+:root:not([data-theme="light"]) .brand-mark { color: var(--cyan); }
+:root[data-theme="dark"] .brand-text b,
+:root:not([data-theme="light"]) .brand-text b {
+  color: var(--ink);
+  text-shadow: 0 0 14px rgba(53, 208, 214, .30);
+}
+:root[data-theme="dark"] .panel-head h2,
+:root:not([data-theme="light"]) .panel-head h2 { color: var(--cyan); }
+
+/* --- a touch of instrument glow on the things that carry meaning --- */
+:root[data-theme="dark"] .score.heat-4,
+:root:not([data-theme="light"]) .score.heat-4 { box-shadow: 0 0 12px -2px rgba(245, 182, 61, .55); }
+
+:root[data-theme="dark"] .pill.msrf.msrf-normal,
+:root:not([data-theme="light"]) .pill.msrf.msrf-normal { box-shadow: 0 0 9px -3px rgba(53, 208, 214, .6); }
+:root[data-theme="dark"] .pill.msrf.msrf-important,
+:root:not([data-theme="light"]) .pill.msrf.msrf-important { box-shadow: 0 0 9px -3px rgba(245, 182, 61, .6); }
+:root[data-theme="dark"] .pill.msrf.msrf-vortex,
+:root:not([data-theme="light"]) .pill.msrf.msrf-vortex { box-shadow: 0 0 9px -3px rgba(192, 139, 255, .6); }
+
+/* brighter 1–2 hit curve so low stems read on slate (chart reads this var) */
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) { --hit-low: #aab6ca; }
+
+/* cyan keyboard focus, to match the accent */
+:root[data-theme="dark"] input:focus,
+:root[data-theme="dark"] select:focus,
+:root[data-theme="dark"] textarea:focus,
+:root[data-theme="dark"] .btn:focus-visible,
+:root[data-theme="dark"] .icon-btn:focus-visible,
+:root:not([data-theme="light"]) .btn:focus-visible { outline-color: var(--cyan); }
