@@ -203,7 +203,7 @@ function syntheticFixtures() {
       event: baseEvent({ x_dates: dates(["01/19/2020", "09/06/2023"]) })
     },
     {
-      label: "five anchors (test-bradley shape)",
+      label: "five anchors (sample-eclipses shape)",
       event: baseEvent({
         x_dates: dates(["07/04/2026", "08/20/2026", "03/09/2027", "03/16/2027", "07/17/2027"]),
         z_date_sort_type: "SORT_TYPE__MSRF"

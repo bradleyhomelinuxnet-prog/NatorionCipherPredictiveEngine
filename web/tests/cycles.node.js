@@ -64,7 +64,7 @@ function eventWith(base, isoDates) {
 const dayOf = (iso) => Math.floor(Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) / DAY);
 const isoOfDay = (day) => new Date(day * DAY).toISOString().slice(0, 10);
 
-const bradley = loadEvents("test-bradley.oph")[0];
+const sample = loadEvents("sample-eclipses.oph")[0];
 
 console.log("\ncycle definitions");
 const met = Cycles.definition("metonic");
@@ -109,9 +109,9 @@ console.log("\nsettings read back from storage");
 
 console.log("\ncycle echoes on your own file");
 {
-  const results = Engine.run(bradley, { nowInstant: new Date(Date.UTC(2026, 8, 25)) });
-  const a = Cycles.analyze(bradley, results, Cycles.DEFAULTS);
-  check("test-bradley.oph runs clean", results.errors.length === 0, results.z_keys_by_date.length + " Z-Dates");
+  const results = Engine.run(sample, { nowInstant: new Date(Date.UTC(2026, 8, 25)) });
+  const a = Cycles.analyze(sample, results, Cycles.DEFAULTS);
+  check("sample-eclipses.oph runs clean", results.errors.length === 0, results.z_keys_by_date.length + " Z-Dates");
   const r = a.reach.find((x) => x.cycle === "metonic");
   check("a 19-year echo is reported as impossible across a 7-year span", r.possible === false, r.spanYears.toFixed(1) + " years on screen");
   check("so no Metonic echoes are claimed", a.list.every((i) => i.echoes.every((e) => e.cycle !== "metonic")));
@@ -122,7 +122,7 @@ console.log("\na known Metonic echo");
   // 1969-07-20 plus exactly one Metonic cycle.
   const x = dayOf("1969-07-20");
   const echoDay = Math.round(x + met.days);
-  const e = eventWith(bradley, ["1969-07-20", "1978-03-01", "1983-11-11"]);
+  const e = eventWith(sample, ["1969-07-20", "1978-03-01", "1983-11-11"]);
   const fake = { z_keys_by_date: ["z1", "z2"], z_structs: {
     z1: { z_start: new Date(echoDay * DAY) },
     z2: { z_start: new Date((echoDay + 40) * DAY) }
@@ -140,7 +140,7 @@ console.log("\nX-Dates that are themselves a cycle apart");
   const x1 = "1988-03-18";
   const x2 = isoOfDay(Math.round(dayOf(x1) + met.days));
   const x3 = isoOfDay(Math.round(dayOf(x1) + 2 * met.days) + 1);
-  const e = eventWith(bradley, [x1, "1999-01-01", x2, x3]);
+  const e = eventWith(sample, [x1, "1999-01-01", x2, x3]);
   const a = Cycles.analyze(e, { z_keys_by_date: [], z_structs: {} }, { metonic: true, phoenix: false, tolerance: 2 });
   check("two Metonic-linked pairs found", a.pairs.length >= 2, a.pairs.map((p) => "X" + (p.older + 1) + "→X" + (p.newer + 1) + " ×" + p.k).join(", "));
   check("the pair baseline is small", a.pairSummary && a.pairSummary.expected < 0.01, a.pairSummary && a.pairSummary.expected.toFixed(5) + " expected");
@@ -148,7 +148,7 @@ console.log("\nX-Dates that are themselves a cycle apart");
 
 console.log("\nthe chance baseline, checked by simulation");
 {
-  const e = eventWith(bradley, ["1970-01-10", "1981-06-02", "1994-09-30", "2001-02-14"]);
+  const e = eventWith(sample, ["1970-01-10", "1981-06-02", "1994-09-30", "2001-02-14"]);
   const from = dayOf("2010-01-01"), to = dayOf("2045-12-31");
   const next = rng(19);
   const trials = 1500, n = 100;
@@ -175,7 +175,7 @@ console.log("\nthe chance baseline, checked by simulation");
 
 console.log("\nthe backtest on your files");
 {
-  const files = ["test-bradley.oph", "test-file-bradley-rogue-dates.oph", "7-4-26-8-20-26-3-9-27-3-16-27-8-19-27-4-1-28.oph"];
+  const files = ["sample-eclipses.oph", "sample-eclipses-two-events.oph", "7-4-26-8-20-26-3-9-27-3-16-27-8-19-27-4-1-28.oph"];
   files.forEach((file) => {
     const events = loadEvents(file);
     const bt = Cycles.backtest(events, { tolerance: 1, topN: 10 });
@@ -199,11 +199,11 @@ console.log("\nthe backtest recognises a real hit");
   // Cast from three dates, take the top-scoring projection as the "next event",
   // and the backtest must report it as a hit at rank 1.
   const known = ["2001-03-04", "2003-07-19", "2006-02-11"];
-  const e = eventWith(bradley, known);
+  const e = eventWith(sample, known);
   const res = Engine.run(e, { nowInstant: new Date(dayOf(known[2]) * DAY) });
   const ranked = Engine.sortZDates(res.z_keys_by_date, res.z_structs, C.Z_DATE_SORT_TYPE__SCORE, Engine.scoringSystem(e));
   const topIso = isoOfDay(Math.floor(res.z_structs[ranked[0]].z_start.getTime() / DAY));
-  const bt = Cycles.backtestEvent(eventWith(bradley, known.concat([topIso])), { tolerance: 0, topN: 10 });
+  const bt = Cycles.backtestEvent(eventWith(sample, known.concat([topIso])), { tolerance: 0, topN: 10 });
   const last = bt[bt.length - 1];
   check("the planted event is a hit", last.hit === true, topIso);
   check("…at rank 1", last.best && last.best.rank === 1);
@@ -214,14 +214,14 @@ console.log("\nthe backtest's chance figure, checked by simulation");
   // The arithmetic: move the next event to random days in the control window
   // around it, and it is hit as often as the chance figure says.
   const known = ["2004-05-01", "2006-10-12", "2009-01-30", "2011-08-08"];
-  const probe = Cycles.backtestEvent(eventWith(bradley, known.concat(["2012-01-01"])), { tolerance: 1 }).pop();
+  const probe = Cycles.backtestEvent(eventWith(sample, known.concat(["2012-01-01"])), { tolerance: 1 }).pop();
   check("the control window is " + Cycles.LOCAL_CONTROL_DAYS + " days either side of the event",
     probe.controlDays === 2 * Cycles.LOCAL_CONTROL_DAYS + 1, isoOfDay(probe.controlFrom) + " to " + isoOfDay(probe.controlTo));
   const next = rng(138);
   let hits = 0; const n = 150;
   for (let t = 0; t < n; t++) {
     const day = probe.controlFrom + Math.floor(next() * probe.controlDays);
-    const st = Cycles.backtestEvent(eventWith(bradley, known.concat([isoOfDay(day)])), { tolerance: 1 }).pop();
+    const st = Cycles.backtestEvent(eventWith(sample, known.concat([isoOfDay(day)])), { tolerance: 1 }).pop();
     if (st.hit) hits++;
   }
   const rate = hits / n;
@@ -247,7 +247,7 @@ console.log("\nthe backtest against noise: is the control fair?");
     let day = dayOf("1975-01-01") + Math.floor(next() * 3000);
     const iso = [isoOfDay(day)];
     for (let i = 1; i < EVENTS; i++) { day += 1 + Math.floor(-Math.log(1 - next()) * 365); iso.push(isoOfDay(day)); }
-    const steps = Cycles.backtestEvent(eventWith(bradley, iso), { tolerance: 1, topN: 10 });
+    const steps = Cycles.backtestEvent(eventWith(sample, iso), { tolerance: 1, topN: 10 });
     const sum = Cycles.summarize(steps, 10);
     observed += sum.any.observed; expected += sum.any.expected; scored += sum.any.trials;
     steps.forEach((st) => { if (!st.error && st.inWindow) expectedOld += st.chanceHitHorizon; });
@@ -268,7 +268,7 @@ console.log("\na target beyond the projection horizon is shown but not scored");
 {
   // The default filter hides anything more than 2559 days past the last known
   // event, so an event 20 years later could not have been projected at all.
-  const e = eventWith(bradley, ["1990-01-01", "1993-05-05", "2013-05-05"]);
+  const e = eventWith(sample, ["1990-01-01", "1993-05-05", "2013-05-05"]);
   const steps = Cycles.backtestEvent(e, { tolerance: 1 });
   const st = steps[steps.length - 1];
   check("the step is flagged as beyond the horizon", st.inWindow === false && st.outside === "beyond-filter", st.windowDays + "-day window");
@@ -276,7 +276,7 @@ console.log("\na target beyond the projection horizon is shown but not scored");
   check("…and left out of the score", s.any.trials === 0 && s.any.expected === 0);
   // With that filter off, the reach is the furthest projection instead, and
   // the reason given must say so rather than blame the filter.
-  const open = eventWith(bradley, ["2000-01-01", "2000-03-01", "2000-05-01", "2020-01-01"]);
+  const open = eventWith(sample, ["2000-01-01", "2000-03-01", "2000-05-01", "2020-01-01"]);
   open.iso_event_filter_beyond_max_days = false;
   const far = Cycles.backtestEvent(open, { tolerance: 1 }).pop();
   check("with the filter off, a later event is past the furthest projection", far.inWindow === false && far.outside === "beyond-projections" && far.horizonBy === "projections",
@@ -288,7 +288,7 @@ console.log("\nHH:MM scope: an event inside a projected sunset-to-sunset day");
   check("the sunset library is loaded", T.sunsetAvailable());
   // New York, evening events. In summer the evening is already the next UTC
   // day, which is where counting by UTC day went wrong.
-  const e = JSON.parse(JSON.stringify(bradley));
+  const e = JSON.parse(JSON.stringify(sample));
   e.scope = C.EVENT_SCOPE__HH_MM; e.lat = 40.71; e.long = -74.01; e.location_enabled = true; e.t_dates = [];
   e.x_dates = [T.newXDate("03/04/2001", "21:00"), T.newXDate("07/19/2003", "21:00"), T.newXDate("02/11/2006", "21:00")];
   const last = Cycles.enabledXInstants(e).pop();
@@ -315,7 +315,7 @@ console.log("\nHH:MM scope where summer sunsets come after midnight");
   // Fairbanks in July: the sun sets at 00:01 one night and at 23:58 the next,
   // so two sunset-days open on the same local date. Each must still get its
   // own number, or an event is taken for the same day as the one before it.
-  const e = JSON.parse(JSON.stringify(bradley));
+  const e = JSON.parse(JSON.stringify(sample));
   e.scope = C.EVENT_SCOPE__HH_MM; e.lat = 64.8; e.long = -147.7; e.location_enabled = true; e.t_dates = [];
   let t = Date.UTC(2006, 4, 1), last = null, repeats = 0, skips = 0;
   for (let i = 0; i < 120; i++) {

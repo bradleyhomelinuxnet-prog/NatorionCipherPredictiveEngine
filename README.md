@@ -111,7 +111,7 @@ Ophis is a **worldbuilding & study instrument** after the Archaix thesis of Jaso
 
 ## License
 
-No open-source license has been chosen yet, so the default applies: the author reserves all rights to the study, the
-reports and the rebuilds. The third-party libraries in `lib/` (and their copies in `ophis/lib/` and
+[CC BY-NC-SA 4.0](LICENSE), the same terms as [natori-on-psyfr](https://github.com/bradleyhomelinuxnet-prog/natori-on-psyfr): use it, study it, take it apart and
+pass it on, with credit, not for sale, and with adaptations under the same terms. The third-party libraries in `lib/` (and their copies in `ophis/lib/` and
 `natorion/js/vendor/`) belong to their authors and keep their own licenses; the fonts embedded in Ophis Web are under the
 SIL Open Font License 1.1 ([`web/css/OFL.txt`](web/css/OFL.txt)).

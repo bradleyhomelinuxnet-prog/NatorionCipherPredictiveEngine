@@ -1,7 +1,9 @@
 # Ophis v12 — browser build
 
-This folder is **Ophis v12 exactly as it ships inside `Ophis_v12_Windows.exe`**, running in a web
-browser instead of inside Electron. It has the same functions and screens and gives the same numbers.
+This folder is **Ophis v12 as it ships inside `Ophis_v12_Windows.exe`**, running in a web browser
+instead of inside Electron. It has the same functions and screens and gives the same numbers. The
+one visible difference is its dark "Dark Observatory" skin (see *The skin* below); the engine is
+untouched.
 
 Live copy: <https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/ophis/>
 
@@ -12,7 +14,7 @@ The `.exe` is an Electron app. All of its logic lives in `resources/app.asar`. T
 | Part of the exe | What it does | In this folder |
 |---|---|---|
 | `ophis.html` | The page and its script loader | `index.html`, with four small additions (below) |
-| `src/*.js`, `src/ophis.css` | The whole app: engine, screens, chart, export | Copied **byte-for-byte** |
+| `src/*.js`, `src/ophis.css` | The whole app: engine, screens, chart, export | Copied **byte-for-byte**, except the three skin files (below) |
 | `lib/*` | Third-party libraries (Chart.js, Leaflet, moment, jsPDF…) | Only the libraries `ophis.html` loads, copied byte-for-byte except line 1 of `suncalc.js` (below) |
 | `img/*` | Icons, moon/eclipse symbols, offline world-map tiles | Copied byte-for-byte |
 | `package.json` | The app's name and version | Kept. At start-up the app reads its version from it (`init_step1_getAppVersion` in `src/ophis_main.js`) |
@@ -26,6 +28,17 @@ diff -rq src ophis/src                          # lists only the two bridge file
 diff -rq img ophis/img                          # no output
 diff -rq lib ophis/lib | grep -v '^Only in lib' # no output (ophis/lib is a subset)
 ```
+
+### The skin
+
+Three files differ from the exe on purpose, and only in colour:
+
+- `src/ophis.css` is replaced by the Dark Observatory theme.
+- `src/ophis_view__chart.js` (5 lines) and `src/ophis_view__chart_config.js` (4 lines) change the
+  chart's background, axis and curve colours from black-on-white to light-on-dark.
+
+No engine, model, validation or export file is touched: every other file in `src/` matches the exe
+byte for byte. The root `src/` carries the same skin, so the `diff` commands above still hold.
 
 Two details differ from the first version of this folder:
 
@@ -95,8 +108,8 @@ Checked in headless Chromium, served over HTTP, with the file dialogs scripted:
 - Start-up ran all six `init` steps, the self-check and the unit tests with no console errors and
   no failed requests.
 - The three sample files at the repository root opened through File › Open:
-  `7-4-26-…-4-1-28.oph` (6 X-Dates, 177 Z-Dates), `test-bradley.oph` (5 X-Dates, 114 Z-Dates) and
-  `test-file-bradley-rogue-dates.oph` (two events, 211 Z-Dates). Each drew its chart.
+  `7-4-26-…-4-1-28.oph` (6 X-Dates, 177 Z-Dates), `sample-eclipses.oph` (5 X-Dates, 108 Z-Dates) and
+  `sample-eclipses-two-events.oph` (two events, 184 Z-Dates). Each drew its chart.
 - Editing the event name changed the title to "(Not Saved)". Ctrl+S saved and changed it to "(Saved)".
   When the browser was refused permission to write, the title went back to "(Not Saved)".
 - Operations Col Visible, Prettify, and Minify with its warning dialog all toggled the real options.
