@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<base target="_blank">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ophis v12 · Reverse-Engineering Report &amp; Security Analysis</title>
 <meta name="description" content="A white-box reverse-engineering study of Ophis v12, an offline Electron date-projection app: how the .exe came apart, how a shared .oph file reaches code execution, and how the engine was rebuilt without that hole.">
@@ -156,13 +157,13 @@
 <nav class="top">
   <div class="brand">OPHIS v12 <span>· RE Report</span></div>
   <div class="links">
-    <a href="#summary" data-go="summary">Summary</a>
-    <a href="#method" data-go="method">Method</a>
-    <a href="#anatomy" data-go="anatomy">Anatomy</a>
-    <a href="#delta" data-go="delta">v9→v12</a>
-    <a href="#chain" data-go="chain">Exploit Chain</a>
-    <a href="#findings" data-go="findings">Findings</a>
-    <a href="#harden" data-go="harden">Hardening</a>
+    <a target="_self" href="#summary" data-go="summary">Summary</a>
+    <a target="_self" href="#method" data-go="method">Method</a>
+    <a target="_self" href="#anatomy" data-go="anatomy">Anatomy</a>
+    <a target="_self" href="#delta" data-go="delta">v9→v12</a>
+    <a target="_self" href="#chain" data-go="chain">Exploit Chain</a>
+    <a target="_self" href="#findings" data-go="findings">Findings</a>
+    <a target="_self" href="#harden" data-go="harden">Hardening</a>
     <a href="OPHIS.html" target="_blank" rel="noopener" style="color:var(--gold2)">↗ v9 Codex</a>
     <a href="PSYFR1.html" target="_blank" rel="noopener" style="color:var(--gold2)">↗ PSYFR Engine</a>
   </div>
