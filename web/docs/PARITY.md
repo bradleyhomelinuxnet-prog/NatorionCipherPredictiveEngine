@@ -69,8 +69,8 @@ many random events `--fuzz` asks for:
 - custom operations, a disabled operation, an operation that does not compile
 - **HH:MM scope** at three latitudes (New York, Sydney, Stockholm), including
   X-Dates either side of a sunset
-- the repository's own `test-bradley.oph`,
-  `test-file-bradley-rogue-dates.oph`, and
+- the repository's own `sample-eclipses.oph`,
+  `sample-eclipses-two-events.oph`, and
   `7-4-26-8-20-26-3-9-27-3-16-27-8-19-27-4-1-28.oph`
 
 ### Result

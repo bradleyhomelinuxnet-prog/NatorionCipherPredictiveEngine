@@ -21,7 +21,7 @@ python3 -m http.server 8137    # same
 ```
 
 Drop a `.oph` file anywhere on the page to open it, or use **Open**.
-The repository's own `test-bradley.oph` is a good first load.
+The repository's own `sample-eclipses.oph` is a good first load.
 
 ---
 

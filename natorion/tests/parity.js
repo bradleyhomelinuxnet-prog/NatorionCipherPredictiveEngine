@@ -119,7 +119,7 @@ const original = loadOriginal(), natorion = loadNatorion(), R = rng(seed);
 const NOW = Date.UTC(2026, 8, 23, 12, 0);
 // Every fifth random case also runs with "today" moved inside its own date
 // range, so the on-today / before-today filters actually bite.
-const cases = ["test-bradley.oph", "test-file-bradley-rogue-dates.oph", "7-4-26-8-20-26-3-9-27-3-16-27-8-19-27-4-1-28.oph"].map(f => ({ name: f, json: fs.readFileSync(path.join(REPO, f), "utf8") }));
+const cases = ["sample-eclipses.oph", "sample-eclipses-two-events.oph", "7-4-26-8-20-26-3-9-27-3-16-27-8-19-27-4-1-28.oph"].map(f => ({ name: f, json: fs.readFileSync(path.join(REPO, f), "utf8") }));
 for (let i = 0; i < count; i++) {
   const json = randomEvent(R, i % 5 === 4), c = { name: "random#" + i + (i % 5 === 4 ? " (HH:MM)" : ""), json: json };
   if (i % 5 === 2) { const xs = JSON.parse(json).iso_events[0].x_dates, d = xs[xs.length - 1].date; c.now = Date.UTC(+d.slice(6), +d.slice(0, 2) - 1, +d.slice(3, 5)) + Math.floor(R() * 200) * 864e5 + 7 * 3600000; c.name += " (today inside)"; }
