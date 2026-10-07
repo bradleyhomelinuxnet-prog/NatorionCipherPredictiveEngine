@@ -1,5 +1,7 @@
 # Ophis v12 (“PSYFR”) — Reverse-Engineering Case Study
 
+[![tests](https://github.com/bradleyhomelinuxnet-prog/NatorionCipherPredictiveEngine/actions/workflows/tests.yml/badge.svg)](https://github.com/bradleyhomelinuxnet-prog/NatorionCipherPredictiveEngine/actions/workflows/tests.yml) [![Live site](https://img.shields.io/badge/live-site-d8a943)](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/) [![license: CC BY-NC-SA 4.0](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-3d6fb4)](https://github.com/bradleyhomelinuxnet-prog/NatorionCipherPredictiveEngine/blob/main/LICENSE) ![Runs in the browser](https://img.shields.io/badge/runs-in%20the%20browser-54b8c9)
+
 <img src="PSYFR.jpg" alt="PSYFR poster: a hooded figure and a white rabbit before a glowing gate onto a future city" width="200" align="right">
 
 > **Live site: [bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/)** — three browser apps, the report and the Hardened Engine Lab. Nothing to install, and nothing leaves your machine.
