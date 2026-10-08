@@ -6,6 +6,7 @@
 #              differential test against the same original engine plus 500
 #              random events (seeded, so a failure reproduces), and the page
 #              itself in headless Chromium.
+#   player   — the Phoenix Player in headless Chromium on a sample index.
 #   legacy   — the single-file pages' formula parser against the new Function()
 #              compiler it replaced, plus 1,380 seeded random formulas a page.
 name: Tests
@@ -78,3 +79,20 @@ jobs:
           node-version: 22
       - name: Single-file pages parse formulas exactly as the old compiler ran them
         run: node tests/legacy-parity.node.js --fuzz 1380 --seed 19
+
+  player:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Install Playwright Chromium and ffmpeg
+        run: |
+          npx --yes playwright@1.56.1 install --with-deps chromium
+          command -v ffmpeg || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+      - name: Phoenix Player in headless Chromium
+        run: |
+          npm i --no-save --no-audit --no-fund --prefix "$RUNNER_TEMP/pw" playwright@1.56.1
+          NODE_PATH="$RUNNER_TEMP/pw/node_modules" node phoenix-player/tests/browser.js

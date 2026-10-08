@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phoenix Player</title>
+<meta name="description" content="Plays a Phoenix Production master asset index — stills and clips in order, from the CDN or your own downloads.">
+<!-- Media may come from any https host the index names, or from files you pick (blob:). Nothing else loads. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src https: blob: data:; media-src https: blob:; base-uri 'none'; form-action 'none'">
+<style>
+:root{
+  --bg:#f4f1ea; --panel:#fffdf8; --ink:#1d1b17; --muted:#6b655a; --line:#ddd5c5; --accent:#9a7420; --accent-ink:#fff;
+  --img:#2f6f86; --vid:#9a4a2a; --stage:#0b0d10; --focus:#2f6f86; --warn:#a33a2a;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1117; --panel:#151b23; --ink:#e8e2d4; --muted:#9a9384; --line:#283240; --accent:#d8a943; --accent-ink:#1a1408;
+    --img:#54b8c9; --vid:#e08a5c; --stage:#05070a; --focus:#54b8c9; --warn:#ef7a62;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1117; --panel:#151b23; --ink:#e8e2d4; --muted:#9a9384; --line:#283240; --accent:#d8a943; --accent-ink:#1a1408;
+  --img:#54b8c9; --vid:#e08a5c; --stage:#05070a; --focus:#54b8c9; --warn:#ef7a62;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+header h1{margin:0;font-size:17px;letter-spacing:.04em}
+header h1 span{color:var(--accent)}
+header .sp{flex:1}
+.stat{color:var(--muted);font-size:13px}
+.btn{background:transparent;border:1px solid var(--line);border-radius:8px;padding:6px 11px;min-height:34px}
+.btn:hover{border-color:var(--accent)}
+a.btn{color:inherit;text-decoration:none;display:inline-flex;align-items:center}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+
+/* Load screen */
+#load{max-width:860px;margin:32px auto;padding:0 16px}
+#load h2{margin:0 0 6px;font-size:22px}
+#load p{color:var(--muted);margin:0 0 14px}
+#drop{border:2px dashed var(--line);border-radius:12px;padding:12px;background:var(--panel)}
+#drop.over{border-color:var(--accent)}
+#paste{width:100%;min-height:260px;resize:vertical;background:transparent;border:0;outline:none;font:12px/1.4 ui-monospace,Consolas,monospace;color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.note{font-size:13px;color:var(--muted)}
+.err{color:var(--warn);font-size:14px;margin-top:8px}
+
+/* Player */
+#app{display:none;height:calc(100% - 57px)}
+#app.on{display:grid;grid-template-columns:minmax(0,1fr) 360px}
+#main{display:flex;flex-direction:column;min-width:0;min-height:0}
+#stage{position:relative;flex:1;min-height:220px;background:var(--stage);overflow:hidden}
+#stage .layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .45s ease}
+#stage .layer.show{opacity:1}
+#stage img,#stage video{max-width:100%;max-height:100%;object-fit:contain;display:block}
+#stage img.kb{animation:kb var(--hold,6s) ease-out forwards}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.06)}}
+@media (prefers-reduced-motion: reduce){#stage img.kb{animation:none}#stage .layer{transition:none}}
+#msg{position:absolute;inset:auto 0 0 0;padding:10px 16px;color:#f3d9cf;background:rgba(0,0,0,.6);font-size:14px;display:none}
+#bar{height:3px;background:rgba(255,255,255,.12)}
+#bar i{display:block;height:100%;width:0;background:var(--accent)}
+#controls{display:flex;gap:8px;align-items:center;padding:8px 16px;border-top:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+#controls .sp{flex:1}
+#controls label{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+#hold{width:90px}
+#info{padding:10px 16px 14px;background:var(--panel);border-top:1px solid var(--line);max-height:30vh;overflow:auto}
+#info .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
+#info .prompt{margin:6px 0 0;font-size:14px}
+#info code{font:12px ui-monospace,Consolas,monospace;background:rgba(127,127,127,.12);padding:1px 5px;border-radius:4px}
+.tag{font:600 11px/1 system-ui;padding:3px 6px;border-radius:4px;color:#fff;letter-spacing:.04em}
+.tag.IMG{background:var(--img)} .tag.VID{background:var(--vid)}
+.src{font-size:11px;border:1px solid var(--line);border-radius:4px;padding:2px 5px}
+.src.local{border-color:var(--accent);color:var(--accent)}
+.ref{font-size:11px;border:1px solid var(--line);border-radius:10px;padding:1px 6px;color:var(--muted)}
+
+aside{border-left:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
+#filters{padding:10px 12px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#filters input,#filters select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 7px;min-height:32px}
+#filters .full{grid-column:1/-1}
+#count{font-size:12px;color:var(--muted);padding:6px 12px;border-bottom:1px solid var(--line)}
+#list{list-style:none;margin:0;padding:0;overflow:auto;flex:1}
+#list li{display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;padding:7px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+#list li:hover{background:rgba(127,127,127,.08)}
+#list li[aria-current="true"]{background:rgba(216,169,67,.14);box-shadow:inset 3px 0 0 var(--accent)}
+#list .n{font:12px ui-monospace,Consolas,monospace;color:var(--muted);grid-row:span 2;align-self:center;min-width:32px}
+#list .t{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#list .s{font-size:12px;color:var(--muted);grid-column:2/4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#list .st{background:none;border:0;color:var(--muted);font-size:16px;line-height:1;padding:0 2px}
+#list .st[aria-pressed="true"]{color:var(--accent)}
+#list .day{cursor:default;display:block;background:var(--bg);font:600 12px system-ui;color:var(--accent);padding:5px 12px;position:sticky;top:0}
+
+@media (max-width:860px){
+  #app.on{display:flex;flex-direction:column;height:auto}
+  #stage{min-height:0;aspect-ratio:16/9;flex:none}
+  aside{border-left:0;border-top:1px solid var(--line)}
+  #list{max-height:60vh}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>PHOENIX <span>PLAYER</span></h1>
+  <span class="stat" id="hdr"></span>
+  <span class="sp"></span>
+  <button class="btn" id="bLocal" title="Pick your downloaded files; matching ones play from disk">Link downloads…</button>
+  <button class="btn" id="bNew">New index</button>
+  <button class="btn" id="bTheme" title="Light or dark">◐ Theme</button>
+  <input type="file" id="fLocal" multiple accept="image/*,video/*" class="sr" tabindex="-1">
+</header>
+
+<section id="load">
+  <h2>Load an asset index</h2>
+  <p>Paste the <b>MASTER ASSET INDEX</b> text, drop the .txt file here, or open it. It is read in this browser only — nothing is uploaded. A plain list of image and video links works too.</p>
+  <div id="drop"><label class="sr" for="paste">Index text</label><textarea id="paste" spellcheck="false" placeholder="====================================================================&#10;PHOENIX PRODUCTION — MASTER ASSET INDEX (newest first)&#10;…&#10;[001] [IMG] 03:48  ·  Seedream 5 lite · 21:9&#10;      FILE: hf_20261008_034816&#10;      Prompt…&#10;      https://…/hf_20261008_034816_….png"></textarea></div>
+  <div class="row">
+    <button class="btn primary" id="bLoad">Play</button>
+    <button class="btn" id="bOpen">Open .txt…</button>
+    <input type="file" id="fTxt" accept=".txt,text/plain" class="sr" tabindex="-1">
+    <label class="note"><input type="checkbox" id="remember"> Remember this index in this browser</label>
+  </div>
+  <div class="err" id="loadErr" role="alert"></div>
+</section>
+
+<div id="app">
+  <div id="main">
+    <div id="stage" aria-live="polite"><div class="layer" id="L0"></div><div class="layer" id="L1"></div><div id="msg" role="status"></div></div>
+    <div id="bar"><i></i></div>
+    <div id="controls">
+      <button class="btn" id="bPrev" aria-label="Previous">⏮</button>
+      <button class="btn primary" id="bPlay" aria-label="Play">▶</button>
+      <button class="btn" id="bNext" aria-label="Next">⏭</button>
+      <button class="btn" id="bAuto" aria-pressed="true" title="Advance to the next item when one ends">Auto</button>
+      <button class="btn" id="bLoop" aria-pressed="false" title="Start again after the last item">Loop</button>
+      <button class="btn" id="bShuf" aria-pressed="false" title="Shuffle the playlist">Shuffle</button>
+      <button class="btn" id="bMute" aria-pressed="false">Sound on</button>
+      <label>Still <input type="range" id="hold" min="2" max="19" step="1" value="6"><span id="holdV">6s</span></label>
+      <span class="sp"></span>
+      <span class="stat" id="pos"></span>
+      <button class="btn" id="bFull" aria-label="Full screen">⛶</button>
+    </div>
+    <div id="info"></div>
+  </div>
+  <aside>
+    <div id="filters">
+      <input class="full" id="q" type="search" placeholder="Search prompt, model, FILE…" aria-label="Search">
+      <select id="fType" aria-label="Type"><option value="">Stills + clips</option><option value="IMG">Stills</option><option value="VID">Clips</option></select>
+      <select id="fOrder" aria-label="Order"><option value="old">Oldest first</option><option value="new">Newest first (as listed)</option></select>
+      <select id="fDay" aria-label="Day"><option value="">Every day</option></select>
+      <select id="fModel" aria-label="Model"><option value="">Every model</option></select>
+      <select id="fAspect" aria-label="Aspect"><option value="">Every aspect</option></select>
+      <select id="fMore" aria-label="Subset"><option value="">Everything</option><option value="star">★ Starred</option><option value="local">On disk</option></select>
+      <button class="btn" id="bM3u" title="The playlist as you see it, for VLC and other players">Save .m3u</button>
+      <button class="btn" id="bTxt" title="FILE stems of the playlist, one per line">Copy FILE list</button>
+    </div>
+    <div id="count"></div>
+    <ul id="list" aria-label="Playlist"></ul>
+  </aside>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("phoenix-player:" + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("phoenix-player:" + k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem("phoenix-player:" + k); } catch (e) {} }
+};
+
+/* ---------- Parsing the index ---------- */
+const RE_DAY = /^[─\-=\s]*(\d{4}-\d{2}-\d{2})[─\-=\s]*$/;
+const RE_ITEM = /^\[(\d+)\]\s*\[(IMG|VID)\]\s*(\d{1,2}:\d{2})?\s*(?:·\s*(.*))?$/i;
+const RE_URL = /https?:\/\/[^\s<>"']+/i;
+const VIDEO_EXT = /\.(mp4|webm|mov|m4v)(\?|#|$)/i;
+
+function baseName(u) { try { return decodeURIComponent(new URL(u).pathname.split("/").pop() || ""); } catch (e) { return ""; } }
+function stemOf(name) { const m = /^(hf_\d{8}_\d{6})/i.exec(name); return m ? m[1].toLowerCase() : name.replace(/\.[^.]+$/, "").toLowerCase(); }
+function cleanName(name) { return name.replace(/\s*\(\d+\)(?=\.[^.]+$)/, "").toLowerCase(); }   // "x (1).png" → "x.png"
+
+function parseIndex(text) {
+  const lines = text.replace(/\r/g, "").split("\n"), items = [];
+  let day = "", cur = null;
+  const finish = () => { if (cur && cur.url) items.push(cur); cur = null; };
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    let m;
+    if ((m = RE_DAY.exec(line)) && !RE_URL.test(line)) { finish(); day = m[1]; continue; }
+    if ((m = RE_ITEM.exec(line))) {
+      finish();
+      cur = { n: parseInt(m[1], 10), type: m[2].toUpperCase(), day, time: m[3] || "", model: "", dur: 0, res: "", aspect: "", file: "", prompt: "", url: "" };
+      (m[4] || "").split("·").map(s => s.trim()).filter(Boolean).forEach((p, i) => {
+        if (/^\d+(\.\d+)?s$/.test(p)) cur.dur = parseFloat(p);
+        else if (/^\d{3,4}p$/i.test(p)) cur.res = p;
+        else if (/^\d+(\.\d+)?:\d+(\.\d+)?$/.test(p)) cur.aspect = p;
+        else if (i === 0) cur.model = p;
+      });
+      continue;
+    }
+    if ((m = /^FILE:\s*(\S+)/i.exec(line))) { if (cur) cur.file = m[1]; continue; }
+    if ((m = RE_URL.exec(line)) && m.index === 0) {
+      const url = m[0];
+      if (cur && !cur.url) { cur.url = url; finish(); continue; }
+      // a bare link with no entry around it
+      finish();
+      items.push({ n: items.length + 1, type: VIDEO_EXT.test(url) ? "VID" : "IMG", day, time: "", model: "", dur: 0, res: "", aspect: "", file: stemOf(baseName(url)), prompt: "", url });
+      continue;
+    }
+    if (cur && !cur.prompt && !/^[=─]+$/.test(line)) cur.prompt = line;
+  }
+  finish();
+  items.forEach((it, i) => {
+    it.key = it.url;                      // stable id for stars
+    it.base = baseName(it.url).toLowerCase();
+    if (!it.file) it.file = stemOf(it.base);
+    if (!it.n) it.n = i + 1;
+    // order key: day + time, ties keep the index's own order (newest first)
+    it.when = (it.day || "0000-00-00") + " " + (it.time || "00:00");
+    it.idx = i;
+  });
+  return items;
+}
+
+// <<<uuid>>> reference tokens → short chips; the rest is the prompt.
+function promptParts(p) {
+  const refs = [];
+  const text = p.replace(/<<<([^>]+)>>>/g, (_, r) => { const k = /^image_\d+$/.test(r) ? r.replace("_", " ") : "@" + r.slice(0, 8); if (!refs.includes(k)) refs.push(k); return ""; })
+                .replace(/\s{2,}/g, " ").replace(/^[\s,—-]+/, "").trim();
+  return { refs, text };
+}
+
+/* ---------- State ---------- */
+let ALL = [], LIST = [], at = -1, playing = false, timer = 0, tStart = 0, tHold = 0, layer = 0;
+const local = new Map();                  // item.key → blob URL
+const stars = new Set(store.get("stars", []));
+const S = Object.assign({ hold: 6, auto: true, loop: false, shuffle: false, muted: false, order: "old" }, store.get("settings", {}));
+let shuffleSeed = 19;
+
+/* ---------- Load screen ---------- */
+function startWith(text, fromStore) {
+  const items = parseIndex(text);
+  if (!items.length) { $("loadErr").textContent = "No assets found. Each entry needs a link starting with https://."; return false; }
+  ALL = items;
+  if (!fromStore) { if ($("remember").checked) store.set("index", text); else store.del("index"); }
+  $("loadErr").textContent = "";
+  $("load").style.display = "none"; $("app").classList.add("on");
+  fillFilters(); applySettings(); rebuild(true);
+  return true;
+}
+$("bLoad").onclick = () => startWith($("paste").value);
+$("bOpen").onclick = () => $("fTxt").click();
+$("fTxt").onchange = e => { const f = e.target.files[0]; if (f) f.text().then(t => { $("paste").value = t; startWith(t); }); };
+const drop = $("drop");
+drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", e => {
+  e.preventDefault(); drop.classList.remove("over");
+  const f = e.dataTransfer.files[0];
+  if (f) f.text().then(t => { $("paste").value = t; startWith(t); });
+});
+$("bNew").onclick = () => { stop(); $("app").classList.remove("on"); $("load").style.display = ""; $("hdr").textContent = ""; };
+
+/* ---------- Filters and playlist ---------- */
+function opt(sel, values, label) { values.forEach(v => { const o = document.createElement("option"); o.value = v; o.textContent = label ? label(v) : v; sel.appendChild(o); }); }
+function fillFilters() {
+  ["fDay", "fModel", "fAspect"].forEach(id => { const s = $(id); while (s.options.length > 1) s.remove(1); });
+  const count = (k) => { const c = new Map(); ALL.forEach(it => it[k] && c.set(it[k], (c.get(it[k]) || 0) + 1)); return c; };
+  const days = count("day"), models = count("model"), aspects = count("aspect");
+  opt($("fDay"), [...days.keys()].sort().reverse(), v => v + " (" + days.get(v) + ")");
+  opt($("fModel"), [...models.keys()].sort(), v => v + " (" + models.get(v) + ")");
+  opt($("fAspect"), [...aspects.keys()].sort(), v => v + " (" + aspects.get(v) + ")");
+  const nI = ALL.filter(i => i.type === "IMG").length;
+  $("hdr").textContent = ALL.length + " assets · " + nI + " stills · " + (ALL.length - nI) + " clips";
+}
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = Math.imul(a ^ (a >>> 15), a | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function rebuild(keepCurrent) {
+  const cur = LIST[at];
+  const q = $("q").value.trim().toLowerCase(), ty = $("fType").value, d = $("fDay").value, mo = $("fModel").value, as = $("fAspect").value, more = $("fMore").value;
+  LIST = ALL.filter(it => (!ty || it.type === ty) && (!d || it.day === d) && (!mo || it.model === mo) && (!as || it.aspect === as)
+    && (more !== "star" || stars.has(it.key)) && (more !== "local" || local.has(it.key))
+    && (!q || (it.prompt + " " + it.model + " " + it.file + " " + it.base + " #" + it.n).toLowerCase().includes(q)));
+  // The index is newest first; within a minute it keeps that order, so "oldest first" is the index read backwards.
+  if (S.order === "old") LIST.reverse();
+  if (S.shuffle) { const r = rng(shuffleSeed); for (let i = LIST.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [LIST[i], LIST[j]] = [LIST[j], LIST[i]]; } }
+  renderList();
+  const k = keepCurrent && cur ? LIST.indexOf(cur) : -1;
+  if (k >= 0) { at = k; markCurrent(); }
+  else if (LIST.length) show(0, false);
+  else { at = -1; clearStage("Nothing matches these filters."); $("info").textContent = ""; updatePos(); }
+}
+function renderList() {
+  const ul = $("list"); ul.textContent = "";
+  const frag = document.createDocumentFragment();
+  let lastDay = null;
+  const showDays = !S.shuffle;
+  LIST.forEach((it, i) => {
+    if (showDays && it.day !== lastDay) { lastDay = it.day; const h = document.createElement("li"); h.className = "day"; h.textContent = it.day || "undated"; h.setAttribute("role", "presentation"); frag.appendChild(h); }
+    const li = document.createElement("li"); li.dataset.i = i; li.tabIndex = 0;
+    const n = document.createElement("span"); n.className = "n"; n.textContent = String(it.n).padStart(3, "0");
+    const t = document.createElement("span"); t.className = "t";
+    const tag = document.createElement("span"); tag.className = "tag " + it.type; tag.textContent = it.type;
+    t.append(tag, " " + [it.time, it.model, it.dur ? it.dur + "s" : "", it.aspect].filter(Boolean).join(" · "));
+    const st = document.createElement("button"); st.className = "st"; st.textContent = "★"; st.setAttribute("aria-label", "Star #" + it.n); st.setAttribute("aria-pressed", stars.has(it.key));
+    st.onclick = e => { e.stopPropagation(); toggleStar(it); st.setAttribute("aria-pressed", stars.has(it.key)); };
+    const s = document.createElement("span"); s.className = "s"; s.textContent = (local.has(it.key) ? "● " : "") + (promptParts(it.prompt).text || it.file);
+    li.append(n, t, st, s);
+    li.onclick = () => { show(i, true); };
+    li.onkeydown = e => { if (e.key === "Enter") show(i, true); };
+    frag.appendChild(li);
+  });
+  ul.appendChild(frag);
+  const nV = LIST.filter(i => i.type === "VID"), secs = nV.reduce((a, i) => a + (i.dur || 0), 0) + (LIST.length - nV.length) * S.hold;
+  $("count").textContent = LIST.length + " in playlist · about " + fmtDur(secs) + (local.size ? " · " + LIST.filter(i => local.has(i.key)).length + " on disk" : "");
+}
+function fmtDur(s) { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + "h " : "") + m + "m " + String(x).padStart(2, "0") + "s"; }
+function markCurrent() {
+  document.querySelectorAll("#list li[aria-current]").forEach(li => li.removeAttribute("aria-current"));
+  const li = document.querySelector('#list li[data-i="' + at + '"]');
+  if (li) { li.setAttribute("aria-current", "true"); li.scrollIntoView({ block: "nearest" }); }
+  updatePos();
+}
+function updatePos() { $("pos").textContent = LIST.length ? (at + 1) + " / " + LIST.length : ""; }
+function toggleStar(it) { stars.has(it.key) ? stars.delete(it.key) : stars.add(it.key); store.set("stars", [...stars]); if (LIST[at] === it) renderInfo(it); }
+["q", "fType", "fDay", "fModel", "fAspect", "fMore"].forEach(id => $(id).addEventListener("input", () => rebuild(true)));
+$("fOrder").addEventListener("input", () => { S.order = $("fOrder").value; saveS(); rebuild(true); });
+
+/* ---------- The stage ---------- */
+function srcOf(it) { return local.get(it.key) || it.url; }
+function clearStage(text) { stopTimer(); ["L0", "L1"].forEach(id => { const L = $(id); L.classList.remove("show"); L.textContent = ""; }); showMsg(text || ""); }
+function showMsg(t) { const m = $("msg"); m.textContent = t; m.style.display = t ? "block" : "none"; }
+function show(i, userAction) {
+  if (i < 0 || i >= LIST.length) return;
+  stopTimer(); showMsg("");
+  at = i; const it = LIST[i];
+  const next = $("L" + (1 - layer)), prev = $("L" + layer);
+  layer = 1 - layer;
+  next.textContent = "";
+  let el;
+  if (it.type === "VID") {
+    el = document.createElement("video");
+    el.src = srcOf(it); el.playsInline = true; el.controls = true; el.preload = "auto"; el.muted = S.muted;
+    const mine = () => LIST[at] === it && current() === el;          // events from a clip that has been replaced are ignored
+    el.addEventListener("ended", () => { if (mine() && playing && S.auto) advance(); });
+    el.addEventListener("timeupdate", () => { if (mine() && el.duration) setBar(el.currentTime / el.duration); });
+    el.addEventListener("play", () => { if (mine() && !playing) { playing = true; syncPlay(); } });
+    // Paused from its own controls. A clip that fails also fires "pause"; that one must not stop the playlist.
+    el.addEventListener("pause", () => { if (!el.ended && !el.error && el.readyState > 0 && playing && current() === el) { playing = false; syncPlay(); } });
+    el.addEventListener("error", () => failed(it));
+  } else {
+    el = document.createElement("img");
+    el.alt = promptParts(it.prompt).text.slice(0, 140) || it.file;
+    el.decoding = "async"; el.src = srcOf(it);
+    el.style.setProperty("--hold", S.hold + "s");
+    el.addEventListener("error", () => failed(it));
+  }
+  const old = prev.querySelector("video"); if (old) old.pause();     // it holds its frame while it fades out
+  next.appendChild(el);
+  next.classList.add("show"); prev.classList.remove("show");
+  setTimeout(() => { if (!prev.classList.contains("show")) prev.textContent = ""; }, 500);
+  setBar(0); renderInfo(it); markCurrent(); preload(i + 1);
+  if (userAction && !playing) { playing = true; syncPlay(); }
+  if (playing) run(el, it);
+}
+function run(el, it) {
+  if (it.type === "VID") {
+    const p = el.play();
+    if (p && p.catch) p.catch(() => { el.muted = true; S.muted = true; syncMute(); el.play().catch(() => {}); });
+  } else {
+    el.classList.remove("kb"); void el.offsetWidth; el.classList.add("kb");
+    tStart = performance.now(); tHold = S.hold * 1000;
+    const tick = () => {
+      const f = (performance.now() - tStart) / tHold; setBar(Math.min(1, f));
+      if (f >= 1) { timer = 0; if (S.auto) advance(); else { playing = false; syncPlay(); } }
+      else timer = requestAnimationFrame(tick);
+    };
+    timer = requestAnimationFrame(tick);
+  }
+}
+function stopTimer() { if (timer) cancelAnimationFrame(timer); timer = 0; }
+function setBar(f) { document.querySelector("#bar i").style.width = (f * 100).toFixed(2) + "%"; }
+function failed(it) {
+  if (LIST[at] !== it) return;
+  const el = current(), fmt = el && el.error && el.error.code === 4;
+  showMsg("Could not load #" + it.n + " (" + it.file + "). " + (local.has(it.key) ? "The linked file did not play" + (fmt ? " — this browser may not support its format." : ".")
+    : (fmt ? "The link may have expired, or this browser can't play the format — " : "The link may have expired — ") + "link your downloads to play it from disk.") + (playing && S.auto ? " Skipping…" : ""));
+  if (playing && S.auto) { stopTimer(); setTimeout(() => { if (LIST[at] === it && playing) advance(); }, 2500); }
+}
+function advance() {
+  if (at + 1 < LIST.length) show(at + 1, false);
+  else if (S.loop && LIST.length) { if (S.shuffle) { shuffleSeed += 138; rebuild(false); } show(0, false); }
+  else { playing = false; syncPlay(); }
+}
+function current() { return document.querySelector("#stage .layer.show img, #stage .layer.show video"); }
+function play() {
+  if (!LIST.length) return;
+  if (at < 0) return show(0, true);
+  playing = true; syncPlay();
+  const el = current(), it = LIST[at];
+  if (!el) return show(at, true);
+  if (it.type === "VID") run(el, it);
+  else { // resume a still where it stopped
+    const done = parseFloat(document.querySelector("#bar i").style.width) / 100 || 0;
+    if (done >= 1) return advance();
+    tStart = performance.now() - done * S.hold * 1000; tHold = S.hold * 1000;
+    const tick = () => { const f = (performance.now() - tStart) / tHold; setBar(Math.min(1, f)); if (f >= 1) { timer = 0; S.auto ? advance() : (playing = false, syncPlay()); } else timer = requestAnimationFrame(tick); };
+    timer = requestAnimationFrame(tick);
+  }
+}
+function pause() { playing = false; stopTimer(); const el = current(); if (el && el.tagName === "VIDEO") el.pause(); syncPlay(); }
+function syncPlay() { $("bPlay").textContent = playing ? "⏸" : "▶"; $("bPlay").setAttribute("aria-label", playing ? "Pause" : "Play"); }
+function preload(i) {
+  const it = LIST[i]; if (!it) return;
+  if (it.type === "IMG") { const im = new Image(); im.decoding = "async"; im.src = srcOf(it); }
+  else { const v = document.createElement("video"); v.preload = "auto"; v.muted = true; v.src = srcOf(it); }
+}
+
+/* ---------- Info panel ---------- */
+function renderInfo(it) {
+  const box = $("info"); box.textContent = "";
+  const meta = document.createElement("div"); meta.className = "meta";
+  const tag = document.createElement("span"); tag.className = "tag " + it.type; tag.textContent = it.type;
+  const head = document.createElement("b"); head.textContent = "#" + String(it.n).padStart(3, "0");
+  const src = document.createElement("span"); src.className = "src" + (local.has(it.key) ? " local" : ""); src.textContent = local.has(it.key) ? "from disk" : "from link";
+  meta.append(tag, head, [it.day, it.time && it.time + " UTC", it.model, it.dur && it.dur + "s", it.res, it.aspect].filter(Boolean).join(" · "), src);
+  const pp = promptParts(it.prompt);
+  pp.refs.forEach(r => { const c = document.createElement("span"); c.className = "ref"; c.textContent = r; meta.appendChild(c); });
+  const f = document.createElement("code"); f.textContent = it.file; meta.appendChild(f);
+  const star = document.createElement("button"); star.className = "btn"; star.textContent = stars.has(it.key) ? "★ Starred" : "☆ Star"; star.setAttribute("aria-pressed", stars.has(it.key));
+  star.onclick = () => { toggleStar(it); renderList(); markCurrent(); };
+  const copy = document.createElement("button"); copy.className = "btn"; copy.textContent = "Copy link";
+  copy.onclick = () => { navigator.clipboard && navigator.clipboard.writeText(it.url).then(() => { copy.textContent = "Copied"; setTimeout(() => copy.textContent = "Copy link", 1200); }, () => {}); };
+  const open = document.createElement("a"); open.className = "btn"; open.textContent = "Open ↗"; open.href = it.url; open.target = "_blank"; open.rel = "noopener noreferrer";
+  meta.append(star, copy, open);
+  const p = document.createElement("p"); p.className = "prompt"; p.textContent = pp.text || "(no prompt in the index)";
+  if (/…$/.test(pp.text)) p.title = "The index shortens prompts; this is all it holds.";
+  box.append(meta, p);
+}
+
+/* ---------- Local files ---------- */
+$("bLocal").onclick = () => $("fLocal").click();
+$("fLocal").onchange = e => {
+  const files = [...e.target.files]; if (!files.length) return;
+  const byName = new Map(), byStem = new Map();
+  files.forEach(f => {
+    const nm = cleanName(f.name);
+    byName.set(nm, f); byName.set(nm.replace(/\.[^.]+$/, ""), f);
+    const k = stemOf(nm) + "|" + (/^video\//.test(f.type) || VIDEO_EXT.test(nm) ? "VID" : "IMG");
+    (byStem.get(k) || byStem.set(k, []).get(k)).push(f);
+  });
+  const used = new Set(); let hit = 0;
+  const link = (it, f) => { if (local.has(it.key)) URL.revokeObjectURL(local.get(it.key)); local.set(it.key, URL.createObjectURL(f)); used.add(f); hit++; };
+  // 1) exact file name (with or without its extension)  2) same FILE stem and type, in index order
+  ALL.forEach(it => { const f = byName.get(it.base) || byName.get(it.base.replace(/\.[^.]+$/, "")); if (f && !used.has(f)) link(it, f); });
+  ALL.forEach(it => {
+    if (local.has(it.key)) return;
+    const pool = byStem.get(it.file.toLowerCase() + "|" + it.type) || [];
+    const f = pool.find(x => !used.has(x)); if (f) link(it, f);
+  });
+  e.target.value = "";
+  renderList(); markCurrent(); if (LIST[at]) renderInfo(LIST[at]);
+  showMsg(hit + " of " + ALL.length + " assets linked to files on disk" + (files.length - used.size ? " · " + (files.length - used.size) + " picked files matched nothing" : "") + ".");
+  setTimeout(() => showMsg(""), 4000);
+};
+
+/* ---------- Exports ---------- */
+function download(name, text, type) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
+$("bM3u").onclick = () => {
+  const lines = ["#EXTM3U"];
+  LIST.forEach(it => { lines.push("#EXTINF:" + (it.type === "VID" ? Math.round(it.dur || -1) : S.hold) + ",#" + it.n + " " + it.type + " " + it.file + " — " + promptParts(it.prompt).text.slice(0, 80)); lines.push(it.url); });
+  download("phoenix-playlist_" + LIST.length + ".m3u", lines.join("\n") + "\n", "audio/x-mpegurl");
+};
+$("bTxt").onclick = () => {
+  const t = LIST.map(it => it.file + "  #" + it.n + " " + it.type).join("\n");
+  navigator.clipboard && navigator.clipboard.writeText(t).then(() => { $("bTxt").textContent = "Copied " + LIST.length; setTimeout(() => $("bTxt").textContent = "Copy FILE list", 1500); }, () => {});
+};
+
+/* ---------- Controls ---------- */
+function saveS() { store.set("settings", S); }
+function syncMute() { $("bMute").textContent = S.muted ? "Muted" : "Sound on"; $("bMute").setAttribute("aria-pressed", S.muted); const v = current(); if (v && v.tagName === "VIDEO") v.muted = S.muted; }
+function applySettings() {
+  $("hold").value = S.hold; $("holdV").textContent = S.hold + "s"; $("fOrder").value = S.order;
+  $("bAuto").setAttribute("aria-pressed", S.auto); $("bLoop").setAttribute("aria-pressed", S.loop); $("bShuf").setAttribute("aria-pressed", S.shuffle);
+  syncMute(); syncPlay();
+}
+function stop() { pause(); clearStage(""); }
+$("bPlay").onclick = () => playing ? pause() : play();
+$("bPrev").onclick = () => show(Math.max(0, at - 1), true);
+$("bNext").onclick = () => { if (at + 1 < LIST.length) show(at + 1, true); else if (S.loop) show(0, true); };
+const toggle = (k, id, after) => () => { S[k] = !S[k]; $(id).setAttribute("aria-pressed", S[k]); saveS(); after && after(); };
+$("bAuto").onclick = toggle("auto", "bAuto");
+$("bLoop").onclick = toggle("loop", "bLoop");
+$("bShuf").onclick = toggle("shuffle", "bShuf", () => rebuild(true));
+$("bMute").onclick = () => { S.muted = !S.muted; saveS(); syncMute(); };
+$("hold").oninput = () => {
+  S.hold = parseInt($("hold").value, 10); $("holdV").textContent = S.hold + "s"; saveS(); renderList(); markCurrent();
+  if (timer) { const f = (performance.now() - tStart) / tHold; tHold = S.hold * 1000; tStart = performance.now() - f * tHold; }
+};
+$("bFull").onclick = () => { const s = $("stage"); document.fullscreenElement ? document.exitFullscreen() : (s.requestFullscreen && s.requestFullscreen().catch(() => {})); };
+$("bTheme").onclick = () => {
+  const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  r.dataset.theme = dark ? "light" : "dark"; store.set("theme", r.dataset.theme);
+};
+document.addEventListener("keydown", e => {
+  if (!$("app").classList.contains("on") || /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
+  if (e.target.tagName === "VIDEO" && /^(Arrow|\s)/.test(e.key)) return;     // let the video's own controls have these
+  if (e.key === " " || e.key === "k") { e.preventDefault(); playing ? pause() : play(); }
+  else if (e.key === "ArrowRight" || e.key === "n") $("bNext").click();
+  else if (e.key === "ArrowLeft" || e.key === "p") $("bPrev").click();
+  else if (e.key === "f") $("bFull").click();
+  else if (e.key === "m") $("bMute").click();
+  else if (e.key === "s" && LIST[at]) { toggleStar(LIST[at]); renderList(); markCurrent(); }
+});
+
+/* ---------- Start ---------- */
+(function init() {
+  const th = store.get("theme", null); if (th) document.documentElement.dataset.theme = th;   // otherwise dark, like the rest of the site
+  const saved = store.get("index", null);
+  if (saved) { $("remember").checked = true; $("paste").value = saved; startWith(saved, true); }
+})();
+</script>
+</body>
+</html>

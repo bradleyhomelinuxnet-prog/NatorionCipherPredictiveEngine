@@ -1,0 +1,36 @@
+====================================================================
+PHOENIX PRODUCTION — MASTER ASSET INDEX (newest first)
+6 assets · 3 images + 3 videos
+[IMG] = still · [VID] = clip. Match FILE stem to your desktop downloads.
+====================================================================
+
+
+────────  2026-10-08  ────────
+[001] [IMG] 03:48  ·  Seedream 5 lite · 21:9
+      FILE: hf_20261008_034816
+      Hand-painted storybook watercolor, a ledger open under a lamp…
+      https://cdn.test/u/hf_20261008_034816_aaaa0001.png
+
+────────  2026-09-29  ────────
+[002] [VID] 02:27  ·  Cinema Studio 3.0 · 10s · 720p · 16:9
+      FILE: hf_20260929_022717
+      The King's Chamber: dark polished red granite, a lidless box…
+      https://cdn.test/u/hf_20260929_022717_bbbb0002.mp4
+[003] [VID] 02:27  ·  Cinema Studio 3.0 · 10s · 720p · 16:9
+      FILE: hf_20260929_022717
+      The Grand Gallery from its foot, corbelled walls climbing…
+      https://cdn.test/u/hf_20260929_022717_cccc0003.mp4
+[004] [IMG] 01:44  ·  Seedream 4.5 · 3:4
+      FILE: hf_20260929_014436
+      <<<39b82f74-c469-42f4-80de-50325be9a977>>> Waist-up portrait of a storyteller, nineteen rings behind…
+      https://cdn.test/u/hf_20260929_014436_dddd0004.png
+
+────────  2026-09-08  ────────
+[005] [VID] 00:49  ·  seedance_unlimited · 15s · 720p · 16:9
+      FILE: hf_20260908_004923
+      <<<b5961961-3eeb-4ebe-b5c6-ef69cf2850bd>>> a rain-slick street at 138 lamps…
+      https://cdn.test/u/hf_20260908_004923_eeee0005.mp4
+[006] [IMG] 00:30  ·  Seedream 4.5 · 16:9
+      FILE: hf_20260908_003000
+      A link that is gone.
+      https://cdn.test/u/hf_20260908_003000_gone0006.png
