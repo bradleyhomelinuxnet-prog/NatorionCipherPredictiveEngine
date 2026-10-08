@@ -5,7 +5,7 @@
 <base target="_blank">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NATORI-ON-PSYFR · The Predictive Chronology Engine</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline';">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1028,6 +1028,52 @@ function moonInfo(ay,m,d){const J=jdn(ay,m,d);let age=mod(J-NEWMOON_J2000,SYN);c
    PREDICTION ENGINE
    ============================================================ */
 const SCORING={V8:'V8',V7:'V7'};
+/* Formulas are parsed into a tree and evaluated, never compiled as code. The grammar is the
+   slice of JavaScript the old compile-to-code path accepted after its filter: numbers (07 is
+   octal, as in sloppy JS), Y, OPH_PHI/PI/CRV, the six oph_ functions, + - * / ** and brackets.
+   Anything JavaScript rejected, this rejects; so do ++, -- (JS took --Y as "decrement Y") and // or /*
+   (JS read them as comments, so X1+2//8 quietly meant X1+2).
+   Same tree, same order, same floating point: tests/legacy-parity.node.js checks it. */
+const OPH_FNS={oph_flip:v=>oph_flip(v),oph_round:v=>oph_round(v),oph_floor:v=>oph_floor(v),oph_ceil:v=>oph_ceil(v),oph_abs:v=>oph_abs(v),oph_sqrt:v=>oph_sqrt(v)};
+function parseEq(src){
+  const T=[];let i=0;
+  while(i<src.length){
+    const r=src.slice(i);let m;
+    if((m=/^(\d+\.?\d*|\.\d+)/.exec(r))){
+      const s=m[0];let v;
+      if(/^0\d/.test(s)){
+        if(/^0[0-7]+$/.test(s))v=parseInt(s,8);
+        else if(/^0\d*[89]\d*(\.\d*)?$/.test(s))v=Number(s.replace(/^0+(?=\d)/,''));
+        else throw 0;
+      }else v=Number(s);
+      if(/^[\w.]/.test(src.slice(i+s.length)))throw 0;
+      T.push({t:'n',v});i+=s.length;
+    }
+    else if((m=/^[A-Za-z_]\w*/.exec(r))){T.push({t:'id',v:m[0]});i+=m[0].length;}
+    else if((m=/^(\*\*|\+\+|--|[-+*/()])/.exec(r))){if(m[0]==='++'||m[0]==='--')throw 0;T.push({t:m[0]});i+=m[0].length;}
+    else throw 0;
+  }
+  let p=0;const peek=()=>T[p]&&T[p].t,eat=t=>{if(peek()!==t)throw 0;p++;};
+  function add(){let a=mul();while(peek()==='+'||peek()==='-'){const o=T[p++].t,l=a,b=mul();a=o==='+'?(Y=>l(Y)+b(Y)):(Y=>l(Y)-b(Y));}return a;}
+  function mul(){let a=pow();while(peek()==='*'||peek()==='/'){const o=T[p++].t,l=a,b=pow();a=o==='*'?(Y=>l(Y)*b(Y)):(Y=>l(Y)/b(Y));}return a;}
+  function pow(){                      // JS: -a**b is an error; a**-b and a**b**c (right to left) are not
+    if(peek()==='-'||peek()==='+'){const a=una();if(peek()==='**')throw 0;return a;}
+    const a=pri();if(peek()!=='**')return a;p++;const b=pow();return Y=>a(Y)**b(Y);
+  }
+  function una(){const o=T[p++].t,a=(peek()==='-'||peek()==='+')?una():pri();return o==='-'?(Y=>-a(Y)):(Y=>+a(Y));}
+  function pri(){
+    const k=T[p++];if(!k)throw 0;
+    if(k.t==='n'){const v=k.v;return()=>v;}
+    if(k.t==='('){const a=add();eat(')');return a;}
+    if(k.t==='id'){
+      if(k.v==='Y')return Y=>Y;
+      if(k.v==='OPH_PHI'||k.v==='OPH_PI'||k.v==='OPH_CRV'){const c=k.v==='OPH_PHI'?OPH_PHI:k.v==='OPH_PI'?OPH_PI:OPH_CRV;return()=>c;}
+      if(Object.prototype.hasOwnProperty.call(OPH_FNS,k.v)&&peek()==='('){const f=OPH_FNS[k.v];p++;if(peek()===')'){p++;return()=>f(undefined);}const a=add();eat(')');return Y=>f(a(Y));}
+    }
+    throw 0;
+  }
+  const fn=add();if(p!==T.length)throw 0;return fn;
+}
 function compileOp(eqRaw){
   let eq=eqRaw.replace(/\s+/g,'').replace(/×/g,'x');
   let start;
@@ -1038,11 +1084,11 @@ function compileOp(eqRaw){
   let test=body.replace(/OPH_PHI|OPH_PI|OPH_CRV/g,'1').replace(/oph_(flip|round|floor|ceil|abs|sqrt)/g,'f').replace(/Y/g,'1');
   if(/[^0-9+\-*/().f]/.test(test))throw new Error("illegal token in equation");
   let fn;
-  try{fn=new Function('Y','OPH_PHI','OPH_PI','OPH_CRV','oph_flip','oph_round','oph_floor','oph_ceil','oph_abs','oph_sqrt','return '+body+';');}
+  try{fn=parseEq(body);}
   catch(e){throw new Error("syntax error");}
-  let t=fn(1000,OPH_PHI,OPH_PI,OPH_CRV,oph_flip,oph_round,oph_floor,oph_ceil,oph_abs,oph_sqrt);
+  let t=fn(1000);
   if(typeof t!=='number'||!isFinite(t))throw new Error("does not evaluate to a number");
-  return {start, fn:(Y)=>fn(Y,OPH_PHI,OPH_PI,OPH_CRV,oph_flip,oph_round,oph_floor,oph_ceil,oph_abs,oph_sqrt)};
+  return {start, fn};
 }
 
 function scoreZDate(ZA, J, system){
