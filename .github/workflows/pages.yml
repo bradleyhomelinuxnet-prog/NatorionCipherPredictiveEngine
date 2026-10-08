@@ -43,6 +43,8 @@ jobs:
           # Chronicon and the clocks. It reads four data files from ../lib.
           cp -R web site/web
           rm -rf site/web/tests
+          # Phoenix Player: a single page; its index is pasted in, never published.
+          mkdir -p site/phoenix-player && cp phoenix-player/index.html site/phoenix-player/
           mkdir -p site/lib
           for f in astronomy.browser.min.js tz_lookup_oss.js solar_eclipses_processed.js lunar_eclipses_processed.js; do
             cp "lib/$f" site/lib/

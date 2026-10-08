@@ -56,6 +56,8 @@ malicious .oph  →  operation string hits new Function()  →  renderer code ex
 | `OPHIS-Natorion-Cipher.html` | The single-file build: an earlier ground-up rebuild of Ophis in one self-contained HTML file — [open it on the site](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/OPHIS-Natorion-Cipher.html). |
 | `PSYFR1.html`, `PSYFR2.html`, `NatoriOphis.html`, `Natori-On-PSYFR-Main-UI.html` | Earlier single-file browser experiments (the chronology engine and its field guide), kept for lineage. |
 | `Ophis_v9_*`, `OPHIS.html` | The prior v9 report and field guides, kept for lineage. `OPHIS.html` is the same page as `Ophis_v9_Explained.html` (the report's “naming trap”). |
+| [`tests/`](tests/) | The parity test for the single-file pages. |
+| [`phoenix-player/`](phoenix-player/) | **Phoenix Player**: paste or drop a Phoenix Production *master asset index* and it plays the stills and clips in order (oldest first, or as listed), from their links or from your downloads matched by `FILE` stem. Filters, search, stars, a still timer, shuffle and loop, and `.m3u` export for VLC. The index stays in your browser. [Open it on the site](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/phoenix-player/). |
 | `*.oph` | Sample Ophis files. Both parity tests also run them as fixtures. |
 | `chronicon-clocks-calendrics.txt`, `ophis-xtras.txt`, `PSYFR.jpg` | Source material: the Chronicon page the clocks were built from, ten extra operations (numbered 17–26), and the PSYFR poster. |
 | [`.github/`](.github/) | The Pages and Tests workflows, and Dependabot for the actions they use. |
@@ -74,6 +76,12 @@ node web/tests/unit.node.js                            # behaviour tests, no dep
 node web/tests/cycles.node.js                          # cycle echoes and the backtest, no dependencies
 node web/tests/browser.js                              # the page in headless Chromium (needs Playwright)
 node web/tests/parity.node.js --fuzz 500 --seed 138    # against the original v12 code, plus 500 random events
+
+# The single-file pages (PSYFR1, NatoriOphis, Natori-On-PSYFR-Main-UI)
+node tests/legacy-parity.node.js --fuzz 1380 --seed 19  # their formula parser against the compiler it replaced
+
+# Phoenix Player
+node phoenix-player/tests/browser.js                    # the player in headless Chromium (needs Playwright and ffmpeg)
 ```
 
 The parity tests load the extracted renderer from `src/` into Node and run it side by side with each rebuild.

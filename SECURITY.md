@@ -38,8 +38,12 @@ reference engine beside the parser can run; before that was added, the policy bl
 - [ ] **#5** Sanitise/escape strings before they reach the CLI log stream.
 - [x] **Rewrites** HTML-escape the anchor `label` and the formulas before `innerHTML` — done in `PSYFR1.html`,
   `Natori-On-PSYFR-Main-UI.html` and `NatoriOphis.html`, so a label from a loaded configuration file shows as text.
-- [ ] **Rewrites** Replace their own `new Function` (`PSYFR1.html:739`, `NatoriOphis.html:533`) with the same parser. Its
-  character allowlist keeps it to arithmetic today, but it is still a filter in front of a compiler.
+- [x] **Rewrites** Replace their own `new Function` with a parser — done in `PSYFR1.html`, `NatoriOphis.html` and
+  `Natori-On-PSYFR-Main-UI.html`, and `'unsafe-eval'` is gone from all three page policies. The parser accepts exactly what
+  the old compiler did, except `++`, `--`, `//` and `/*`, which JavaScript read as increment, decrement or a comment
+  (`X1+2//8` quietly meant `X1+2`). [`tests/legacy-parity.node.js`](tests/legacy-parity.node.js) runs both on every
+  built-in formula, 17 injection payloads and 1,380 seeded random formulas per page. Before the fix, `NatoriOphis.html`'s
+  policy already blocked `eval`, so on the live site it compiled none of its 19 formulas and projected nothing.
 
 ## Disclosure
 
