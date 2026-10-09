@@ -7,7 +7,7 @@ _Written by Natorion Studio from the event “The Eclipse Ledger” on 8 October
 ## Production plan
 
 📏 VIDEO LENGTH: 10 minutes (600 seconds)  
-📝 SCRIPT: 1,661 words (at 160–175 words per minute; the brief asks 1,600–1,750)  
+📝 SCRIPT: 1,663 words (at 160–175 words per minute; the brief asks 1,600–1,750)  
 📸 TOTAL IMAGES NEEDED: 70  
 📦 IMAGE BATCHES: 14 rounds (5 images per round)  
 🎬 TOTAL VIDEO CLIPS: 70  
@@ -15,7 +15,7 @@ _Written by Natorion Studio from the event “The Eclipse Ledger” on 8 October
 🖼️ THUMBNAIL: 1 image  
 📋 SEO PACKAGE: Title + Description + Tags  
 
-Sections: 0:00 The hook (131 words) · 0:47 Origins and context (377 words) · 3:03 Escalation (656 words) · 6:58 Climax and resolution (379 words) · 9:14 Legacy and ending (118 words)
+Sections: 0:00 The hook (131 words) · 0:47 Origins and context (378 words) · 3:03 Escalation (656 words) · 6:59 Climax and resolution (380 words) · 9:15 Legacy and ending (118 words)
 
 ## Voiceover script
 
@@ -37,7 +37,7 @@ Only the spoken narration. Every paragraph is one scene.
 
 §8 X3: 6 February 2027, a Saturday, 162 days on. Julian Day 2,461,443, to the astronomers.
 
-§9 X4 lands on 2 August 2027, 177 days after X3: half a year, the gap between a resolution and its funeral. On the Coptic calendar that reads Epep 26, 1743.
+§9 X4 lands on 2 August 2027, 177 days after X3: half a year, the gap between a resolution and its funeral. On the Coptic calendar that reads Epep 26, 1743 AM.
 
 §10 X5 lands on 17 August 2027, 15 days after X4: about a month, one rent day to the next. On the Islamic calendar that reads Rab. I 15, 1449 AH.
 
@@ -139,7 +139,7 @@ Only the spoken narration. Every paragraph is one scene.
 
 §59 On the Persian calendar the day reads Aban 17, 1407 AP: Solar Hijri 1407, from 622 CE.
 
-§60 On the Ethiopic calendar the day reads Tekemt 28, 2021: Amete Mihret 2021, 13 months.
+§60 On the Ethiopic calendar the day reads Tekemt 28, 2021 AM: Amete Mihret 2021, 13 months.
 
 §61 The Chinese sexagenary count calls that day Wu-Shen. Earth Monkey, year 45 of 60, approximate, turns at the new year.
 
@@ -261,7 +261,7 @@ Aspect Ratio: 16:9 Horizontal
 
 IMAGE 9 — for Script §9
 
-Script Line: “X4 lands on 2 August 2027, 177 days after X3: half a year, the gap between a resolution and its funeral. On the Coptic calendar that reads Epep 26, 1743.”
+Script Line: “X4 lands on 2 August 2027, 177 days after X3: half a year, the gap between a resolution and its funeral. On the Coptic calendar that reads Epep 26, 1743 AM.”
 
 Image Prompt: “Natori adding a date below the first while the Surveyor leans in, one eyebrow up. 2 characters, each exactly as their Look Cards describe them: NATORI — THE CHRONICLER — “A semi-stylized animated character with tall lean proportions and a slightly oversized head. Dramatically oversized long drooping nose tinted rosy pink at the tip and bridge, protruding far from the face. Large round solid-black dot eyes with tiny white catchlight dots, no colored iris detail. Warm olive skin with matte rough painterly brush-stroke texture, rosy pink tint on nose tip and cheeks. Long face with high cheekbones and a narrow chin. Thick auburn hair pulled back and rendered in chunky simplified painted masses, two painted strands loose at the temple. Wearing a charcoal-grey wool doublet with one faded burgundy sleeve, a white linen collar gone to cream, a leather-bound ledger at the belt, the wool heavy and creased with true weight in its folds, a reed pen or quill behind one ear and a leather ledger chained to the belt. Three small gold glyph marks painted at the throat, ink stains on the right thumb, and a habit of tilting the head when a number does not add up.” THE SURVEYOR — “A semi-stylized animated character with stocky broad-shouldered proportions and a slightly oversized head. Dramatically oversized large round bulbous nose tinted rosy pink at the tip and bridge, protruding far from the face. Large round solid-black dot eyes with tiny white catchlight dots, no colored iris detail. Sun-browned ruddy skin with matte rough painterly brush-stroke texture, rosy pink tint on nose tip and cheeks. Square face with a heavy jaw and a permanently raised left eyebrow. Cropped grey-shot black hair in blocky painted masses. Thick blocky russet beard as a textured mass, squared off at the bottom. Wearing a deep blue wool coat with brass buttons, a leather case of dividers and a rule at the belt, a wide-brimmed felt hat, dusty riding boots, the wool rubbed pale at the seams, the boots scuffed, a plumb line looped over one shoulder. A pale scar across the bridge of the nose and hands like shovels with rosy pink knuckles.” Background: a timber-beamed study: a cluttered oak table under a brass astrolabe, stacked ledgers, a wax-sealed letter, a wall clock stopped at 1:38, rain on leaded glass, every surface with visible painted texture, weathered and lived-in. Environmental storytelling: a globe with a cracked ocean, a candle guttering in a brass stick, quills in a jar, a cat on the ledgers, a half-eaten pear. Camera: CLOSE-UP — the face filling the frame, the oversized nose in three-quarter profile, the emotion unmistakable. Lighting: Single dominant warm amber light from a candle in a brass stick at frame left, 55% of the frame in deep shadow, warm amber rim light separating the character from the background, volumetric light through drifting dust and lamp smoke, atmospheric haze in the far corners. Color mood: dark warm brown and deep blue with forest green and burgundy, and one candlelit amber accent, like a classical oil painting. On-screen text in an aged serif font: “2 August 2027”. Cinematic painterly art-house 3D animation frame, European animated feature film quality, semi-stylized character proportions with oversized prominent rosy-tipped noses and large dark-dot eyes with white catchlights, matte hand-painted brush-stroke textures on all surfaces, rich warm natural color palette, strong directional atmospheric lighting with volumetric haze, depth layers with atmospheric perspective, 16:9 horizontal. NOT Pixar, NOT Disney, NOT DreamWorks, NOT clean CGI, NOT cute, NOT chibi, NOT storybook illustration, NOT flat 2D, NOT anime.”
 
@@ -791,7 +791,7 @@ Aspect Ratio: 16:9 Horizontal
 
 IMAGE 60 — for Script §60
 
-Script Line: “On the Ethiopic calendar the day reads Tekemt 28, 2021: Amete Mihret 2021, 13 months.”
+Script Line: “On the Ethiopic calendar the day reads Tekemt 28, 2021 AM: Amete Mihret 2021, 13 months.”
 
 Image Prompt: “The Astronomer tapping one table on the wall with the stylus. One character, exactly as the Look Card describes: THE ASTRONOMER — “A semi-stylized animated character with medium, slightly stooped proportions and a slightly oversized head. Dramatically oversized gently pointed but thick nose tinted rosy pink at the tip and bridge, protruding far from the face. Large round solid-black dot eyes with tiny white catchlight dots, no colored iris detail. Pale weathered skin with matte rough painterly brush-stroke texture, rosy pink tint on nose tip and cheeks. Narrow face with deep creases, hooded eyes and hollow cheeks. Long white hair in thin painted masses falling past the collar. Long thin white beard rendered as a single tapering mass. Wearing a long forest-green velvet gown worn to a shine, a brass quadrant on a cord, a black skullcap, the velvet bald at the elbows and hem, a wax tablet and a stylus on a cord. A missing front tooth that shows when the mouth opens, and a stoop that straightens only when looking up.” Background: a merchant's counting-room wall hung with nineteen painted calendar boards, a brass lamp, an iron strongbox, ledgers tied with ribbon, every surface with visible painted texture, weathered and lived-in. Environmental storytelling: a spilled purse of coins, an abacus, a wax seal and its stick, dust on the beams, a stopped clock. Camera: EXTREME WIDE — the figure small in a vast environment, foreground, midground and background fading into atmospheric haze. Lighting: Single dominant warm amber light from a candle in a brass stick at frame right, 55% of the frame in deep shadow, warm amber rim light separating the character from the background, volumetric light through drifting dust and lamp smoke, atmospheric haze in the far corners. Color mood: dark warm brown and deep blue with forest green and burgundy, and one candlelit amber accent, like a classical oil painting. Cinematic painterly art-house 3D animation frame, European animated feature film quality, semi-stylized character proportions with oversized prominent rosy-tipped noses and large dark-dot eyes with white catchlights, matte hand-painted brush-stroke textures on all surfaces, rich warm natural color palette, strong directional atmospheric lighting with volumetric haze, depth layers with atmospheric perspective, 16:9 horizontal. NOT Pixar, NOT Disney, NOT DreamWorks, NOT clean CGI, NOT cute, NOT chibi, NOT storybook illustration, NOT flat 2D, NOT anime.”
 
@@ -991,7 +991,7 @@ Duration: 7 seconds · Model: Seedance 2.5 · Aspect Ratio: 16:9
 
 VIDEO CLIP 9 — from Image 9
 
-Narration during this clip: “X4 lands on 2 August 2027, 177 days after X3: half a year, the gap between a resolution and its funeral. On the Coptic calendar that reads Epep 26, 1743.”
+Narration during this clip: “X4 lands on 2 August 2027, 177 days after X3: half a year, the gap between a resolution and its funeral. On the Coptic calendar that reads Epep 26, 1743 AM.”
 
 Seedance Animation Prompt: “Camera: slow push-in. Natori and the Surveyor: a slow eyebrow raise, the eyes shifting once toward the page, the mouth opening slightly to speak. Environment: the candle flame dancing, rain streaking the leaded glass, the cat's tail curling, the astrolabe turning a degree on its cord. Lighting: The flame gutters once and steadies; the shadows breathe with it. Maintain painterly matte textured art-house animation quality throughout. Smooth natural character movement. Deep atmospheric lighting. NO style shift to clean CGI. NO morphing. NO Pixar/Disney look.”
 
@@ -1521,7 +1521,7 @@ Duration: 7 seconds · Model: Seedance 2.5 · Aspect Ratio: 16:9
 
 VIDEO CLIP 60 — from Image 60
 
-Narration during this clip: “On the Ethiopic calendar the day reads Tekemt 28, 2021: Amete Mihret 2021, 13 months.”
+Narration during this clip: “On the Ethiopic calendar the day reads Tekemt 28, 2021 AM: Amete Mihret 2021, 13 months.”
 
 Seedance Animation Prompt: “Camera: gentle tilt up. The Astronomer: a slow walk of three steps, the head turning toward the horizon, the cloak stirring. Environment: lamplight wavering across the boards, a coin rolling to a stop, dust drifting from the beams. Lighting: The flame gutters once and steadies; the shadows breathe with it. Maintain painterly matte textured art-house animation quality throughout. Smooth natural character movement. Deep atmospheric lighting. NO style shift to clean CGI. NO morphing. NO Pixar/Disney look.”
 
@@ -1650,8 +1650,8 @@ This animated history of The Eclipse Ledger follows 7 dates through the Ophis me
 0:00 — The hook
 0:47 — Origins and context
 3:03 — Escalation
-6:58 — Climax and resolution
-9:14 — Legacy and ending
+6:59 — Climax and resolution
+9:15 — Legacy and ending
 
 Subscribe for more animated history every week!
 
@@ -1663,7 +1663,7 @@ TAGS (20): A Day in the Life of a Chronicler in 2026, The Eclipse Ledger history
 
 ## Checks
 
-- 1,661 words in 70 paragraphs, within the brief; every paragraph 15–40 words: yes
+- 1,663 words in 70 paragraphs, within the brief; every paragraph 15–40 words: yes
 - Etymology drops: 3 · “still exists today” anchors: 3 · closes with the call to subscribe: yes
 - Banned phrases and banned visual words: none
 - Style tag on every image: yes · no shot type repeated twice running: yes
