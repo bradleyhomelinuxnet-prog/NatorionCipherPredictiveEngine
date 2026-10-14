@@ -400,7 +400,7 @@ Under the dial:
 - **The moon** — a drawing of that day's phase, its age, how much is lit, the lunation number, and how many moons and Metonic 19-year cycles separate it from today.
 - **Resonance** — flags that light up for a Phoenix node year, a Metonic match with this year, a mirror year, and "138" in the Long Count.
 - **Z-Dates in this year** — every projection from your current event that falls in the year on the dial. Click one to jump to it.
-- **The calendar wall** — the day on **nineteen** calendars: Gregorian, Anunna turnings, Hebrew, Egyptian civil, Maya, Julian, Julian Day, Islamic, Persian, Indian, Coptic, Ethiopic, Buddhist, Chinese sexagenary, Byzantine, Kali Yuga, Holocene, French Republican and Unix.
+- **The calendar wall** — the day on **nineteen** calendars: Gregorian, Anunna turnings, Annus Mundi (Archaix, with the Hebrew date beneath), Egyptian civil, Maya, Julian, Julian Day, Islamic, Persian, Indian, Coptic, Ethiopic, Buddhist, Chinese sexagenary, Byzantine, Kali Yuga, Holocene, French Republican and Unix.
 - **The event ledger** — the Archaix chronology from 5239 BC to 2178, filterable by Phoenix, Nemesis, NER, Baktun or key events. Click a row to set the dial to that year.
 
 **The bridge.** **Use as X-Date** adds the dial's day to your current event. From any Z-Date's derivation, **Open in Chronicon** comes the other way.
