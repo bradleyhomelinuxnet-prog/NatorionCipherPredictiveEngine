@@ -161,8 +161,12 @@
     else if (T > 0 && T % 144000 === 0) node = " · ✦ " + (T / 144000) + " baktun";
     add("Anunna turnings", (turns < 0 ? "−" : "") + T.toLocaleString("en-US"), "days since AM Year One · " + (T / 360).toFixed(1) + " Draconian yr of 360 · " + (T / 216000).toFixed(2) + " NER" + node, "red");
 
-    var hy = intlYear(ms, "hebrew"), met = mod(hy, 19) || 19, hLeap = mod(7 * hy + 1, 19) < 7;
-    add("Hebrew", intl(ms, "hebrew"), "Anno Mundi " + hy + " · Metonic year " + met + "/19" + (met === 19 ? " ★" : "") + (hLeap ? " · 13 moons" : ""), "gold");
+    /* Archaix Annus Mundi leads (AM = astro + 3894, so 2026 = AM 5920); the
+       rabbinic Hebrew date rides underneath in the small line. Studio still
+       reads the Hebrew date through `hebrew`, keyed back under "Hebrew". */
+    var hy = intlYear(ms, "hebrew"), met = mod(hy, 19) || 19, hLeap = mod(7 * hy + 1, 19) < 7, am = a + 3894, hDate = intl(ms, "hebrew");
+    add("Annus Mundi · Archaix", "AM " + (am >= 1 ? am : am + " (before Year One)") + (isPal(Math.abs(am)) ? " ⮌" : ""), "from Year One, 3895 BC · Hebrew " + hDate + " · Metonic " + met + "/19" + (met === 19 ? " ★" : "") + (hLeap ? " · 13 moons" : ""), "gold");
+    out[out.length - 1].hebrew = { name: "Hebrew", big: hDate, meta: "Anno Mundi " + hy + " · Metonic year " + met + "/19" + (met === 19 ? " ★" : "") + (hLeap ? " · 13 moons" : ""), tone: "gold" };
 
     var ed = J - 1448638, eY = Math.floor(ed / 365) + 1, doy = mod(ed, 365), eM = Math.floor(doy / 30), eD = mod(doy, 30) + 1;
     var egM = ["Thoth", "Phaophi", "Athyr", "Choiak", "Tybi", "Mechir", "Phamenoth", "Pharmuthi", "Pachons", "Payni", "Epiphi", "Mesore"];

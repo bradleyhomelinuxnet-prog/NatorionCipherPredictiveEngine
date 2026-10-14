@@ -264,7 +264,7 @@
   }
   function calOf(w) {
     var out = {};
-    try { CH.calendars(w.y, w.m, w.d).forEach(function (c) { out[c.name] = c; }); } catch (e) { /* none */ }
+    try { CH.calendars(w.y, w.m, w.d).forEach(function (c) { out[c.name] = c; if (c.hebrew) out.Hebrew = c.hebrew; }); } catch (e) { /* none */ }
     return out;
   }
   function spoken(cal, name) { var c = cal[name]; return c ? String(c.big).replace(/ · /g, ", ").replace(/\s+/g, " ").trim() : ""; }
