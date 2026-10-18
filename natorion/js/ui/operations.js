@@ -89,6 +89,11 @@
       S.change(function () { C.EXTRA_OPERATIONS.forEach(function (x) { if (have.indexOf(NC.expr.normalize(x.equation)) < 0) { ops().push({ equation: x.equation, weight: x.weight, enabled: true }); added++; } }); });
       render(); D.toast(added ? added + " extra operations added, switched on." : "The extras are already here.");
     });
+    $("opsMirrors").addEventListener("click", function () {
+      var have = ops().map(function (o) { return NC.expr.normalize(o.equation); }), added = 0;
+      S.change(function () { C.MIRROR_OPERATIONS.forEach(function (x) { if (have.indexOf(NC.expr.normalize(x.equation)) < 0) { ops().push({ equation: x.equation, weight: x.weight, enabled: false }); added++; } }); });
+      render(); D.toast(added ? added + " mirror operations added, switched off. Tick the ones you want." : "The mirrors are already here.");
+    });
     $("tryEq").addEventListener("input", tryIt);
     $("tryY").addEventListener("input", tryIt);
     renderConstants();

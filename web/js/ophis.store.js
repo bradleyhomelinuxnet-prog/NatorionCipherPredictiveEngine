@@ -262,6 +262,18 @@
     return added;
   };
 
+  /* The same, for the Mirrors (which arrive switched off). */
+  Store.addMirrorOperations = function () {
+    var event = Store.currentEvent();
+    var have = event.operations.map(function (op) { return Expr.normalize(op.equation, true); });
+    var added = 0;
+    C.mirrorOperations().forEach(function (op) {
+      if (have.indexOf(Expr.normalize(op.equation, true)) < 0) { event.operations.push(op); added++; }
+    });
+    if (added > 0) Store.commit("operations");
+    return added;
+  };
+
   Store.setAllOperations = function (enabled) {
     Store.currentEvent().operations.forEach(function (op) { op.enabled = enabled; });
     Store.commit("operations");
