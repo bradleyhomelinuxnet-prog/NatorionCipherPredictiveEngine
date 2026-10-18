@@ -262,6 +262,27 @@
     { equation: "X2+Yx0.360", weight: B, note: "Y x 0.360 + X2 (360, over 1000)" }
   ];
 
+  /* The Mirrors: ten that complete the X1/X2 grid of the sixteen with the
+     same constants. All beta, appended switched off by the Mirrors button. */
+  C.MIRROR_OPERATIONS = [
+    { equation: "X1+oph_round(Y)", weight: B, note: "Y + X1 — the isometric date on X1" },
+    { equation: "X1+oph_flip(oph_round(Y))", weight: B, note: "Y reversed + X1 (holo-, on X1)" },
+    { equation: "X1+Y/OPH_CRV", weight: B, note: "Y / 5.08 + X1" },
+    { equation: "X1+Y/OPH_PHI", weight: B, note: "Y / 1.618 + X1" },
+    { equation: "X1+(Y/2.0)xOPH_PHI", weight: B, note: "Y / 2 x 1.618 + X1" },
+    { equation: "X1+YxOPH_PHI", weight: B, note: "Y x 1.618 + X1" },
+    { equation: "X1+(Y/2.0)xOPH_HEP", weight: B, note: "Y / 2 x 7.01 + X1 (half hepta-cycle)" },
+    { equation: "X2+(Y/2.0)xOPH_HEP", weight: B, note: "Y / 2 x 7.01 + X2 (half hepta-cycle)" },
+    { equation: "X1+Y/OPH_PI", weight: B, note: "Y / 3.14 + X1" },
+    { equation: "X2+Y/OPH_PI", weight: B, note: "Y / 3.14 + X2" }
+  ];
+
+  C.mirrorOperations = function () {
+    return C.MIRROR_OPERATIONS.map(function (op) {
+      return { equation: op.equation, weight: op.weight, enabled: false };
+    });
+  };
+
   C.extraOperations = function () {
     return C.EXTRA_OPERATIONS.map(function (op) {
       return { equation: op.equation, weight: op.weight, enabled: true };

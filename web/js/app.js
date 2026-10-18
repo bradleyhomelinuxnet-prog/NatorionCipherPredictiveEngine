@@ -220,6 +220,11 @@
       if (added > 0) UI.toast(added + " extra operation" + (added === 1 ? "" : "s") + " added, switched on.", "ok");
       else UI.toast("The extras are already in the list.");
     });
+    UI.on(hosts.operations, "click", '[data-action="add-mirror-operations"]', function () {
+      var added = Store.addMirrorOperations();
+      if (added > 0) UI.toast(added + " mirror operation" + (added === 1 ? "" : "s") + " added, switched off.", "ok");
+      else UI.toast("The mirrors are already in the list.");
+    });
     UI.on(hosts.operations, "click", '[data-action="ops-all-on"]', function () { Store.setAllOperations(true); });
     UI.on(hosts.operations, "click", '[data-action="ops-all-off"]', function () { Store.setAllOperations(false); });
     UI.on(hosts.operations, "click", '[data-action="reset-operations"]', function () {

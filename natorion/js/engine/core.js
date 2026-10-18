@@ -202,6 +202,17 @@
     op("X2+Yx0.360", B, false)
   ];
 
+  // The Mirrors: ten that complete the X1/X2 grid of the sixteen with the same
+  // constants (the forms the table only runs on one anchor, the halved
+  // hepta-cycle, and division by pi). All beta, added switched off.
+  C.MIRROR_OPERATIONS = [
+    op("X1+oph_round(Y)", B, false), op("X1+oph_flip(oph_round(Y))", B, false),
+    op("X1+Y/OPH_CRV", B, false), op("X1+Y/OPH_PHI", B, false),
+    op("X1+(Y/2.0)xOPH_PHI", B, false), op("X1+YxOPH_PHI", B, false),
+    op("X1+(Y/2.0)xOPH_HEP", B, false), op("X2+(Y/2.0)xOPH_HEP", B, false),
+    op("X1+Y/OPH_PI", B, false), op("X2+Y/OPH_PI", B, false)
+  ];
+
   C.cloneDefaultOperations = function () { return C.DEFAULT_OPERATIONS.map(function (o) { return op(o.equation, o.weight, o.enabled); }); };
 
   /* ----------------------------------------------- serialized fields -- */
