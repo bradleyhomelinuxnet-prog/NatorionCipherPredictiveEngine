@@ -17,6 +17,9 @@
   var UI = root.Ophis.UI;
   var O = {};
 
+  // 36,500: the cap runOperations() puts on every Z-Value, written for people.
+  var LIMIT_DAYS = C.MAXIMUM_ROTATION_COUNT_Z.toLocaleString("en-US");
+
   var SORT_COLUMNS = [
     { type: C.Z_DATE_SORT_TYPE__DATE, label: "Z-Dates", tip: "Sort by date, soonest first." },
     { type: C.Z_DATE_SORT_TYPE__HIT_COUNT, label: "Hits", tip: "Sort by hit count — operations plus MSRF matches." },
@@ -80,6 +83,21 @@
         ", multiplier ×" + Engine.msrfMultiplierForKind(match.kind)]
     ]);
   }
+
+  /* The "100-yr limit" tag for a Z-Date's date cell, or "" when no formula
+     on it was capped. A label only: the score is the original's. */
+  function limitTag(zStruct) {
+    var capped = Engine.limitHitCount(zStruct);
+    if (!capped) return "";
+    var total = zStruct.operation_hit_count;
+    var tip = "<b>100-year limit</b><br>" +
+      (capped === total ? "Every operation" : capped + " of the " + total + " operations") + " on this day came to " +
+      LIMIT_DAYS + " days or more and " + (capped === 1 ? "was" : "were") + " capped at exactly " + LIMIT_DAYS + " (100 years) after " +
+      (capped === 1 ? "its" : "their") + " anchor. Formulas capped this way all land on the same day, so their agreement " +
+      "here comes from the limit, not from a real convergence. The score is unchanged.";
+    return ' <span class="limit-tag" data-tip="' + UI.esc(tip) + '">100-yr limit</span>';
+  }
+  O.limitTag = limitTag;
 
   /* -------------------------------------------------------------- render */
 
@@ -193,6 +211,7 @@
             ? '<span class="z-date-end">→ ' + UI.esc(zStruct.z_readable_end) + '</span>'
             : '<span class="z-meta">' + UI.esc(weekday) + " · " + (daysOut === 0 ? "today" : (daysOut > 0 ? "in " + daysOut + "d" : Math.abs(daysOut) + "d ago")) + '</span>') +
           (root.Ophis.CyclesView ? root.Ophis.CyclesView.tagFor(key) : "") +
+          limitTag(zStruct) +
         '</td>' +
         '<td class="num col-hits">' + zStruct.hit_count + '</td>' +
         '<td class="num col-score"><span class="score heat-' + heatStep(zStruct.score, results) + '">' + zStruct.score + '</span></td>' +
@@ -255,18 +274,23 @@
         '<th>Op</th><th>Pair</th><th class="num">Y</th><th>Formula</th><th class="num">Z-Value</th><th class="num">Days out</th><th>MSRF</th><th class="num">Points</th>' +
       '</tr></thead><tbody>';
 
+    var cappedCount = 0;
     zStruct.operation_match_structs.forEach(function (match) {
       var result = match.operation_result;
       var yStruct = match.y_struct;
       var anchorOrdinal = result.operation.anchor === C.STARTING_X1 ? yStruct.x_1_ordinal : yStruct.x_2_ordinal;
       var msrf = Engine.msrfMatch(result.rotation_count_z);
+      var capped = Engine.isLimitResult(result);
+      if (capped) cappedCount++;
 
       html += '<tr data-op-hash="' + UI.esc(result.hash) + '" class="' +
           (Store.selection.operationHash === result.hash ? "selected" : "") + '">' +
         '<td class="lbl ' + (Engine.isAlpha(result.operation) ? "alpha" : "beta") + '">' + UI.label("O", result.operation_ordinal) + '</td>' +
         '<td class="lbl">' + UI.label("X", yStruct.x_1_ordinal) + " → " + UI.label("X", yStruct.x_2_ordinal) + '</td>' +
         '<td class="num">' + UI.decimal(yStruct.rotation_count_y) + '</td>' +
-        '<td class="mono">' + UI.esc(Expr.display(result.operation.equation)) + '</td>' +
+        '<td class="mono">' + UI.esc(Expr.display(result.operation.equation)) +
+          (capped ? ' <span class="limit-tag" data-tip="' + UI.esc("This formula came to " +
+            LIMIT_DAYS + " days or more and was capped at the 100-year limit.") + '">limit</span>' : "") + '</td>' +
         '<td class="num">' + UI.decimal(result.z_value) + '</td>' +
         '<td class="num">' + UI.decimal(result.rotation_count_z) + ' <span class="muted">from ' + UI.labelPlain("X", anchorOrdinal) + '</span></td>' +
         '<td>' + (msrf
@@ -287,6 +311,15 @@
           : '') + '</p>';
     } else {
       html += '<p class="detail-note">Score = operations ' + zStruct.operation_score + ' = <b>' + zStruct.score + '</b> · no MSRF match.</p>';
+    }
+
+    if (cappedCount) {
+      html += '<p class="detail-note limit-note">' + (cappedCount === 1 ? "The formula" : "The " + cappedCount + " formulas") +
+        ' marked <span class="limit-tag">limit</span> came to ' + LIMIT_DAYS +
+        ' days or more. The engine caps every Z-Value at ' + LIMIT_DAYS + ' days (100 years), so every ' +
+        'formula that overshoots lands on its anchor + ' + LIMIT_DAYS + ' days. ' +
+        (cappedCount === zStruct.operation_hit_count ? "Every operation on this day is capped: " : "") +
+        'agreement from the limit is not a real convergence. The score is counted as the original program counts it, unchanged.</p>';
     }
 
     host.innerHTML = html;

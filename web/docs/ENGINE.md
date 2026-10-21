@@ -109,6 +109,11 @@ afterwards, in that order — the desktop app is deliberate about it
   in, so a row shows a range, `from` → `to`.
 
 Z-Values above 36,500 days (about a century) are clamped.
+Every formula that overshoots therefore lands on the same day, its anchor +
+36,500 days, and those formulas agree because of the clamp, not because they
+converge. The engine scores them as v12 did; the Output marks such a Z-Date
+**100-yr limit** (`Engine.limitHitCount`, read-only), and the derivation marks
+each clamped formula **limit**.
 
 The day-count from the anchor to the Z-Date, rounded to one decimal, is what
 gets matched against the MSRF tables.

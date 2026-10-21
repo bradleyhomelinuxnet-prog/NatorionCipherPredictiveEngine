@@ -212,6 +212,27 @@ async function main() {
     await ctx.close();
     ({ ctx, page } = await fresh(browser));
 
+    section("the 100-year limit");
+    await page.evaluate(() => {
+      const event = Ophis.Store.currentEvent();
+      event.x_dates = ["06/26/1945", "08/20/1969"].map(date => ({ date, time: "00:00", enabled: true }));
+      Ophis.C.FILTERS.forEach(filter => { event[filter.key] = false; });
+      Ophis.Store.commit("dates");
+    });
+    const limitRows = await page.$$eval(".z-row", rows => rows.filter(row => row.querySelector(".col-date .limit-tag")).map(row => row.getAttribute("data-z-key")));
+    check("the two capped days carry a 100-yr limit tag in their date cell, and no other day does", limitRows.length === 2, limitRows.join());
+    const limitTip = await page.getAttribute(".col-date .limit-tag", "data-tip");
+    check("…whose tooltip says the agreement comes from the limit", /from the limit, not from a real convergence/.test(limitTip || ""), limitTip);
+    await page.click('.z-row[data-z-key="' + limitRows[0] + '"] .z-date');
+    await page.waitForSelector("#panel-detail.open");
+    const marked = await page.$$eval("#panel-detail .detail-table .limit-tag", tags => tags.map(t => t.textContent));
+    const rowsInDetail = await page.$$eval("#panel-detail .detail-table tbody tr", rows => rows.length);
+    check("the derivation marks each capped formula limit, with a note", marked.length === rowsInDetail && marked.every(t => t === "limit") &&
+      /caps every Z-Value at 36,500 days/.test(await page.textContent("#panel-detail .limit-note")), marked.join() + " / " + rowsInDetail);
+
+    await ctx.close();
+    ({ ctx, page } = await fresh(browser));
+
     section("current time");
     const labelled = await page.getByLabel("Current time", { exact: true }).evaluateAll(fields => fields.map(field => field.id).join());
     check("the field is named by its label", labelled === "now-date", labelled || "no field");

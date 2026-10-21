@@ -116,6 +116,29 @@
   Engine.isAlpha = function (operation) { return operation.weight >= C.POINTS__ALPHA_OPERATION_MATCH; };
 
   /* ====================================================================== */
+  /* The 100-year limit (read-only)                                         */
+  /* ====================================================================== */
+
+  /* runOperations() caps every Z-Value at MAXIMUM_ROTATION_COUNT_Z, 36,500
+     days, so every formula that overshoots lands on the same day: its anchor
+     + 36,500 days. Those formulas agree because of the cap, not because they
+     converge. These two only read a finished run, so the UI can say so; no
+     score, hit or rank depends on them. */
+  Engine.isLimitResult = function (operationResult) {
+    return operationResult.z_instant.getTime() - operationResult.anchor_instant.getTime() >=
+      C.MAXIMUM_ROTATION_COUNT_Z * C.MILLIS_PER_DAY;
+  };
+
+  /** How many of a Z-Date's operation matches were capped at the limit. */
+  Engine.limitHitCount = function (zStruct) {
+    var count = 0;
+    (zStruct.operation_match_structs || []).forEach(function (match) {
+      if (Engine.isLimitResult(match.operation_result)) count++;
+    });
+    return count;
+  };
+
+  /* ====================================================================== */
   /* Event normalisation                                                    */
   /* ====================================================================== */
 

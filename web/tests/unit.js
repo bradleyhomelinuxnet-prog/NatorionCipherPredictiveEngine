@@ -654,6 +654,61 @@
   });
 
   /* ====================================================================== */
+  suite("the 100-year limit", function (test) {
+    var LIMIT_MS = C.MAXIMUM_ROTATION_COUNT_Z * C.MILLIS_PER_DAY;
+
+    function limitDays(results) {
+      return Object.keys(results.z_structs).filter(function (key) {
+        return Engine.limitHitCount(results.z_structs[key]) > 0;
+      }).map(function (key) { return results.z_structs[key]; });
+    }
+
+    test("06/26/1945 and 08/20/1969 give exactly two limit days, made only of capped formulas", function () {
+      var results = run(event({ x_dates: xdates(["06/26/1945", "08/20/1969"]) }));
+      assert.eq(results.errors.length, 0, results.errors.join("; "));
+      var days = limitDays(results);
+      assert.eq(days.length, 2, "limit days");
+      days.forEach(function (z) {
+        assert.eq(Engine.limitHitCount(z), z.operation_hit_count, z.z_readable_start + " is made only of capped formulas");
+        z.operation_match_structs.forEach(function (match) {
+          var result = match.operation_result;
+          assert.eq(result.z_instant.getTime() - result.anchor_instant.getTime(), LIMIT_MS, "landed on the anchor + 36,500 days");
+        });
+      });
+      assert.deep(days.map(function (z) { return z.z_readable_start; }).sort(), ["06/01/2045", "07/26/2069"]);
+    });
+
+    test("short spans reach no limit", function () {
+      [["01/19/2020", "06/06/2021", "09/06/2023"], ["01/01/2020", "07/19/2021", "02/06/2023"], ["03/03/2021", "09/09/2022"]].forEach(function (dates) {
+        var results = run(event({ x_dates: xdates(dates) }));
+        assert.eq(results.errors.length, 0, results.errors.join("; "));
+        assert.ok(results.total_z_dates > 0, "the span projects something");
+        assert.eq(limitDays(results).length, 0, dates.join(" → "));
+      });
+    });
+
+    test("an uncapped formula on a limit day is not counted", function () {
+      var z = { operation_match_structs: [
+        { operation_result: { anchor_instant: new Date(0), z_instant: new Date(LIMIT_MS) } },
+        { operation_result: { anchor_instant: new Date(0), z_instant: new Date(LIMIT_MS - 1) } }
+      ] };
+      assert.eq(Engine.limitHitCount(z), 1);
+      assert.eq(Engine.limitHitCount({ operation_match_structs: [] }), 0);
+    });
+
+    test("counting the limit changes no score, hit or rank", function () {
+      var evt = event(Object.assign({ x_dates: xdates(["06/26/1945", "08/20/1969"]) }, NO_FILTERS));
+      var before = run(evt);
+      var rows = rowsOf(before);
+      var sorted = before.z_keys_sorted.slice();
+      Object.keys(before.z_structs).forEach(function (key) { Engine.limitHitCount(before.z_structs[key]); });
+      assert.deep(rowsOf(before), rows);
+      assert.deep(before.z_keys_sorted, sorted);
+      assert.deep(rowsOf(run(evt)), rows, "and a fresh run agrees");
+    });
+  });
+
+  /* ====================================================================== */
   suite(".oph files", function (test) {
     var SAMPLE = JSON.stringify({
       app_version: "12",
