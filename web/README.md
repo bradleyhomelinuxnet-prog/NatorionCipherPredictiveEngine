@@ -48,6 +48,7 @@ the `.oph` format.
 | **Output** | One row per projected day. Click a column to sort, click a row for the full derivation, hover any pill to see the arithmetic behind it. **Rows: Days | 7-day windows** groups the same Z-Dates into periods of up to a week (summed hits, best single score; nothing is re-scored), the way the SOP says to read a cast on older dates. A **100-yr limit** tag marks a day reached by formulas the engine capped at 36,500 days: they agree because of the cap, not a real convergence (the score is unchanged). |
 | **Operations** | The formula table. Edit, weight, enable, add, reset, or add the ten extras (17–26). Errors show inline as you type. |
 | **Filters** | The eight output filters, with live counts of shown-of-generated. When every Z-Date is filtered out, the output names the filter (or the T-Dates) whose removal alone would bring back the most, with a button to turn that filter off; when no single one does, it says several are hiding them together. |
+| **Optional tags** | Settings for three rules from the author's later documents that the original program never ran, all off by default and remembered by this browser (never saved in the `.oph`): the **Fibonacci Sequence Filter** (Op 1: when Y is in F = 8 … 1597, project F forward from X2; Op 2: from X1 and X2), **Geodetic Chronometry (138)** (138 × k, 365.25 × 1.38k, and 365.25 ÷ (1.38 × k) ≈ 264, 132, 88, 66, 53, 44) and **Diurnal projections** (365.25 × k, and × and ÷ 1.618 and 3.14, up to 2559.08). Every list is generated from its formula. A hit shows as a dashed pill in a Tags column, apart from the MSRF pills and labelled "author's list, not in the shipped MSRF". Tags read the finished results and change no score, hit or rank. |
 | **Cycles** | Cycle echoes: Z-Dates that sit a whole number of Metonic (19-year) or 138-year cycles from an X-Date, each count set against what chance alone would give. It reads the engine's results and never changes them. Its settings are kept in this browser, not in the `.oph` file. |
 | **Backtest** | Would the cast have projected your later events from your earlier ones? Each step is measured against chance near the real date: how much of the 60 days either side of it the projections happen to cover. A random date anywhere in the years ahead would flatter the cast, since projections crowd the weeks after the last event, and so do real events. One known limit: when events are only weeks apart, the top-10 verdict is a little generous (noise dated about a month apart is called above chance about 7% of the time, not 5%); the verdict on all projections stays fair. Events still in the future, or beyond the projection horizon, are shown but not scored. |
 | **Chronicon ↗** | Opens the Natorion app's Chronicon (clocks, cycles, calendars) in its own window; nothing of it is loaded into Ophis Web. |
@@ -79,6 +80,7 @@ web/
     ophis.engine.js     the pipeline: intervals, projection, scoring, filters, sorting
     ophis.file.js       .oph reading and writing, CSV export
     ophis.sop.js        Protocol Prime, the SOP warnings and 7-day windows (advice, never a guard)
+    ophis.tags.js       optional tags: Fibonacci, Geodetic (138), Diurnal (read results, never change them)
     ophis.cycles.js     cycle echoes and the backtest, measured against chance
     ophis.store.js      session state and persistence
     ui.dom.js           DOM helpers, tooltips, modals
@@ -94,7 +96,7 @@ web/
 ```
 
 The engine layer (`ophis.constants`, `ophis.expr`, `ophis.time`,
-`ophis.engine`, `ophis.file`, and the `ophis.sop` and `ophis.cycles` readings beside it) has no
+`ophis.engine`, `ophis.file`, and the `ophis.sop`, `ophis.tags` and `ophis.cycles` readings beside it) has no
 DOM dependency at all — it runs in Node unchanged, which is how the tests drive
 it.
 

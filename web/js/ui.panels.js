@@ -355,6 +355,59 @@
   };
 
   /* ====================================================================== */
+  /* Optional tags (settings)                                               */
+  /* ====================================================================== */
+
+  /* The switches for ophis.tags.js, in the order they are listed. */
+  var OPTIONAL_TAGS = [
+    {
+      key: "tag_fibonacci",
+      label: "Fibonacci Sequence Filter",
+      note: "Author’s list, not in the shipped MSRF. F = 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597. " +
+        "Op 1: when Y (X1→X2) is in F, each member of F is projected forward from X2. Op 2: each member is " +
+        "projected forward from X1 and from X2. A projection landing on a Z-Date tags it."
+    },
+    {
+      key: "tag_geodetic",
+      label: "Geodetic Chronometry (138)",
+      note: "Author’s list, not in the shipped MSRF. Multiples of 138 from 138 to 2484; 365.25 × 1.38k: " +
+        "504.0, 1008.0, 1512.1, 2016.1, 2520.2; and 365.25 ÷ (1.38 × k): ≈264, 132, 88, 66, 53, 44. " +
+        "A Z-Date is tagged when an operation’s rotation count from its anchor is within 0.1 day of one of them."
+    },
+    {
+      key: "tag_diurnal",
+      label: "Diurnal projections",
+      note: "Author’s list, not in the shipped MSRF. 365.25 × k, and 365.25 × and ÷ 1.618 and 3.14, " +
+        "each times k, up to (365.25 ÷ 3.14) × 22 = 2559.08. Generated from those formulas; a " +
+        "rotation count within 0.1 day of a value tags the Z-Date."
+    }
+  ];
+
+  P.renderTags = function (host) {
+    var options = Store.globalOptions;
+    var on = OPTIONAL_TAGS.filter(function (t) { return options[t.key] === true; }).length;
+    host.innerHTML =
+      '<header class="panel-head">' +
+        '<h2>Optional tags</h2>' +
+        '<span class="count">' + on + " of " + OPTIONAL_TAGS.length + '</span>' +
+      '</header>' +
+      '<p class="panel-hint">Settings. Rules from the author’s later documents that the original program never ran. ' +
+        'Each one reads the finished results and adds a dashed pill in a Tags column. None of them changes a score, ' +
+        'a hit count or the order of the rows. They apply to every event, are remembered by this browser, and are ' +
+        'not saved in the .oph file.</p>' +
+      '<ul class="tag-rows">' +
+      OPTIONAL_TAGS.map(function (t) {
+        var checked = options[t.key] === true;
+        return '<li class="tag-row' + (checked ? " on" : "") + '">' +
+          '<label class="tick"><input type="checkbox" data-tag-option="' + t.key + '" data-focus-key="tag-' + t.key + '"' +
+            (checked ? " checked" : "") + ' aria-label="' + UI.esc(t.label) + '"><span></span></label>' +
+          '<div class="tag-text"><b>' + UI.esc(t.label) + '</b><span class="tag-note">' + UI.esc(t.note) + '</span></div>' +
+          '</li>';
+      }).join("") +
+      '</ul>';
+  };
+
+  /* ====================================================================== */
   /* Event settings                                                         */
   /* ====================================================================== */
 

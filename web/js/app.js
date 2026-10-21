@@ -65,6 +65,7 @@
     Panels.renderEventSettings(hosts.eventSettings);
     Panels.renderOperations(hosts.operations);
     Panels.renderFilters(hosts.filters);
+    Panels.renderTags(hosts.tags);
     // Cycle echoes are read off the results before anything that shows them is drawn.
     CyclesView.refresh();
     CyclesView.renderPanel(hosts.cycles);
@@ -274,6 +275,11 @@
         if (filter.valueKey) event[filter.valueKey] = filter.valueDef;
       });
       Store.commit("filters");
+    });
+
+    /* ---- optional tags ---- */
+    UI.on(hosts.tags, "change", "[data-tag-option]", function (e, target) {
+      Store.setTagOption(target.getAttribute("data-tag-option"), target.checked);
     });
 
     /* ---- event settings ---- */
@@ -611,6 +617,7 @@
       eventSettings: document.getElementById("panel-event"),
       operations: document.getElementById("panel-operations"),
       filters: document.getElementById("panel-filters"),
+      tags: document.getElementById("panel-tags"),
       cycles: document.getElementById("panel-cycles"),
       chartOptions: document.getElementById("chart-options"),
       output: document.getElementById("panel-output"),

@@ -801,6 +801,143 @@
   });
 
   /* ====================================================================== */
+  suite("optional tags", function (test) {
+    var Tags = Ophis.Tags;
+    var ALL_ON = { tag_fibonacci: true, tag_geodetic: true, tag_diurnal: true };
+
+    function keyOf(results, readable) {
+      return results.z_keys_by_date.filter(function (key) { return results.z_structs[key].z_readable_start === readable; })[0];
+    }
+    function shown(list, series) {
+      return list.filter(function (e) { return e.series === series; }).map(function (e) { return e.shown; });
+    }
+
+    test("F is the author's set, from 8 to 1597", function () {
+      assert.deep(Tags.FIBONACCI, [8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]);
+    });
+
+    test("the Geodetic lists are generated from their formulas", function () {
+      var multiples = shown(Tags.GEODETIC, "138");
+      assert.eq(multiples.length, 18);
+      assert.eq(multiples[0], 138);
+      assert.eq(multiples[17], 2484, "138 × 18, the last under the ceiling");
+      assert.deep(shown(Tags.GEODETIC, "×1.38"), [504, 1008, 1512.1, 2016.1, 2520.2]);
+      var divided = Tags.GEODETIC.filter(function (e) { return e.series === "÷1.38"; });
+      assert.deep(divided.map(function (e) { return e.k; }), [1, 2, 3, 4, 5, 6]);
+      divided.forEach(function (e) {
+        assert.eq(e.value, 365.25 / (1.38 * e.k), "365.25 ÷ (1.38 × " + e.k + ")");
+        assert.ok(Math.abs(e.value - e.written) < 1, e.value + " is the author's ≈" + e.written);
+      });
+      assert.deep(divided.map(function (e) { return e.written; }), [264, 132, 88, 66, 53, 44]);
+    });
+
+    test("the Diurnal lists run up to (365.25 ÷ 3.14) × 22 = 2559.08", function () {
+      assert.close(Tags.LIST_CEILING, 2559.0764, 1e-4);
+      var byPi = Tags.DIURNAL.filter(function (e) { return e.series === "÷pi"; });
+      assert.eq(byPi.length, 22);
+      assert.close(byPi[0].value, 116.32, 0.01);
+      assert.eq(byPi[21].shown, 2559);
+      assert.close(Tags.DIURNAL.filter(function (e) { return e.series === "year"; }).pop().value, 2556.75, 1e-9, "365.25 × 7");
+      Tags.DIURNAL.forEach(function (e) { assert.ok(e.value <= Tags.LIST_CEILING + 1e-9, e.label + " k=" + e.k); });
+    });
+
+    test("Fibonacci Op 1 and Op 2 tag the day Y (21, in F) lands on from X2", function () {
+      var evt = event(Object.assign({ x_dates: xdates(["01/01/2020", "01/22/2020"]) }, NO_FILTERS));
+      var results = run(evt);
+      var tags = Tags.fibonacci(results, evt);
+      var key = keyOf(results, "02/12/2020");
+      assert.ok(key, "X2 + 21 is a Z-Date");
+      var ops = (tags[key] || []).map(function (t) { return t.op + ":" + t.from + "+" + t.n; }).sort();
+      assert.deep(ops, ["1:X2+21", "2:X2+21"]);
+      assert.eq(Tags.describeFibonacci(tags[key][0]), "Y(X1→X2) = 21, in F · X2 + 21 days");
+      Object.keys(tags).forEach(function (k) { assert.ok(results.z_keys_by_date.indexOf(k) >= 0, "only shown Z-Dates are tagged"); });
+    });
+
+    test("Op 2 alone when Y is not in F, naming the anchor by its own label", function () {
+      var evt = event(Object.assign({ x_dates: xdates(["01/01/2020", "01/23/2020"]) }, NO_FILTERS));
+      var results = run(evt);
+      var all = [];
+      var tags = Tags.fibonacci(results, evt);
+      Object.keys(tags).forEach(function (k) { all = all.concat(tags[k]); });
+      assert.ok(all.length > 0, "Op 2 lands somewhere");
+      assert.ok(all.every(function (t) { return t.op === 2; }), "Y = 22 is not in F, so no Op 1");
+      assert.eq(Tags.describeFibonacci({ op: 2, x1: 0, x2: 4, from: "X2", n: 34 }), "X1→X5 · X5 + 34 days");
+    });
+
+    test("a hidden Z-Date is never tagged", function () {
+      var evt = event(Object.assign({ x_dates: xdates(["01/01/2020", "01/22/2020"]) }, NO_FILTERS));
+      evt.iso_event_filter_min_hit_count = true;
+      evt.iso_event_filter_min_hit_count_value = 99;
+      var results = run(evt);
+      assert.eq(results.z_keys_by_date.length, 0);
+      assert.eq(Object.keys(Tags.fibonacci(results, evt)).length, 0);
+      assert.eq(Object.keys(Tags.listTags(results, Tags.GEODETIC)).length, 0);
+    });
+
+    test("the Days-scope start time moves Fibonacci projections exactly as it moves the engine's", function () {
+      var evt = event(Object.assign({ x_dates: xdates(["01/01/2020", "01/22/2020"]), day_scope_start_time_in_millis: 23 * C.MILLIS_PER_HOUR }, NO_FILTERS));
+      var results = run(evt);
+      var key = keyOf(results, "02/12/2020");
+      assert.ok(key && Tags.fibonacci(results, evt)[key], "still tagged");
+    });
+
+    test("in HH:MM scope a projection tags the sunset window it falls in", function () {
+      if (!T.sunsetAvailable()) return;   // the astronomy library is optional
+      var evt = event(Object.assign({
+        scope: C.EVENT_SCOPE__HH_MM, location_enabled: true, lat: 31.8, long: 35.2,
+        x_dates: xdates([["01/01/2020", "12:00"], ["01/22/2020", "12:00"]])
+      }, NO_FILTERS));
+      var results = run(evt);
+      var tags = Tags.fibonacci(results, evt);
+      var op1 = [];
+      Object.keys(tags).forEach(function (k) { tags[k].forEach(function (t) { if (t.op === 1 && t.n === 21) op1.push(k); }); });
+      var landed = results.z_keys_by_date.filter(function (k) {
+        return results.z_structs[k].operation_match_structs.some(function (m) { return m.operation_result.operation_ordinal === 0; });
+      });
+      assert.eq(op1.length, 1, "Op 1 fires once, for X2 + 21");
+      assert.deep(op1, landed, "Op 1's X2 + 21 shares O1's Z-Date (X2 + Y)");
+    });
+
+    test("Geodetic tags a rotation count of 138; the tolerance is 0.1 day", function () {
+      var results = run(event(Object.assign({ x_dates: xdates(["01/01/2025", "05/19/2025"]) }, NO_FILTERS)));
+      var tags = Tags.listTags(results, Tags.GEODETIC);
+      var key = keyOf(results, "10/04/2025");
+      assert.ok(tags[key] && tags[key].some(function (h) { return h.entry.series === "138" && h.entry.k === 1 && h.rc === 138; }), "X2 + 138");
+      assert.eq(Tags.describeListHit(tags[key][0]), "138 × 1 = 138 · O1(X1→X2) counts 138");
+
+      function fake(rc) {
+        return { z_keys_by_date: ["k"], z_structs: { k: { operation_match_structs: [
+          { y_struct: { x_1_ordinal: 0, x_2_ordinal: 1 }, operation_result: { rotation_count_z: rc, operation_ordinal: 0 } }] } } };
+      }
+      assert.ok(Tags.listTags(fake(138.1), Tags.GEODETIC).k, "138.1 is within a tenth");
+      assert.no(Tags.listTags(fake(138.2), Tags.GEODETIC).k, "138.2 is not");
+      assert.ok(Tags.listTags(fake(365.3), Tags.DIURNAL).k, "365.3 against 365.25");
+      assert.no(Tags.listTags(fake(365), Tags.DIURNAL).k, "365 is a quarter-day off");
+      var hit = Tags.listTags(fake(264.7), Tags.GEODETIC).k[0];
+      assert.eq(Tags.describeListHit(hit), "365.25 ÷ (1.38 × 1) = 264.67 (the author writes ≈264) · O1(X1→X2) counts 264.7");
+    });
+
+    test("every tag is off by default", function () {
+      // This page never restores a stored session, so these are the store's defaults.
+      ["tag_fibonacci", "tag_geodetic", "tag_diurnal"].forEach(function (key) { assert.eq(Ophis.Store.globalOptions[key], false, key); });
+      assert.eq(Tags.forRun(run(event({ x_dates: xdates(["01/01/2020", "01/22/2020"]) })), null,
+        { tag_fibonacci: false, tag_geodetic: false, tag_diurnal: false }), null);
+    });
+
+    test("tagging changes nothing the engine produced", function () {
+      [["01/01/2020", "01/22/2020"], ["01/01/2025", "05/19/2025", "06/16/2026"], ["06/26/1945", "08/20/1969"]].forEach(function (dates) {
+        var evt = event(Object.assign({ x_dates: xdates(dates) }, NO_FILTERS));
+        var results = run(evt);
+        var before = JSON.stringify([results.z_structs, results.y_structs, results.z_keys_sorted, results.z_keys_by_date, results.total_z_dates]);
+        var tags = Tags.forRun(results, evt, ALL_ON);
+        assert.ok(tags.fibonacci && tags.geodetic && tags.diurnal);
+        assert.eq(JSON.stringify([results.z_structs, results.y_structs, results.z_keys_sorted, results.z_keys_by_date, results.total_z_dates]), before, dates.join(" → "));
+        assert.deep(rowsOf(run(evt)), rowsOf(results), "and a fresh run agrees");
+      });
+    });
+  });
+
+  /* ====================================================================== */
   suite(".oph files", function (test) {
     var SAMPLE = JSON.stringify({
       app_version: "12",
@@ -999,6 +1136,23 @@
         Store.setResultsView("anything");
         assert.eq(Store.globalOptions.results_view, "days");
         assert.no(/results_view/.test(Store.exportOph()), "never in a .oph");
+      });
+    });
+
+    test("the optional tags are this browser's settings: off by default, not an edit, never in a .oph", function () {
+      withSession(function () {
+        var KEYS = ["tag_fibonacci", "tag_geodetic", "tag_diurnal"];
+        localStorage.removeItem(KEY);
+        KEYS.forEach(function (key) { Store.globalOptions[key] = false; });
+        Store.setTagOption("tag_geodetic", true);
+        assert.no(Store.dirty, "switching a tag is not an edit");
+        assert.ok(Store.globalOptions.tag_geodetic);
+        Store.setTagOption("not_a_tag", true);
+        assert.no("not_a_tag" in Store.globalOptions);
+        Store.globalOptions.tag_geodetic = false;
+        assert.ok(Store.load());
+        assert.eq(Store.globalOptions.tag_geodetic, true, "remembered by this browser");
+        assert.no(/tag_/.test(Store.exportOph()), "never in a .oph");
       });
     });
 

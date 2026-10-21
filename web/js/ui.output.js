@@ -16,6 +16,7 @@
   var Store = root.Ophis.Store;
   var UI = root.Ophis.UI;
   var Sop = root.Ophis.Sop;
+  var Tags = root.Ophis.Tags;
   var O = {};
 
   // 36,500: the cap runOperations() puts on every Z-Value, written for people.
@@ -99,6 +100,70 @@
     return ' <span class="limit-tag" data-tip="' + UI.esc(tip) + '">100-yr limit</span>';
   }
   O.limitTag = limitTag;
+
+  /* ------------------------------------------------------ optional tags */
+
+  /* A tooltip lists at most this many hits, then says how many it left out. */
+  var MAX_TAG_LINES = 8;
+
+  var LIST_TAG = {
+    geodetic: { prefix: "Geo", name: "Geodetic Chronometry (138)" },
+    diurnal: { prefix: "Diur", name: "Diurnal projection" }
+  };
+
+  /* The optional tags for this run, or null when every tag is off. Worked out
+     from the run on screen and nothing else, and kept for as long as that
+     run and those switches are: a re-render for a selection reuses it. */
+  var tagCache = { results: null, key: "", tags: null };
+  function optionalTags(event, results) {
+    var options = Store.globalOptions;
+    var key = [options.tag_fibonacci, options.tag_geodetic, options.tag_diurnal].join();
+    if (tagCache.results !== results || tagCache.key !== key) {
+      tagCache = { results: results, key: key, tags: Tags.forRun(results, event, options) };
+    }
+    return tagCache.tags;
+  }
+
+  function moreLine(list) {
+    return list.length > MAX_TAG_LINES ? [["", "+ " + (list.length - MAX_TAG_LINES) + " more"]] : [];
+  }
+
+  function fibonacciPill(hits) {
+    var rows = [["Tag", "Fibonacci Projection"], ["Rule", "the author’s Fibonacci Sequence Filter"],
+      ["List", "author’s list, not in the shipped MSRF"]]
+      .concat(hits.slice(0, MAX_TAG_LINES).map(function (t) { return ["Op " + t.op, UI.esc(Tags.describeFibonacci(t))]; }))
+      .concat(moreLine(hits))
+      .concat([["Effect", "None. A label only: score, hits and rank are unchanged."]]);
+    return '<span class="pill opt-tag fibonacci" tabindex="0" data-tip="' + UI.esc(UI.tipTable(rows)) + '">Fibonacci</span>';
+  }
+
+  /* One pill per list value a row hits; the tooltip lists the operations that hit it. */
+  function listPills(kind, hits) {
+    var groups = [];
+    hits.forEach(function (h) {
+      var group = groups.filter(function (g) { return g.entry === h.entry; })[0];
+      if (!group) groups.push(group = { entry: h.entry, hits: [] });
+      group.hits.push(h);
+    });
+    return groups.map(function (g) {
+      var rows = [["Tag", UI.esc(LIST_TAG[kind].name)], ["List", "author’s list, not in the shipped MSRF"]]
+        .concat(g.hits.slice(0, MAX_TAG_LINES).map(function (h) { return ["Hit", UI.esc(Tags.describeListHit(h))]; }))
+        .concat(moreLine(g.hits))
+        .concat([["Tolerance", "Within " + Tags.TOLERANCE_DAYS + " day of the exact value"],
+                 ["Effect", "None. A label only: score, hits and rank are unchanged."]]);
+      return '<span class="pill opt-tag ' + kind + '" tabindex="0" data-tip="' + UI.esc(UI.tipTable(rows)) + '">' +
+        LIST_TAG[kind].prefix + " " + g.entry.shown + '</span>';
+    }).join("");
+  }
+
+  function tagCell(key, tags) {
+    var pills = "";
+    if (tags.fibonacci[key]) pills += fibonacciPill(tags.fibonacci[key]);
+    ["geodetic", "diurnal"].forEach(function (kind) {
+      if (tags[kind][key]) pills += listPills(kind, tags[kind][key]);
+    });
+    return '<td class="col-tags">' + (pills ? '<div class="pill-wrap">' + pills + '</div>' : '<span class="muted">—</span>') + '</td>';
+  }
 
   /* -------------------------------------------------------------- render */
 
@@ -189,9 +254,19 @@
       return;
     }
 
-    var html = head + '<div class="table-scroll"><table class="output-table"><thead><tr><th class="ord"><span class="sr-only">Z#</span></th>';
+    var tags = optionalTags(event, results);
+    // The Geodetic and Diurnal lists are the author's, never the program's; say
+    // so where the eye lands, not only in a tooltip.
+    var listNote = (Store.globalOptions.tag_geodetic || Store.globalOptions.tag_diurnal)
+      ? '<p class="tags-note">Tags: author’s list, not in the shipped MSRF</p>' : "";
+
+    var html = head + listNote + '<div class="table-scroll"><table class="output-table"><thead><tr><th class="ord"><span class="sr-only">Z#</span></th>';
     SORT_COLUMNS.forEach(function (column) {
       var active = sortType === column.type;
+      if (tags && column.type === C.Z_DATE_SORT_TYPE__OPERATIONS) {
+        html += '<th class="col-tags" data-tip="' + UI.esc("Optional tags from the author’s later documents, switched on under Optional tags. " +
+          "They label rows only: no score, hit count or rank changes.") + '">Tags</th>';
+      }
       html += '<th class="sortable col-' + column.type + (active ? " active" : "") + '" data-sort="' + column.type + '"' +
         ' data-tip="' + UI.esc(column.tip) + '" tabindex="0" role="button">' +
         UI.esc(column.label) + '<span class="sort-caret">▾</span></th>';
@@ -233,6 +308,7 @@
         '<td class="num col-hits">' + zStruct.hit_count + '</td>' +
         '<td class="num col-score"><span class="score heat-' + heatStep(zStruct.score, results) + '">' + zStruct.score + '</span></td>' +
         '<td class="col-msrf">' + msrfPills + '</td>' +
+        (tags ? tagCell(key, tags) : "") +
         '<td class="col-ops"><div class="pill-wrap">' + operationPills + '</div></td>' +
         '</tr>';
     });

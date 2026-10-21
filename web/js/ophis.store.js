@@ -31,7 +31,12 @@
       // 'days' is the table the original drew, one row per Z-Date; 'windows'
       // groups the same rows into 7-day periods, the way the SOP says to read
       // a cast built on older dates. A reading aid: it re-scores nothing.
-      results_view: "days"
+      results_view: "days",
+      // Optional tags (ophis.tags.js), all off by default. They label rows and
+      // change nothing; like the rows view, they are this browser's, not the file's.
+      tag_fibonacci: false,
+      tag_geodetic: false,
+      tag_diurnal: false
     },
     results: null,
     selection: { zKey: null, operationHash: null, yOrdinal: null },
@@ -265,6 +270,14 @@
     Store.globalOptions.results_view = view === "windows" ? "windows" : "days";
     Store.save();
     Store.notify("view");
+  };
+
+  /** Switch one optional tag on or off. A way of reading results, not an edit. */
+  Store.setTagOption = function (key, on) {
+    if (["tag_fibonacci", "tag_geodetic", "tag_diurnal"].indexOf(key) < 0) return;
+    Store.globalOptions[key] = on === true;
+    Store.save();
+    Store.notify("tags");
   };
 
   /* --------------------------------------------------- operation actions */

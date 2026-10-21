@@ -45,6 +45,7 @@ function load(rel) {
   "web/js/ophis.engine.js",
   "web/js/ophis.file.js",
   "web/js/ophis.sop.js",
+  "web/js/ophis.tags.js",
   "web/js/ophis.store.js",
   "web/js/ui.dom.js",
   "web/js/ui.panels.js",

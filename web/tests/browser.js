@@ -270,6 +270,37 @@ async function main() {
     await ctx.close();
     ({ ctx, page } = await fresh(browser));
 
+    section("optional tags");
+    await page.evaluate(() => {
+      const event = Ophis.Store.currentEvent();
+      event.x_dates = ["01/01/2025", "01/22/2025", "06/09/2025"].map(date => ({ date, time: "00:00", enabled: true }));
+      Ophis.C.FILTERS.forEach(filter => { event[filter.key] = false; });
+      Ophis.Store.commit("dates");
+    });
+    const tableRows = () => page.$$eval(".z-row", rows => rows.map(row => row.getAttribute("data-z-key") + " " +
+      row.querySelector(".col-hits").textContent + " " + row.querySelector(".col-score").textContent).join("|"));
+    const rowsBeforeTags = await tableRows();
+    check("every tag is off by default, and there is no Tags column", !(await page.$(".output-table th.col-tags")) &&
+      /0 of 3/.test(await page.textContent("#panel-tags .count")));
+    await page.focus('[data-tag-option="tag_fibonacci"]');
+    await page.keyboard.press("Space");
+    check("switching a tag on keeps keyboard focus on its box", await page.evaluate(() => document.activeElement.getAttribute("data-tag-option")) === "tag_fibonacci");
+    await page.click('[data-tag-option="tag_geodetic"]');
+    await page.click('[data-tag-option="tag_diurnal"]');
+    const fib = await page.$$eval(".pill.opt-tag.fibonacci", pills => pills.length);
+    const geo = await page.$$eval(".pill.opt-tag.geodetic", pills => pills.map(p => p.textContent));
+    check("a Tags column shows dashed Fibonacci and Geodetic pills", fib > 0 && geo.indexOf("Geo 138") >= 0 &&
+      await page.$eval(".pill.opt-tag", p => getComputedStyle(p).borderTopStyle) === "dashed", fib + " / " + geo.join());
+    check("…apart from the MSRF pills", await page.$$eval(".col-tags .pill.msrf, .col-msrf .pill.opt-tag", pills => pills.length) === 0);
+    check("…under a line saying the lists are the author's, not the shipped MSRF", /author’s list, not in the shipped MSRF/.test(await page.textContent("#panel-output .tags-note")));
+    const fibTip = await page.getAttribute(".pill.opt-tag.fibonacci", "data-tip");
+    check("a tag's tooltip says it changes nothing", /A label only: score, hits and rank are unchanged/.test(fibTip) && /Op [12]/.test(fibTip), fibTip.slice(0, 160));
+    check("tagging changes no row, hit count, score or order", await tableRows() === rowsBeforeTags);
+    check("the tags are not saved in the .oph file", !/tag_/.test(await page.evaluate(() => Ophis.Store.exportOph())));
+
+    await ctx.close();
+    ({ ctx, page } = await fresh(browser));
+
     section("current time");
     const labelled = await page.getByLabel("Current time", { exact: true }).evaluateAll(fields => fields.map(field => field.id).join());
     check("the field is named by its label", labelled === "now-date", labelled || "no field");
