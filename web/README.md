@@ -40,12 +40,12 @@ the `.oph` format.
 
 | Panel | |
 |---|---|
-| **X-Dates** | The input dates. Enable, disable, insert, sort, delete. |
+| **X-Dates** | The input dates. Enable, disable, insert, sort, delete. **☉ Today** adds the Current time date, in date order, never twice. **Objective / Subjective** is Protocol Prime: a subjective cast (your own or a client's dates) must end with the day it is run, so choosing it adds today. Under the dates, non-blocking warnings from the author's operating procedure: anchors under 6 days apart; X-Dates more than 3 years old (use 5 or more, and read the results as windows); subjective, but today missing or not last. None of them stops a cast. |
 | **Intervals** | Every pair and its day-count, with any MSRF match on the interval itself. |
 | **T-Dates** | Optional target dates — with any enabled, only Z-Dates landing on them are shown. |
 | **Event** | Name, notes, scope (Days or sunset-based HH:MM), location, scoring system. |
 | **Timeline** | X-Dates on a time axis, an arc from each anchor to every date it produced, stems whose height is the score and whose colour is the hit count. Wheel zooms, drag pans (mouse, finger or pen), double-click fits, click or tap selects. Optional moon-phase and eclipse markers. |
-| **Output** | One row per projected day. Click a column to sort, click a row for the full derivation, hover any pill to see the arithmetic behind it. A **100-yr limit** tag marks a day reached by formulas the engine capped at 36,500 days: they agree because of the cap, not a real convergence (the score is unchanged). |
+| **Output** | One row per projected day. Click a column to sort, click a row for the full derivation, hover any pill to see the arithmetic behind it. **Rows: Days | 7-day windows** groups the same Z-Dates into periods of up to a week (summed hits, best single score; nothing is re-scored), the way the SOP says to read a cast on older dates. A **100-yr limit** tag marks a day reached by formulas the engine capped at 36,500 days: they agree because of the cap, not a real convergence (the score is unchanged). |
 | **Operations** | The formula table. Edit, weight, enable, add, reset, or add the ten extras (17–26). Errors show inline as you type. |
 | **Filters** | The eight output filters, with live counts of shown-of-generated. When every Z-Date is filtered out, the output names the filter (or the T-Dates) whose removal alone would bring back the most, with a button to turn that filter off; when no single one does, it says several are hiding them together. |
 | **Cycles** | Cycle echoes: Z-Dates that sit a whole number of Metonic (19-year) or 138-year cycles from an X-Date, each count set against what chance alone would give. It reads the engine's results and never changes them. Its settings are kept in this browser, not in the `.oph` file. |
@@ -78,6 +78,7 @@ web/
     ophis.time.js       dates, rounding, day counting, sunset, moon, eclipses
     ophis.engine.js     the pipeline: intervals, projection, scoring, filters, sorting
     ophis.file.js       .oph reading and writing, CSV export
+    ophis.sop.js        Protocol Prime, the SOP warnings and 7-day windows (advice, never a guard)
     ophis.cycles.js     cycle echoes and the backtest, measured against chance
     ophis.store.js      session state and persistence
     ui.dom.js           DOM helpers, tooltips, modals
@@ -93,7 +94,7 @@ web/
 ```
 
 The engine layer (`ophis.constants`, `ophis.expr`, `ophis.time`,
-`ophis.engine`, `ophis.file`, and the `ophis.cycles` analysis beside it) has no
+`ophis.engine`, `ophis.file`, and the `ophis.sop` and `ophis.cycles` readings beside it) has no
 DOM dependency at all — it runs in Node unchanged, which is how the tests drive
 it.
 

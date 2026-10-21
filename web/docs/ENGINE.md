@@ -267,6 +267,12 @@ Two notes on the format as the desktop app writes it:
 - `day_scope_start_time_in_millis` shifts every day-scope Z-Date by that much
   before it is snapped to a day. Leave it at zero unless you know you need it.
 
+One field this build adds: `"projection_kind": "subjective"`, Protocol Prime's
+label for an event built on the operator's own dates. It is written only for a
+subjective event; absent means objective, so every objective event, and every
+file saved before the switch existed, is byte-for-byte what it was. The engine
+never reads it. The desktop app ignores it, and keeps today's X-Date either way.
+
 ---
 
 ## 9 · CSV export

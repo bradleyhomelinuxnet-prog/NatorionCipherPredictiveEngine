@@ -15,6 +15,7 @@
   var Engine = root.Ophis.Engine;
   var Store = root.Ophis.Store;
   var UI = root.Ophis.UI;
+  var Sop = root.Ophis.Sop;
   var O = {};
 
   // 36,500: the cap runOperations() puts on every Z-Value, written for people.
@@ -149,12 +150,23 @@
 
     var sortType = event.z_date_sort_type || C.DEFAULT_Z_DATE_SORT_TYPE;
     var keys = results.z_keys_sorted;
+    var windows = Store.globalOptions.results_view === "windows";
+
+    // Days is the original's table; 7-day windows groups it for reading as periods.
+    var views = '<span class="kind-label">Rows</span><div class="segmented" role="group" aria-label="Rows">' +
+      [["days", "Days", "One row per Z-Date, as the original drew it."],
+       ["windows", Sop.WINDOW_DAYS + "-day windows", "The same Z-Dates grouped into periods of up to " + Sop.WINDOW_DAYS + " days. Nothing is re-scored."]
+      ].map(function (view) {
+        return '<button type="button" data-action="results-view" data-view="' + view[0] + '" data-focus-key="view-' + view[0] + '"' +
+          ' data-tip="' + UI.esc(view[2]) + '" aria-pressed="' + ((view[0] === "windows") === windows) + '">' + view[1] + '</button>';
+      }).join("") + '</div>';
 
     var head =
       '<header class="panel-head">' +
         '<h2>Output</h2>' +
         '<span class="count">' + keys.length + " Z-Date" + (keys.length === 1 ? "" : "s") + '</span>' +
         '<span class="spacer"></span>' +
+        views +
         '<button class="btn small" data-action="export-csv" data-tip="Download this event\'s Z-Dates as CSV">Export CSV</button>' +
       '</header>';
 
@@ -169,6 +181,11 @@
       host.innerHTML = head + '<p class="empty">' + UI.esc(C.NO_RESULTS_MESSAGE) +
         ' <span class="muted">' + results.total_z_dates + ' were generated before filtering.</span></p>' +
         whatIsHiding(event, results);
+      return;
+    }
+
+    if (windows) {
+      host.innerHTML = head + windowsTable(results);
       return;
     }
 
@@ -222,6 +239,43 @@
 
     host.innerHTML = html + "</tbody></table></div>";
   };
+
+  /**
+   * The 7-day windows view: the same shown Z-Dates, grouped into periods.
+   *
+   * The SOP says a cast built on older dates should be read as windows, not
+   * exact days. Each window reports its members' own numbers, the summed hits
+   * and the best single score, and nothing is re-scored or re-ranked; switch
+   * back to Days and the table is exactly as it was.
+   */
+  function windowsTable(results) {
+    var zStructs = results.z_keys_by_date.map(function (key) { return results.z_structs[key]; });
+    var windows = Sop.groupIntoWindows(zStructs);
+    var columns = [
+      ["Window", "Each window opens at a Z-Date and takes every Z-Date less than " + Sop.WINDOW_DAYS + " days after it."],
+      ["Z-Dates", "How many shown Z-Dates fall in the window."],
+      ["Labels", "The same Z-labels as the Days table and the chart."],
+      ["Hits", "The members’ hit counts, added together."],
+      ["Best score", "The highest single score among the members. Scores are not summed or changed."]
+    ];
+    var html = '<div class="table-scroll"><table class="output-table windows-table">' +
+      '<caption>' + zStructs.length + " Z-Dates in " + windows.length + " window" + (windows.length === 1 ? "" : "s") +
+        " of up to " + Sop.WINDOW_DAYS + " days · a reading aid: nothing is re-scored</caption><thead><tr>" +
+      columns.map(function (c) { return '<th scope="col" data-tip="' + UI.esc(c[1]) + '">' + UI.esc(c[0]) + '</th>'; }).join("") +
+      "</tr></thead><tbody>";
+    windows.forEach(function (w) {
+      var first = w.members[0], last = w.members[w.members.length - 1];
+      html += '<tr class="window-row">' +
+        '<td class="col-date"><span class="z-date">' + UI.esc(first.z_readable_start) +
+          (last !== first ? " – " + UI.esc(last.z_readable_start) : "") + '</span></td>' +
+        '<td class="num">' + w.members.length + '</td>' +
+        '<td class="lbl">' + w.members.map(function (z) { return UI.label("Z", z.z_ordinal); }).join(" ") + '</td>' +
+        '<td class="num">' + w.hits + '</td>' +
+        '<td class="num"><span class="score heat-' + heatStep(w.best, results) + '">' + w.best + '</span></td>' +
+        '</tr>';
+    });
+    return html + "</tbody></table></div>";
+  }
 
   /* Score heat as one of five steps, used for the intensity of the score chip.
      A class rather than an inline style, so the page needs no 'unsafe-inline'. */

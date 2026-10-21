@@ -14,6 +14,7 @@
   var Engine = root.Ophis.Engine;
   var Store = root.Ophis.Store;
   var UI = root.Ophis.UI;
+  var Sop = root.Ophis.Sop;
   var P = {};
 
   /* -------------------------------------------------- date field helpers */
@@ -106,6 +107,34 @@
     return html + "</ol>";
   }
 
+  /* Protocol Prime: Objective or Subjective (ophis.sop.js). */
+  function renderProjectionKind(event) {
+    var subjective = Sop.isSubjective(event);
+    var tip = "Protocol Prime. Objective: dates not personally tied to you — a market, a team. " +
+      "Subjective: your own or a client’s dates, which must end with the day the projection is run " +
+      "as the last X-Date. Choosing Subjective adds today.";
+    return '<div class="kind-row"><span class="kind-label">Projection</span>' +
+      '<div class="segmented" role="group" aria-label="Objective or subjective projection" data-tip="' + UI.esc(tip) + '">' +
+      [[Sop.OBJECTIVE, "Objective"], [Sop.SUBJECTIVE, "Subjective"]].map(function (pair) {
+        return '<button type="button" data-action="set-kind" data-kind="' + pair[0] + '" data-focus-key="kind-' + pair[0] + '"' +
+          ' aria-pressed="' + ((pair[0] === Sop.SUBJECTIVE) === subjective) + '">' + pair[1] + '</button>';
+      }).join("") +
+      '</div></div>';
+  }
+
+  /* The SOP warnings under the X-Dates: advice, never a guard. */
+  function renderSopWarnings(event) {
+    var warnings = Sop.warnings(event, Store.nowInstant());
+    if (!warnings.length) return "";
+    var old = warnings.some(function (w) { return w.id === "age"; });
+    return '<div class="sopwarn" role="note" aria-label="Operating procedure warnings">' +
+      warnings.map(function (w) { return '<p data-sop="' + w.id + '">⚠ ' + UI.esc(w.text) + '</p>'; }).join("") +
+      (old && Store.globalOptions.results_view !== "windows"
+        ? '<button class="btn small" data-action="read-windows" data-focus-key="read-windows">Read results as ' + Sop.WINDOW_DAYS + '-day windows</button>'
+        : "") +
+      '</div>';
+  }
+
   P.renderXDates = function (host) {
     var event = Store.currentEvent();
     var enabled = Engine.enabledXDateCount(event);
@@ -115,11 +144,14 @@
         '<span class="count' + (enabled < C.MINIMUM_NUMBER_OF_X_DATES ? " warn" : "") + '">' + enabled + " of " + event.x_dates.length + '</span>' +
         '<span class="spacer"></span>' +
         '<button class="btn small" data-action="add-x" data-tip="Add an X-Date">+ Add</button>' +
+        '<button class="btn small" data-action="add-today" data-focus-key="add-today" data-tip="Protocol Prime: add today (the Current time date) as an X-Date, in date order">☉ Today</button>' +
         '<button class="btn small" data-action="sort-x" data-tip="Sort X-Dates oldest first">Sort</button>' +
         '<button class="btn small ghost" data-action="clear-x" data-tip="Remove every X-Date">Clear</button>' +
       '</header>' +
       '<p class="panel-hint">Known past occurrences of the event. Two or more, oldest first — every pair becomes an interval&nbsp;Y.</p>' +
-      renderDateRows(event, "x");
+      renderDateRows(event, "x") +
+      renderProjectionKind(event) +
+      renderSopWarnings(event);
   };
 
   P.renderTDates = function (host) {

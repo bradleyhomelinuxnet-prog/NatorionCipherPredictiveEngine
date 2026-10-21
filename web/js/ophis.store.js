@@ -15,6 +15,7 @@
   var T = root.Ophis.Time;
   var Engine = root.Ophis.Engine;
   var File = root.Ophis.File;
+  var Sop = root.Ophis.Sop;
 
   var STORAGE_KEY = "ophis.web.session.v1";
 
@@ -26,7 +27,11 @@
       auto_recalculate: true,
       theme: "light",
       file_input_validation_mode: C.DEFAULT_FILE_INPUT_VALIDATION_MODE,
-      show_operations_column: true
+      show_operations_column: true,
+      // 'days' is the table the original drew, one row per Z-Date; 'windows'
+      // groups the same rows into 7-day periods, the way the SOP says to read
+      // a cast built on older dates. A reading aid: it re-scores nothing.
+      results_view: "days"
     },
     results: null,
     selection: { zKey: null, operationHash: null, yOrdinal: null },
@@ -223,6 +228,43 @@
       return ia.getTime() - ib.getTime();
     });
     Store.commit("dates");
+  };
+
+  /* ------------------------------------- Protocol Prime (ophis.sop.js) */
+
+  /** ☉ Today: the Current time date as an X-Date, in date order, never twice. */
+  Store.addToday = function () {
+    var result = Sop.addToday(Store.currentEvent(), Store.nowInstant());
+    if (result.added) Store.commit("dates");
+    return result;
+  };
+
+  /**
+   * Objective or subjective. Choosing subjective adds today through the same
+   * path as ☉ Today, so the two can never disagree. Choosing objective removes
+   * nothing: today may be a date the operator wants, and deleting an anchor
+   * behind their back would move the results.
+   */
+  Store.setProjectionKind = function (kind) {
+    var event = Store.currentEvent();
+    var subjective = kind === Sop.SUBJECTIVE;
+    if (subjective === Sop.isSubjective(event)) return { added: false, changed: false };
+    var result = { added: false, changed: true };
+    if (subjective) {
+      event.projection_kind = Sop.SUBJECTIVE;
+      result.added = Sop.addToday(event, Store.nowInstant()).added;
+    } else {
+      delete event.projection_kind;
+    }
+    Store.commit(result.added ? "dates" : "event-kind");
+    return result;
+  };
+
+  /** Rows: Days or 7-day windows. How results are read, not part of the session. */
+  Store.setResultsView = function (view) {
+    Store.globalOptions.results_view = view === "windows" ? "windows" : "days";
+    Store.save();
+    Store.notify("view");
   };
 
   /* --------------------------------------------------- operation actions */

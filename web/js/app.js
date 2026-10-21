@@ -175,6 +175,24 @@
       UI.on(host, "click", '[data-action="clear-t"]', function () { Store.clearDates("t"); });
     });
 
+    /* ---- Protocol Prime and the SOP (ophis.sop.js) ---- */
+    UI.on(hosts.xDates, "click", '[data-action="add-today"]', function () {
+      if (Store.addToday().added) UI.toast("Added today as a control — every historical date now casts against it.", "ok");
+      else UI.toast("Today is already a control.");
+    });
+    UI.on(hosts.xDates, "click", '[data-action="set-kind"]', function (e, target) {
+      var result = Store.setProjectionKind(target.getAttribute("data-kind"));
+      if (result.changed && target.getAttribute("data-kind") === Ophis.Sop.SUBJECTIVE) {
+        UI.toast(result.added
+          ? "Subjective: today added as an X-Date, per Protocol Prime."
+          : "Subjective: today is already an X-Date.", result.added ? "ok" : undefined);
+      }
+    });
+    UI.on(hosts.xDates, "click", '[data-action="read-windows"]', function () { Store.setResultsView("windows"); });
+    UI.on(hosts.output, "click", '[data-action="results-view"]', function (e, target) {
+      Store.setResultsView(target.getAttribute("data-view"));
+    });
+
     /* ---- intervals ---- */
     UI.on(hosts.intervals, "click", '[data-action="select-y"]', function (e, target) {
       var ordinal = parseInt(target.getAttribute("data-y"), 10);

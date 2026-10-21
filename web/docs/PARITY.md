@@ -135,6 +135,10 @@ The desktop app runs `replaceAll(",", ", ")` over the finished JSON string,
 which also rewrites commas inside event names and notes. This build writes
 normal JSON. Both read either.
 
+A subjective event (Protocol Prime) also carries `"projection_kind":
+"subjective"`. Objective events never do, so their files are unchanged; the
+engine does not read the field, and v12 ignores it.
+
 ### 4 · Error wording
 
 A few messages are reworded for clarity ("X2 must be later than X1" rather than

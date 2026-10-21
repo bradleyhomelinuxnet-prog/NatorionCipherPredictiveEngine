@@ -709,6 +709,98 @@
   });
 
   /* ====================================================================== */
+  suite("Protocol Prime and the SOP", function (test) {
+    var Sop = Ophis.Sop;
+    function ids(warnings) { return warnings.map(function (w) { return w.id; }).join(","); }
+    function dates(evt) { return evt.x_dates.map(function (x) { return x.date; }); }
+
+    test("☉ Today adds the Current time date once, in date order", function () {
+      var evt = event({ x_dates: xdates(["01/19/2025", "06/06/2026", "03/01/2027"]) });
+      var first = Sop.addToday(evt, NOW);
+      assert.deep(first, { added: true, index: 2 });
+      assert.deep(dates(evt), ["01/19/2025", "06/06/2026", "01/19/2027", "03/01/2027"], "before the later date, not appended");
+      assert.deep(Sop.addToday(evt, NOW), { added: false, index: 2 }, "a duplicate is refused");
+      assert.eq(evt.x_dates.length, 4);
+      var past = event({ x_dates: xdates(["01/19/2025", "06/06/2026"]) });
+      assert.deep(Sop.addToday(past, NOW), { added: true, index: 2 }, "after past dates it is the last");
+    });
+
+    test("a disabled copy of today does not count as today", function () {
+      var evt = event({ x_dates: xdates(["01/19/2025", ["01/19/2027", "00:00", false]]) });
+      assert.eq(Sop.addToday(evt, NOW).added, true);
+    });
+
+    test("anchors under 6 days apart are warned about; 6 is enough", function () {
+      var close = Sop.warnings(event({ x_dates: xdates(["01/01/2026", "01/06/2026", "03/01/2026"]) }), NOW);
+      assert.eq(ids(close), "spacing");
+      assert.ok(/X1 and X2 are 5 days apart/.test(close[0].text), close[0].text);
+      assert.eq(ids(Sop.warnings(event({ x_dates: xdates(["01/01/2026", "01/07/2026"]) }), NOW)), "");
+    });
+
+    test("X-Dates more than 3 years before the projection date suggest 5+ dates and windows", function () {
+      var old = Sop.warnings(event({ x_dates: xdates(["01/18/2024", "06/06/2025", "01/01/2026"]) }), NOW);
+      assert.eq(ids(old), "age");
+      assert.ok(/1 X-Date is more than 3 years old \(oldest: X1, 01\/18\/2024\)/.test(old[0].text), old[0].text);
+      assert.ok(/5 or more X-Dates \(this event has 3\)/.test(old[0].text) && /windows of about a week/.test(old[0].text));
+      assert.eq(ids(Sop.warnings(event({ x_dates: xdates(["01/20/2024", "06/06/2025"]) }), NOW)), "", "inside 3 years");
+      var later = new Date(NOW.getTime() + 2 * C.MILLIS_PER_DAY);
+      assert.eq(ids(Sop.warnings(event({ x_dates: xdates(["01/20/2024", "06/06/2025"]) }), later)), "age", "measured from Current time");
+    });
+
+    test("subjective wants today as the last X-Date", function () {
+      var evt = event({ x_dates: xdates(["01/01/2026", "06/06/2026"]), projection_kind: Sop.SUBJECTIVE });
+      var missing = Sop.warnings(evt, NOW);
+      assert.eq(ids(missing), "protocol-prime");
+      assert.ok(/today \(01\/19\/2027\) is not an X-Date/.test(missing[0].text), missing[0].text);
+      evt.x_dates.push(xdates(["03/01/2027"])[0]);
+      Sop.addToday(evt, NOW);
+      var notLast = Sop.warnings(evt, NOW);
+      assert.eq(ids(notLast), "protocol-prime");
+      assert.ok(/is an X-Date but not the last one/.test(notLast[0].text), notLast[0].text);
+      evt.x_dates.pop();
+      assert.eq(ids(Sop.warnings(evt, NOW)), "", "today last: nothing to say");
+      delete evt.projection_kind;
+      evt.x_dates = xdates(["01/01/2026", "06/06/2026"]);
+      assert.eq(ids(Sop.warnings(evt, NOW)), "", "objective never asks for today");
+    });
+
+    test("7-day windows group Z-Dates less than 7 days after the first, re-scoring nothing", function () {
+      function z(day, hits, score) { return { z_start: new Date(Date.UTC(2027, 0, day)), hit_count: hits, score: score }; }
+      var list = [z(10, 3, 1.5), z(1, 1, 0.5), z(7, 2, 4), z(8, 1, 1)];
+      var copy = JSON.stringify(list);
+      var windows = Sop.groupIntoWindows(list);
+      assert.eq(windows.length, 2);
+      assert.deep(windows.map(function (w) { return [w.members.length, w.hits, w.best]; }), [[2, 3, 4], [2, 4, 1.5]],
+        "1 and 7 share a window (6 days); 8 opens the next, and 10 joins it");
+      assert.eq(JSON.stringify(list), copy, "the Z-Dates are untouched");
+    });
+
+    test("the kind is saved only for a subjective event, so other files stay byte-identical", function () {
+      var objective = event({ x_dates: xdates(["01/01/2026", "06/06/2026"]) });
+      var text = FileIO.serialize([objective]);
+      assert.no(/projection_kind/.test(text), "no field for an objective event");
+      var subjective = JSON.parse(JSON.stringify(objective));
+      subjective.projection_kind = Sop.SUBJECTIVE;
+      var saved = FileIO.serialize([subjective]);
+      assert.eq(saved, text.replace('"day_scope_start_time_in_millis": 0\n', '"day_scope_start_time_in_millis": 0,\n      "projection_kind": "subjective"\n'),
+        "one field added, nothing else moved");
+      assert.ok(Sop.isSubjective(FileIO.parse(saved).events[0]), "and read back");
+      assert.eq(FileIO.serialize(FileIO.parse(saved).events), saved, "round trip");
+      assert.eq(FileIO.serialize(FileIO.parse(text).events), text, "an objective file round-trips unchanged");
+      var odd = JSON.parse(saved);
+      odd.iso_events[0].projection_kind = "sideways";
+      assert.no("projection_kind" in FileIO.parse(JSON.stringify(odd)).events[0], "anything else reads as objective");
+    });
+
+    test("the kind changes nothing the engine produces", function () {
+      var evt = event(Object.assign({ x_dates: xdates(["01/01/2024", "06/06/2025", "01/19/2027"]) }, NO_FILTERS));
+      var rows = rowsOf(run(evt));
+      evt.projection_kind = Sop.SUBJECTIVE;
+      assert.deep(rowsOf(run(evt)), rows);
+    });
+  });
+
+  /* ====================================================================== */
   suite(".oph files", function (test) {
     var SAMPLE = JSON.stringify({
       app_version: "12",
@@ -879,6 +971,34 @@
         Store.dirty = true;
         assert.ok(Store.load());
         assert.no(Store.dirty, "a file just opened holds no unsaved edits");
+      });
+    });
+
+    test("Subjective adds today once and survives a reload; Objective keeps today", function () {
+      withSession(function () {
+        Store.setNowOffset(T.utcMillis(2027, 0, 19) - T.floorToUtcMidnight(new Date()).getTime());
+        Store.dirty = false;
+        var today = T.formatUtcDateOnly(Store.nowInstant());
+        assert.deep(Store.setProjectionKind("subjective"), { added: true, changed: true });
+        assert.ok(Store.dirty, "choosing a kind is an edit");
+        assert.eq(Store.currentEvent().x_dates[3].date, today, "today is the last X-Date");
+        assert.deep(Store.addToday(), { added: false, index: 3 }, "☉ Today refuses a second copy");
+        assert.ok(Store.load(), "the session is restored");
+        assert.eq(Store.currentEvent().projection_kind, "subjective", "and is still subjective");
+        Store.setProjectionKind("objective");
+        assert.no("projection_kind" in Store.currentEvent(), "objective is the absent field");
+        assert.eq(Store.currentEvent().x_dates.length, 4, "today stays");
+      });
+    });
+
+    test("Rows: 7-day windows is a reading option, not an edit", function () {
+      withSession(function () {
+        Store.setResultsView("windows");
+        assert.eq(Store.globalOptions.results_view, "windows");
+        assert.no(Store.dirty);
+        Store.setResultsView("anything");
+        assert.eq(Store.globalOptions.results_view, "days");
+        assert.no(/results_view/.test(Store.exportOph()), "never in a .oph");
       });
     });
 

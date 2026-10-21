@@ -213,6 +213,10 @@
         event[key] = isNaN(value) ? 0 : value;
       });
 
+      // Protocol Prime (ophis.sop.js). Absent, or anything else, means objective;
+      // only a subjective event carries the field.
+      if (raw.projection_kind === "subjective") event.projection_kind = "subjective";
+
       events.push(event);
     });
 
@@ -268,6 +272,9 @@
       out.chart_y_max = event.chart_y_max || 0;
       out.z_date_sort_type = event.z_date_sort_type;
       out.day_scope_start_time_in_millis = event.day_scope_start_time_in_millis || 0;
+      // Written only for a subjective event, so an objective one, and every
+      // file saved before the switch existed, stays byte-identical.
+      if (event.projection_kind === "subjective") out.projection_kind = "subjective";
       return out;
     });
 

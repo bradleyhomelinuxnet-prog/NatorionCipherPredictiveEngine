@@ -233,6 +233,43 @@ async function main() {
     await ctx.close();
     ({ ctx, page } = await fresh(browser));
 
+    section("Protocol Prime and the SOP");
+    const sopIds = () => page.$$eval("#panel-xdates .sopwarn [data-sop]", ps => ps.map(p => p.getAttribute("data-sop")).join());
+    check("the sample's oldest date (over 3 years back) brings the SOP age warning, with a windows button",
+      await sopIds() === "age" && !!(await page.$('[data-action="read-windows"]')), await sopIds());
+    const xBefore = await page.$$eval("#panel-xdates .date-row", rows => rows.length);
+    await page.click('[data-action="add-today"]');
+    await page.click('[data-action="add-today"]');
+    const xAfter = await page.$$eval("#panel-xdates .date-row", rows => rows.length);
+    check("☉ Today adds today once, and the second press is refused", xAfter === xBefore + 1 && /already/.test(await page.textContent("#toast")), xBefore + " -> " + xAfter);
+    check("…as the last X-Date", await page.evaluate(() => {
+      const list = Ophis.Store.currentEvent().x_dates;
+      return list[list.length - 1].date === Ophis.Time.formatUtcDateOnly(Ophis.Store.nowInstant());
+    }));
+    check("a new event is objective, and saving it writes no kind", await page.getAttribute('[data-kind="objective"]', "aria-pressed") === "true" &&
+      !/projection_kind/.test(await page.evaluate(() => Ophis.Store.exportOph())));
+    await page.focus('[data-kind="subjective"]');
+    await page.keyboard.press("Enter");
+    check("Subjective is pressed from the keyboard, keeps focus, and adds no second today",
+      await page.getAttribute('[data-kind="subjective"]', "aria-pressed") === "true" &&
+      await page.evaluate(() => document.activeElement.getAttribute("data-kind")) === "subjective" &&
+      await page.$$eval("#panel-xdates .date-row", rows => rows.length) === xAfter && await sopIds() === "age");
+    check("…and the saved file now says subjective", /"projection_kind": "subjective"/.test(await page.evaluate(() => Ophis.Store.exportOph())));
+    await page.click('[data-action="read-windows"]');
+    const caption = await page.textContent("#panel-output .windows-table caption").catch(() => "");
+    check("Read results as 7-day windows switches the rows to windows", /in \d+ windows? of up to 7 days/.test(caption) &&
+      await page.getAttribute('[data-view="windows"]', "aria-pressed") === "true" && !(await page.$('[data-action="read-windows"]')), caption);
+    const shownBefore = await page.evaluate(() => Ophis.Store.results.z_keys_sorted.length);
+    const grouped = await page.$$eval("#panel-output .windows-table tbody tr td:nth-child(2)", cells => cells.reduce((sum, c) => sum + Number(c.textContent), 0));
+    check("…holding every shown Z-Date exactly once", grouped === shownBefore, grouped + " vs " + shownBefore);
+    await page.click('[data-view="days"]');
+    check("Days brings the original table back", (await page.$$(".z-row")).length === shownBefore);
+    await page.click('[data-kind="objective"]');
+    check("Objective keeps today's X-Date", await page.$$eval("#panel-xdates .date-row", rows => rows.length) === xAfter);
+
+    await ctx.close();
+    ({ ctx, page } = await fresh(browser));
+
     section("current time");
     const labelled = await page.getByLabel("Current time", { exact: true }).evaluateAll(fields => fields.map(field => field.id).join());
     check("the field is named by its label", labelled === "now-date", labelled || "no field");
