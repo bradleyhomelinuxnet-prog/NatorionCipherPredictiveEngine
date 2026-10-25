@@ -289,6 +289,24 @@
     });
   };
 
+  /* All thirty-six — the sixteen, the extras 17–26 and the ten mirrors, every
+     one switched on. A new event runs these and Reset restores them. A file
+     that leaves its operations out still means the sixteen, as in v12. */
+  C.ALL_OPERATIONS = C.DEFAULT_OPERATIONS.concat(C.EXTRA_OPERATIONS, C.MIRROR_OPERATIONS);
+  C.allOperations = function () {
+    return C.ALL_OPERATIONS.map(function (op) {
+      return { equation: op.equation, weight: op.weight, enabled: true };
+    });
+  };
+
+  /* True when a list is exactly the untouched sixteen (the pre-36 default). */
+  C.isUntouchedSixteen = function (ops) {
+    var d = C.DEFAULT_OPERATIONS;
+    return Array.isArray(ops) && ops.length === d.length && ops.every(function (op, i) {
+      return op && op.equation === d[i].equation && op.weight === d[i].weight && op.enabled === true;
+    });
+  };
+
   /* --- display -------------------------------------------------------- */
   C.DATE_DELIMITER = "/";
   C.X_DATE_DISPLAY_FORMAT = "mm/dd/yyyy";

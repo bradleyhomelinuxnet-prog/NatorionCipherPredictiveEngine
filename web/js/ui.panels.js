@@ -227,7 +227,7 @@
         '<button class="btn small ghost" data-action="add-mirror-operations" data-tip="Add the ten mirror operations, switched off (they complete the X1/X2 grid of the sixteen)">Mirrors</button>' +
         '<button class="btn small ghost" data-action="ops-all-on" data-tip="Enable every operation">All</button>' +
         '<button class="btn small ghost" data-action="ops-all-off" data-tip="Disable every operation">None</button>' +
-        '<button class="btn small ghost" data-action="reset-operations" data-tip="Restore the 16 shipped operations">Reset</button>' +
+        '<button class="btn small ghost" data-action="reset-operations" data-tip="Restore all 36: the 16 shipped, extras 17–26 and the 10 mirrors, all on">Reset</button>' +
         '<button class="icon-btn" data-action="operation-help" data-tip="Formula reference" aria-label="Formula reference">?</button>' +
       '</header>' +
       '<p class="panel-hint">Each formula turns an interval Y into a day-offset from X<sub>1</sub> or X<sub>2</sub>. ' +
@@ -300,6 +300,7 @@
         '<tr><td class="mono">oph_floor oph_ceil oph_abs oph_sqrt</td><td>as named</td></tr>' +
         '<tr><td class="mono">oph_sin oph_cos oph_tan oph_log oph_exp</td><td>as named (radians)</td></tr>' +
       '</tbody></table>' +
+      '<p>A new event runs <b>all thirty-six</b> below, every one switched on; <b>Reset</b> brings them back. A file that leaves its operations out still means the shipped sixteen, as in v12.</p>' +
       '<h3>The shipped set</h3>' +
       '<table class="doc-table"><tbody>' + rows + '</tbody></table>' +
       '<h3>The extras</h3>' +

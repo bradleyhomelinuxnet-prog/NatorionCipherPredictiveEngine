@@ -30,7 +30,7 @@
       name: name || "Event 1", notes: "", x_dates: [], t_dates: [],
       lat: 0, long: 0, location_enabled: false,
       scope: scope || C.SCOPE.DAYS, type: C.TYPE.PERSONAL,
-      operations: C.cloneDefaultOperations(),
+      operations: C.cloneAllOperations(),
       scoring_system: C.SCORING.GTE_V8,
       z_date_sort_type: C.SORT.DATE,
       day_scope_start_time_in_millis: 0

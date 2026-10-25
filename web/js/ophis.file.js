@@ -40,7 +40,7 @@
       location_enabled: false,
       scope: C.DEFAULT_EVENT_SCOPE,
       type: C.DEFAULT_EVENT_TYPE,
-      operations: C.defaultOperations(),
+      operations: C.allOperations(),
       scoring_system: C.DEFAULT_SCORING_SYSTEM,
       z_date_sort_type: C.DEFAULT_Z_DATE_SORT_TYPE,
       day_scope_start_time_in_millis: C.DEFAULT_DAY_SCOPE_START_TIME_MILLIS,

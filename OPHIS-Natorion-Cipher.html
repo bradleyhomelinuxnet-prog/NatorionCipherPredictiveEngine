@@ -1264,7 +1264,7 @@ pre.blob {
   <main class="screen" data-screen="operations">
     <div class="screen-head">
       <div class="eyebrow">The operation table</div>
-      <h1 tabindex="-1">Sixteen functions of Y</h1>
+      <h1 tabindex="-1">Thirty-six functions of Y</h1>
       <p class="lede">Weight decides Alpha from Beta, and feeds the score directly.</p>
     </div>
     <div id="operationsHost"></div>
@@ -2853,10 +2853,22 @@ pre.blob {
     ["X2+Y/OPH_PI", 0.5, "division by \u03C0, X2"]
   ];
   var OPHIS_PACKS = {
+    /**
+     * The live default: every operation this build knows, all switched on --
+     * the sixteen of v10+, the ten Extras (17-26) and the ten Mirrors (27-36).
+     * A new event runs these. A FILE that leaves its operations out still means
+     * the sixteen, as it does in v12 (see readIsoEvent and sameOperations).
+     */
+    "ophis-all-36": {
+      id: "ophis-all-36",
+      label: "All 36 \xB7 16 + Extras + Mirrors",
+      note: "The live default: the sixteen of v10+, the ten Extras and the ten Mirrors, every one switched on.",
+      operations: [...GTE_V10, ...XTRAS, ...MIRRORS].map(row("ophis-all-36"))
+    },
     "ophis-gte-v10": {
       id: "ophis-gte-v10",
       label: "Ophis v10+ \xB7 16 operations",
-      note: "The live default. Adds the two hepta-cycle operations to the v8 table.",
+      note: "Ophis v12's own default, and what a file means when it leaves its operations out. Adds the two hepta-cycle operations to the v8 table.",
       operations: GTE_V10.map(row("ophis-gte-v10"))
     },
     /**
@@ -2907,6 +2919,8 @@ pre.blob {
     }
   };
   var DEFAULT_OPHIS_PACK = "ophis-gte-v10";
+  // What a NEW event runs. Files keep DEFAULT_OPHIS_PACK as their meaning.
+  var NEW_EVENT_PACK = "ophis-all-36";
   function packOperations(packId = DEFAULT_OPHIS_PACK) {
     const pack = OPHIS_PACKS[packId];
     return pack ? pack.operations.map((o) => ({ ...o })) : null;
@@ -2980,7 +2994,7 @@ pre.blob {
       long: 0,
       location_enabled: false,
       day_scope_start_time_in_millis: 0,
-      operations: packOperations(DEFAULT_OPHIS_PACK),
+      operations: packOperations(NEW_EVENT_PACK),
       scoring_system: SCORING_SYSTEM.GTE_V8,
       z_date_sort_type: SORT_TYPE.DATE,
       ...FILTER_DEFAULTS,
@@ -3094,6 +3108,8 @@ pre.blob {
       return null;
     }
     const ev = makeIsoEvent(index);
+    // A file with no operations means v12's sixteen, not the new-event 36.
+    ev.operations = packOperations(DEFAULT_OPHIS_PACK);
     if (typeof raw.name === "string") ev.name = raw.name;
     if (typeof raw.notes === "string") ev.notes = raw.notes;
     ev.day_scope_start_time_in_millis = clampDayStart(raw.day_scope_start_time_in_millis ?? 0);
@@ -3458,7 +3474,8 @@ pre.blob {
       app_version: APP_VERSION,
       schema: SCHEMA_VERSION,
       iso_events: state.document.iso_events,
-      global_options: state.options
+      global_options: state.options,
+      ops36: true
     });
   }
   // Put a restored event's anchors back in date order, but ONLY if it cannot be
@@ -3501,7 +3518,17 @@ pre.blob {
     const parsed = readDocument(blob, VALIDATION.LOOSE);
     if (!parsed.document) return false;
     for (const w of parsed.warnings) log("restore", w);
-    const repaired = repairAnchorOrder(parsed.document);
+    let repaired = repairAnchorOrder(parsed.document);
+    // Once, for a copy stored before the 36-operation default: an event still
+    // on the untouched sixteen moves up to all thirty-six.
+    if (!blob.ops36) {
+      let moved = 0;
+      for (const ev of parsed.document.iso_events) {
+        if (sameOperations(ev.operations)) { ev.operations = packOperations(NEW_EVENT_PACK); moved++; }
+      }
+      repaired = true;   // write the flag back, so this happens only once
+      if (moved) log("restore", `Moved ${moved} event${moved === 1 ? "" : "s"} from the untouched sixteen up to the 36 default operations.`);
+    }
     state.document = parsed.document;
     state.currentEventIndex = Math.min(
       Number(state.options.current_iso_event_index) || 0,

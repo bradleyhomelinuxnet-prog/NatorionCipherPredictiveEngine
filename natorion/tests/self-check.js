@@ -61,7 +61,12 @@ check("one X-Date is an error", NC.engine.run(Object.assign({}, ev, { x_dates: e
 console.log("documents");
 const text = NC.oph.serialize([ev], { minify: true });
 const back = NC.oph.parse(text);
-check("minified save round-trips", [back.errors.length, back.events[0].x_dates.length, back.events[0].operations.length], [0, 3, 16]);
+check("minified save round-trips", [back.errors.length, back.events[0].x_dates.length, back.events[0].operations.length], [0, 3, 36]);
+check("a new event runs all 36, every one on", [NC.oph.newEvent().operations.length, NC.oph.newEvent().operations.every(o => o.enabled)], [36, true]);
+check("a file that omits its operations still means the sixteen", NC.oph.parse(JSON.stringify({ iso_events: [{ x_dates: [] }] })).events[0].operations.length, 16);
+const ev16 = Object.assign({}, ev, { operations: C.cloneDefaultOperations() });
+check("the untouched sixteen still round-trip as sixteen", NC.oph.parse(NC.oph.serialize([ev16], { minify: true })).events[0].operations.length, 16);
+check("the 36 are the sixteen, extras, mirrors, no repeats", [C.ALL_OPERATIONS.length, new Set(C.ALL_OPERATIONS.map(o => NC.expr.normalize(o.equation))).size, C.isUntouchedSixteen(C.cloneDefaultOperations()), C.isUntouchedSixteen(C.cloneAllOperations())], [36, 36, true, false]);
 check("strict mode rejects a bad latitude", NC.oph.parse(JSON.stringify({ iso_events: [{ scope: "EVENT_SCOPE__HH_MM", lat: 88, long: 0, x_dates: [] }] }), C.VALIDATION.STRICT).events, null);
 check("loose mode repairs it", NC.oph.parse(JSON.stringify({ iso_events: [{ scope: "EVENT_SCOPE__HH_MM", lat: 88, long: 0, x_dates: [] }] })).events[0].lat, C.DEFAULT_LAT);
 check("CSV cells cannot start a formula", NC.oph.csvCell("=HYPERLINK(1)"), "'=HYPERLINK(1)");

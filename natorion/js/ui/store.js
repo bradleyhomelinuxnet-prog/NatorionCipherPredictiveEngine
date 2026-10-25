@@ -41,6 +41,9 @@
       if (saved && Array.isArray(saved.events) && saved.events.length) {
         var parsed = NC.oph.parse(JSON.stringify({ app_version: C.APP_VERSION, iso_events: saved.events }), C.VALIDATION.LOOSE);
         if (parsed.events && parsed.events.length) state.events = parsed.events;
+        // Once, when a copy saved before the 36-operation default is opened:
+        // any event still on the untouched sixteen moves up to all thirty-six.
+        if (!saved.ops36) state.events.forEach(function (ev) { if (C.isUntouchedSixteen(ev.operations)) ev.operations = C.cloneAllOperations(); });
       }
       if (saved && Number.isInteger(saved.current)) state.current = Math.max(0, Math.min(state.events.length - 1, saved.current));
       // A saved setting is kept only when it has its default's type (and, for
@@ -51,13 +54,15 @@
         if (typeof v !== typeof state.settings[k] || (CHOICES[k] && CHOICES[k].indexOf(v) < 0)) return;
         state.settings[k] = v;
       });
+      // Write the move to thirty-six back at once, so it happens only once.
+      if (saved && !saved.ops36) persistNow();
     } catch (e) { /* private window or corrupt copy: start fresh */ }
   }
 
   var saveTimer = null;
   function persistNow() {
     clearTimeout(saveTimer); saveTimer = null;
-    try { root.localStorage.setItem(KEY, JSON.stringify({ events: state.events, current: state.current, settings: state.settings })); emit("saved", true); }
+    try { root.localStorage.setItem(KEY, JSON.stringify({ events: state.events, current: state.current, settings: state.settings, ops36: true })); emit("saved", true); }
     catch (e) { emit("saved", false); }
   }
   function persist() { emit("dirty"); clearTimeout(saveTimer); saveTimer = setTimeout(persistNow, 400); }

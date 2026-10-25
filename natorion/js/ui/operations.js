@@ -81,8 +81,8 @@
   function init() {
     $("opsAdd").addEventListener("click", function () { S.change(function () { ops().push({ equation: "X1+Y", weight: C.POINTS_BETA, enabled: true }); }); render(); var ins = $("opsBody").querySelectorAll('input[type="text"]'); if (ins.length) { ins[ins.length - 1].focus(); ins[ins.length - 1].select(); } });
     $("opsDefaults").addEventListener("click", function () {
-      if (!confirm("Replace this event's operations with the 16 v12 defaults?")) return;
-      S.change(function (e) { e.operations = C.cloneDefaultOperations(); }); render(); D.toast("The 16 default operations are back.");
+      if (!confirm("Replace this event's operations with the 36 defaults (the 16 of v12, extras 17-26 and the 10 mirrors, all on)?")) return;
+      S.change(function (e) { e.operations = C.cloneAllOperations(); }); render(); D.toast("All 36 default operations are back, switched on.");
     });
     $("opsExtras").addEventListener("click", function () {
       var have = ops().map(function (o) { return NC.expr.normalize(o.equation); }), added = 0;

@@ -71,6 +71,7 @@
 
   function event(overrides) {
     var base = FileIO.newEvent("Test");
+    base.operations = C.defaultOperations();   // the golden values are v12's, cast with its sixteen
     Object.keys(overrides || {}).forEach(function (key) { base[key] = overrides[key]; });
     return base;
   }
@@ -1065,6 +1066,9 @@
 
     test("the extras are added once, however often they are asked for", function () {
       withSession(function () {
+        var fresh = FileIO.newEvent("Fresh").operations;
+        assert.eq(fresh.length, 36, "a new event runs all thirty-six");
+        assert.ok(fresh.every(function (op) { return op.enabled; }), "every one switched on");
         assert.eq(Store.currentEvent().operations.length, 16);
         assert.eq(Store.addExtraOperations(), 10);
         assert.eq(Store.currentEvent().operations.length, 26);
@@ -1073,7 +1077,7 @@
         assert.eq(Store.addExtraOperations(), 0, "a respelt extra still counts as present");
         assert.eq(Store.currentEvent().operations.length, 26);
         Store.resetOperations();
-        assert.eq(Store.currentEvent().operations.length, 16);
+        assert.eq(Store.currentEvent().operations.length, 36, "Reset brings back all thirty-six");
       });
     });
 

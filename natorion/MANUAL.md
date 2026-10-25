@@ -17,7 +17,7 @@ This manual assumes you have never used Ophis, never written a formula, and just
 9. [Filters](#9-filters)
 10. [T-Dates: asking about one particular day](#10-t-dates-asking-about-one-particular-day)
 11. [Days scope and HH:MM · sunset scope](#11-days-scope-and-hhmm--sunset-scope)
-12. [Operations: the sixteen formulas](#12-operations-the-sixteen-formulas)
+12. [Operations: the thirty-six formulas](#12-operations-the-thirty-six-formulas)
 13. [Writing your own formula](#13-writing-your-own-formula)
 14. [Several events in one document](#14-several-events-in-one-document)
 15. [Opening, saving and exporting](#15-opening-saving-and-exporting)
@@ -82,9 +82,9 @@ On the **Cipher** screen:
 
 The status line reads like this:
 
-> **15** Y-pairs · **16** operations · **230** Z-Dates projected, **146** shown · UTC days · 9 ms
+> **15** Y-pairs · **36** operations · **463** Z-Dates projected, **260** shown · UTC days · 9 ms
 
-That means 15 pairs of dates were compared, 16 formulas were used, 230 projections came out, and 146 of them passed your filters.
+That means 15 pairs of dates were compared, 36 formulas were used, 463 distinct days were projected, and 260 of them passed your filters. (The shown count depends on today's date.)
 
 ---
 
@@ -150,7 +150,7 @@ Take two X-Dates: **X1 = 07/04/2026** and **X2 = 08/20/2026**.
 4. **Z-Date** = 08/20/2026 + 76 days = **11/04/2026**.
 5. Z rounds to **76**, which is on the Normal MSRF list, so the day scores extra.
 
-The same pair feeds all sixteen operations. #2 reverses the digits of 47 to get 74 and lands on 11/02/2026 (74 is also on the list). #1 simply adds 47 days to X2, landing on 10/06/2026. With more X-Dates there are more pairs: six dates make 15 pairs, and 15 pairs × 16 formulas give up to 240 projections. When several land on the **same day**, they merge into one row, and that row's score climbs.
+The same pair feeds all thirty-six operations. #2 reverses the digits of 47 to get 74 and lands on 11/02/2026 (74 is also on the list). #1 simply adds 47 days to X2, landing on 10/06/2026. With more X-Dates there are more pairs: six dates make 15 pairs, and 15 pairs × 36 formulas give up to 540 projections. When several land on the **same day**, they merge into one row, and that row's score climbs.
 
 > A small precision note, kept from the original: 76.05 rounds to 76.1, exactly 0.1 from the vortex number 76.2, on the very edge of its ±0.1 window. In the computer's floating-point arithmetic, 76.2 − 76.1 comes out a hair over 0.1 (0.10000000000000853), so it counts as the normal number 76, not the vortex. Natorion reproduces Ophis v12's arithmetic exactly, down to cases like this.
 
@@ -248,9 +248,9 @@ HH:MM takes a moment longer, since it calculates real sunsets.
 
 ---
 
-## 12. Operations: the sixteen formulas
+## 12. Operations: the thirty-six formulas
 
-The **Operations** screen lists the current event's formulas. The standard sixteen from Ophis v12:
+The **Operations** screen lists the current event's formulas. A new event runs **all thirty-six**, every one switched on: the standard sixteen from Ophis v12 (#1–16), the ten extras (#17–26) and the ten mirrors (#27–36). The sixteen from Ophis v12:
 
 | # | Formula | Says | Class |
 |---|---|---|---|
@@ -277,8 +277,14 @@ On this screen you can:
 - **Edit** it by typing. A red message explains any mistake.
 - Change its **Class** to alpha (1 point) or beta (½ point).
 - **↑** move it up, **⎘** duplicate it, **✕** remove it.
-- **Add extras 17–26** — ten more formulas from the Ophis community list (Y × 2.718, × 1.38, × 5.52, × 2.178, × 0.360 …).
-- **Restore the 16 defaults** — undo all your changes.
+The extras, #17–26, all beta: `X1+Yx2.718`, `X2+Yx2.718`, `X1+Yx1.38`, `X2+Yx1.38`, `X1+Yx5.52`, `X2+Yx5.52`, `X1+(Y/2.0)x5.52`, `X1+Yx2.178`, `X2+Yx2.178`, `X2+Yx0.360`.
+
+The mirrors, #27–36, all beta, complete the X1/X2 grid of the sixteen: `X1+oph_round(Y)`, `X1+oph_flip(oph_round(Y))`, `X1+Y/OPH_CRV`, `X1+Y/OPH_PHI`, `X1+(Y/2.0)xOPH_PHI`, `X1+YxOPH_PHI`, `X1+(Y/2.0)xOPH_HEP`, `X2+(Y/2.0)xOPH_HEP`, `X1+Y/OPH_PI`, `X2+Y/OPH_PI`.
+
+- **Add extras 17–26** / **Add mirrors** — put back whichever of those ten are missing.
+- **Restore all 36 defaults** — undo all your changes: the thirty-six, all on.
+
+A copy saved in your browser before the thirty-six became the default moves up to them the first time you open it, if its event was still on the untouched sixteen. A `.oph` file that leaves its operations out still means the sixteen, exactly as in Ophis v12.
 
 The **Z at Y=100** column shows what each formula gives when Y is 100, as a quick sanity check.
 
@@ -485,7 +491,7 @@ The **Studio** screen turns the open event into a production package for an anim
 
 **"X1 and X2 must be different days."** Two dates are the same day (or, in HH:MM scope, fall between the same two sunsets).
 
-**"At least 1 Operation is required."** Every formula is off or broken. Go to Operations and tick some, or click **Restore the 16 defaults**.
+**"At least 1 Operation is required."** Every formula is off or broken. Go to Operations and tick some, or click **Restore all 36 defaults**.
 
 **"HH:MM scope needs a latitude within ±65°…"** Fix the latitude or longitude, or pick a place from the list.
 

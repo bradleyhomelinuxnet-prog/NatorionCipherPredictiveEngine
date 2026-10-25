@@ -215,6 +215,17 @@
 
   C.cloneDefaultOperations = function () { return C.DEFAULT_OPERATIONS.map(function (o) { return op(o.equation, o.weight, o.enabled); }); };
 
+  // All thirty-six: the sixteen, the extras 17-26 and the ten mirrors, every
+  // one switched on. This is what a new event runs and what "Restore" brings
+  // back. A file that omits its operations still means the sixteen, as in v12.
+  C.ALL_OPERATIONS = C.DEFAULT_OPERATIONS.concat(C.EXTRA_OPERATIONS, C.MIRROR_OPERATIONS);
+  C.cloneAllOperations = function () { return C.ALL_OPERATIONS.map(function (o) { return op(o.equation, o.weight, true); }); };
+  // True when a list is exactly the untouched sixteen (a pre-36 default).
+  C.isUntouchedSixteen = function (ops) {
+    var d = C.DEFAULT_OPERATIONS;
+    return Array.isArray(ops) && ops.length === d.length && ops.every(function (o, i) { return o && o.equation === d[i].equation && o.weight === d[i].weight && o.enabled === d[i].enabled; });
+  };
+
   /* ----------------------------------------------- serialized fields -- */
   // The .oph keys for filters and chart layers, with their defaults. A key's
   // numeric companion, where there is one, is the key + "_value".

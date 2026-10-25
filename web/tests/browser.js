@@ -108,14 +108,14 @@ async function main() {
     await page.click('[data-action="reset-operations"]');
     await page.click("#modal [data-confirm]");
     check("a cancelled dialog never acts later", await xCount() === before, (await xCount()) + " vs " + before);
-    check("a confirmed dialog does its own job", opsBefore === 17 && await opCount() === 16, opsBefore + " -> " + (await opCount()));
+    check("a confirmed dialog does its own job", opsBefore !== 36 && await opCount() === 36, opsBefore + " -> " + (await opCount()));
     await page.click('#panel-operations [data-action="add-extra-operations"]');
     const withExtras = await opCount();
     await page.click('#panel-operations [data-action="add-extra-operations"]');
-    check("the Extras button adds the ten, once", withExtras === 26 && await opCount() === 26, withExtras + " -> " + (await opCount()));
+    check("the Extras button adds nothing to the 36, which already hold them", withExtras === 36 && await opCount() === 36, withExtras + " -> " + (await opCount()));
     await page.click('[data-action="reset-operations"]');
     await page.click("#modal [data-confirm]");
-    check("Reset puts the sixteen back", await opCount() === 16, String(await opCount()));
+    check("Reset puts all thirty-six back", await opCount() === 36, String(await opCount()));
     await page.click('[data-action="about"]');
     await page.keyboard.press("Escape");
     await page.focus('[data-action="clear-x"]');

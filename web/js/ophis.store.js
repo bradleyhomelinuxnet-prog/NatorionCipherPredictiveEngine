@@ -97,7 +97,8 @@
         events: Store.events,
         currentEventIndex: Store.currentEventIndex,
         globalOptions: Store.globalOptions,
-        dirty: Store.dirty          // unsaved edits are still unsaved after a reload
+        dirty: Store.dirty,         // unsaved edits are still unsaved after a reload
+        ops36: true                 // the one-time move to the 36 defaults is done
       }));
     } catch (e) { /* private mode, quota — the app still works, just forgets */ }
   };
@@ -122,6 +123,12 @@
       }), C.FILE_INPUT_VALIDATION_MODE__ORIGINAL);
       if (!parsed.events.length) return false;
       Store.events = parsed.events;
+      // Once, for a session stored before the 36-operation default: an event
+      // still on the untouched sixteen moves up to all thirty-six.
+      var upgrade = !saved.ops36;
+      if (upgrade) Store.events.forEach(function (event) {
+        if (C.isUntouchedSixteen(event.operations)) event.operations = C.allOperations();
+      });
       Store.currentEventIndex = Math.min(saved.currentEventIndex || 0, parsed.events.length - 1);
       // A session stored before this flag was kept may hold unsaved edits.
       Store.dirty = saved.dirty !== false;
@@ -130,6 +137,7 @@
           Store.globalOptions[key] = saved.globalOptions[key];
         }
       });
+      if (upgrade) Store.save();   // record the move, so it happens only once
       return true;
     } catch (e) { return false; }
   };
@@ -299,7 +307,7 @@
   };
 
   Store.resetOperations = function () {
-    Store.currentEvent().operations = C.defaultOperations();
+    Store.currentEvent().operations = C.allOperations();
     Store.commit("operations");
   };
 
