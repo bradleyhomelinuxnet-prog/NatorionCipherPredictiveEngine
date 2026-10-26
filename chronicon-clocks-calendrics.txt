@@ -1152,7 +1152,7 @@ setFromAstro(TODAY.y,TODAY.m,TODAY.d);
     <h2>Six clocks on one shaft of time</h2>
     <p class="lead">We built a single dial that turns every Chronicon period at once. Move it to any year and all six wheels re-read the same moment.</p>
     <ul>
-      <li><b>Annus Mundi</b> — the Ancient World count from 3895 BC. Today, 30 May 2026, is <span class="hl">AM 5920</span>.</li>
+      <li><b>Annus Mundi</b> — the Ancient World count from 3895 BC. Today, <span id="yahToday">30 May 2026</span>, is <span class="hl" id="yahTodayAM">AM 5920</span>.</li>
       <li><b>Phoenix / Sky Dragon</b> — the strict <span class="hl">138-year</span> lattice. We sit 14 years short of the 2040 visitation.</li>
       <li><b>Nemesis X Object</b> — <span class="hl">792 years</span>, sixty inside Sol and seven-hundred-thirty-two without. It is currently outside; 20 years to the 2046 return.</li>
       <li><b>Anunnaki NER</b> — the <span class="hl">600-year</span> epochs; 762 CE falls exactly on the 6000th NER year, as your work has it.</li>
@@ -1349,7 +1349,7 @@ setFromAstro(TODAY.y,TODAY.m,TODAY.d);
   <!-- ENGINE -->
  
   <footer>
-    <b>The Chronicon Calendrics &amp; Clocks Engine.</b> A worldbuilding &amp; study companion to the Archaix thesis of <b>Jason Breshears</b> (Archaix.com): the Chronicon, the Doomsday Chronology, the 337 Archaix Charts, and the ANUNNA Files. The Annus Mundi dating, the Anunna šar/turning reckoning (šar = a day, NER = 216,000 turnings, baktun = 144,000, 432,000 antediluvian, 864,000 Foundation of Time) and the calendrical readings are the thesis of that work and are presented as such, not as established archaeology. Calendar-wall conversions use the platform's Intl calendar engine where available and proleptic day-count math elsewhere; deep-past readings are cycle-true rather than historically observed. Survey figures are from W. M. Flinders Petrie, <em>The Pyramids and Temples of Gizeh</em> (1883): mean base 9068.8 in / 230.3475 m (440 royal cubits), height 146.71 m (5776 in), cubit 20.62 in, slope ≈51°51′. AM = 3895 − (BC year). <b>You Are Here:</b> 30 May 2026 CE = AM 5920 = Mayan Long-Count year 5138.
+    <b>The Chronicon Calendrics &amp; Clocks Engine.</b> A worldbuilding &amp; study companion to the Archaix thesis of <b>Jason Breshears</b> (Archaix.com): the Chronicon, the Doomsday Chronology, the 337 Archaix Charts, and the ANUNNA Files. The Annus Mundi dating, the Anunna šar/turning reckoning (šar = a day, NER = 216,000 turnings, baktun = 144,000, 432,000 antediluvian, 864,000 Foundation of Time) and the calendrical readings are the thesis of that work and are presented as such, not as established archaeology. Calendar-wall conversions use the platform's Intl calendar engine where available and proleptic day-count math elsewhere; deep-past readings are cycle-true rather than historically observed. Survey figures are from W. M. Flinders Petrie, <em>The Pyramids and Temples of Gizeh</em> (1883): mean base 9068.8 in / 230.3475 m (440 royal cubits), height 146.71 m (5776 in), cubit 20.62 in, slope ≈51°51′. AM = 3895 − (BC year). <b>You Are Here:</b> <span id="yahFooter">30 May 2026 CE = AM 5920 = Mayan Long-Count year 5138.</span>
   </footer>
  
 </div>
@@ -1436,5 +1436,19 @@ document.getElementById('renderHost').innerHTML=scenes.map(s=>`<figure class='re
   paint(); setInterval(paint, 3600000);
 })();
 </script>
+<script>
+/* Live "You Are Here" and "Today": the reader's own date, re-read every minute so it rolls over at midnight. */
+(function(){
+  var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function set(id,txt){var e=document.getElementById(id);if(e)e.textContent=txt;}
+  function paint(){
+    var n=new Date(), y=n.getFullYear(), day=n.getDate()+' '+M[n.getMonth()]+' '+y;
+    set('yahFooter', day+' CE = AM '+(y+3894)+' = Mayan Long-Count year '+(y+3112)+'.');
+    set('yahToday', day);
+    set('yahTodayAM', 'AM '+(y+3894));
+  }
+  paint(); setInterval(paint, 60000);
+})();
+</script>
 </body>
-</html>
+</html>
