@@ -89,29 +89,29 @@ The core loop is `runOperations` at `ophis_model__operations.js:172`:
 - `FEATURE_FLAG__SUNSET__ADD_Z_VALUE_TO_X_DATE_PRIOR_SUNSET = false` → `dateToWhichToAddZValue_native = startingXDate_native` (unchanged) (`:210`).
 - Z-millis = anchor.getTime() + `ithZValue_raw * MILLIS_PER_DAY` (unrounded product, `:192, :215`).
 
-For each op below: Y=1319 → raw Z (days) → rounded Z → anchor + Z (in whole days for the readable Z-date).
+For each op below: Y=1319 → raw Z (days) → anchor + raw Z → the calendar day that instant falls on. The fraction is never rounded up: 4141.66 days after X1 lands at 15:50 GMT on day 4141, so the Z-Date is that day. (Dates checked against both rebuilt engines, Natorion and NATORI-ON-PSYFR, which are pinned to the original program.)
 
 Anchor bases (00:00 GMT):
 - X1 = 2012-11-28
 - X2 = 2016-07-09
 
-| # | Equation | Anchor | Raw Y-comp | Z (days, rounded 2dp) | Round to whole days | Z-Date (native start) |
+| # | Equation | Anchor | Raw Y-comp | Z (days, rounded 2dp) | Whole days added | Z-Date (native start) |
 |---|---|---|---|---|---|---|
-| 1 | `X2+oph_round(Y)` | X2 | round(1319)=1319 | 1319.00 | 1319 | 2020-02-19 |
-| 2 | `X2+oph_flip(oph_round(Y))` | X2 | flip(1319)=9131 | 9131.00 | 9131 | 2041-07-04 |
-| 3 | `X2+Y/OPH_CRV` | X2 | 1319/5.08=259.6457 | 259.65 | 260 | 2017-03-26 |
-| 4 | `X1+(Y/2.0)xOPH_PI` | X1 | 659.5·3.14=2070.83 | 2070.83 | 2071 | 2018-08-01 |
+| 1 | `X2+oph_round(Y)` | X2 | round(1319)=1319 | 1319.00 | 1319 | 2020-02-18 |
+| 2 | `X2+oph_flip(oph_round(Y))` | X2 | flip(1319)=9131 | 9131.00 | 9131 | 2041-07-09 |
+| 3 | `X2+Y/OPH_CRV` | X2 | 1319/5.08=259.6457 | 259.65 | 259 | 2017-03-25 |
+| 4 | `X1+(Y/2.0)xOPH_PI` | X1 | 659.5·3.14=2070.83 | 2070.83 | 2070 | 2018-07-30 |
 | 5 | `X2+Y/OPH_PHI` | X2 | 1319/1.618=815.204 | 815.20 | 815 | 2018-10-02 |
 | 6 | `X2+(Y/2.0)xOPH_PHI` | X2 | 659.5·1.618=1067.071 | 1067.07 | 1067 | 2019-06-11 |
-| 7 | `X1+(Y/2.0)xOPH_CRV` | X1 | 659.5·5.08=3350.26 | 3350.26 | 3350 | 2022-01-27 |
-| 8 | `X2+(Y/2.0)xOPH_PI` | X2 | 659.5·3.14=2070.83 | 2070.83 | 2071 | 2022-03-11 |
+| 7 | `X1+(Y/2.0)xOPH_CRV` | X1 | 659.5·5.08=3350.26 | 3350.26 | 3350 | 2022-01-30 |
+| 8 | `X2+(Y/2.0)xOPH_PI` | X2 | 659.5·3.14=2070.83 | 2070.83 | 2070 | 2022-03-10 |
 | 9 | `X2+YxOPH_PHI` | X2 | 1319·1.618=2134.142 | 2134.14 | 2134 | 2022-05-13 |
-| 10 | `X1+YxOPH_PI` | X1 | 1319·3.14=4141.66 | 4141.66 | 4142 | 2024-03-11 |
-| 11 | `X2+(Y/2.0)xOPH_CRV` | X2 | 659.5·5.08=3350.26 | 3350.26 | 3350 | 2025-09-11 |
-| 12 | `X2+YxOPH_PI` | X2 | 1319·3.14=4141.66 | 4141.66 | 4142 | 2027-11-13 |
-| 13 | `X1+YxOPH_CRV` | X1 | 1319·5.08=6700.52 | 6700.52 | 6701 | 2031-03-25 |
-| 14 | `X2+YxOPH_CRV` | X2 | 1319·5.08=6700.52 | 6700.52 | 6701 | 2034-11-04 |
-| 15 | `X1+YxOPH_HEP` | X1 | 1319·7.01=9246.19 | 9246.19 | 9246 | 2038-02-25 |
+| 10 | `X1+YxOPH_PI` | X1 | 1319·3.14=4141.66 | 4141.66 | 4141 | 2024-03-31 |
+| 11 | `X2+(Y/2.0)xOPH_CRV` | X2 | 659.5·5.08=3350.26 | 3350.26 | 3350 | 2025-09-10 |
+| 12 | `X2+YxOPH_PI` | X2 | 1319·3.14=4141.66 | 4141.66 | 4141 | 2027-11-10 |
+| 13 | `X1+YxOPH_CRV` | X1 | 1319·5.08=6700.52 | 6700.52 | 6700 | 2031-04-03 |
+| 14 | `X2+YxOPH_CRV` | X2 | 1319·5.08=6700.52 | 6700.52 | 6700 | 2034-11-12 |
+| 15 | `X1+YxOPH_HEP` | X1 | 1319·7.01=9246.19 | 9246.19 | 9246 | 2038-03-23 |
 | 16 | *(dup placeholder — see note)* | — | — | — | — | — |
 
 For DAYS scope the `zDate_native_start`/`_end` are collapsed to the day-boundary via `nativeDateToXDate` → `xDateToNativeDate` round-trip at `ophis_model__operations.js:224-232` (with `lat=0, long=0` because `FEATURE_FLAG__LOCK_DAY_SCOPE_TO_GMT` is enabled). Start == End for DAYS.
@@ -128,7 +128,7 @@ Tagging (`tagZDates`, `ophis_model__operations.js:400`):
 - Each operation result appends an `operationMatchStruct = { y_struct, operation_result }` (`:434`).
 - Then `getMsrfMatch(rotation_count_z)` is called on the 1-dp Z-rotation; if non-null, an `msrfMatchStruct` is appended (`:436-441`).
 
-Note the collision behavior: rows 4 & 8 (2071 days), 7 & 11 (3350), 10 & 12 (4142), 13 & 14 (6701) each round to the same integer day count from **different anchors**, so their millis keys differ — they DO NOT merge. Each Z-Date bucket in `zStructsDict` therefore ends up with one operation hit apiece — 15 distinct z-buckets (or 16 if the placeholder resolves to a different key).
+Note the collision behavior: rows 4 & 8 (2070 whole days), 7 & 11 (3350), 10 & 12 (4141), 13 & 14 (6700) each add the same day count from **different anchors**, so their millis keys differ — they DO NOT merge. Each Z-Date bucket in `zStructsDict` therefore ends up with one operation hit apiece — 15 distinct z-buckets (or 16 if the placeholder resolves to a different key).
 
 Scoring (`scoreZDates`, `ophis_model__operations.js:322`):
 - Sort operation and MSRF matches (`:329-330`).
@@ -173,7 +173,7 @@ Checking our 16 z-rotations against the filter lists (`ophis_model__params.js`):
 | 14 | 6700.5 | — | ".5" rejection → null |
 | 15 | 9246.2 | 9246 | none |
 
-Only bucket #3 (2017-03-26) gets an MSRF tag: NORMAL, msrf_number=260, points=1.
+Only bucket #3 (2017-03-25) gets an MSRF tag: NORMAL, msrf_number=260, points=1.
 
 **Bucket #3 final score under GTE_V8:**
 - `operationSubscore = 1.0`
