@@ -69,6 +69,6 @@ unpacked_full/
 
 ## Notes / gotchas
 
-- The `OPHIS.html` in the repo root is **not** the bootstrap — it’s a v9 field guide (byte-identical to `Ophis_v9_Explained.html`). The real loader is `ophis.html` **inside** the asar.
+- The `OPHIS.html` in the repo root is **not** the bootstrap — it’s the v12 Field Guide (the v9 edition is kept as `Ophis_v9_Explained.html`). The real loader is `ophis.html` **inside** the asar.
 - The whole app is **un-obfuscated** — real names, comments, TODOs, `debugger;` statements. No deobfuscation step is needed.
 - Extraction artifacts (`extracted/`, `unpacked_full/`, `*.asar`) are `.gitignore`-d because these commands regenerate them from the `.exe`.
