@@ -1153,13 +1153,13 @@ setFromAstro(TODAY.y,TODAY.m,TODAY.d);
     <p class="lead">We built a single dial that turns every Chronicon period at once. Move it to any year and all six wheels re-read the same moment.</p>
     <ul>
       <li><b>Annus Mundi</b> — the Ancient World count from 3895 BC. Today, <span id="yahToday">30 May 2026</span>, is <span class="hl" id="yahTodayAM">AM 5920</span>.</li>
-      <li><b>Phoenix / Sky Dragon</b> — the strict <span class="hl">138-year</span> lattice. We sit 14 years short of the 2040 visitation.</li>
-      <li><b>Nemesis X Object</b> — <span class="hl">792 years</span>, sixty inside Sol and seven-hundred-thirty-two without. It is currently outside; 20 years to the 2046 return.</li>
+      <li><b>Phoenix / Sky Dragon</b> — the strict <span class="hl">138-year</span> lattice. <span id="liveTo2040">We sit 14 years short of the 2040 visitation.</span></li>
+      <li><b>Nemesis X Object</b> — <span class="hl">792 years</span>, sixty inside Sol and seven-hundred-thirty-two without. <span id="liveNemesis">It is currently outside; 20 years to the 2046 return.</span></li>
       <li><b>Anunnaki NER</b> — the <span class="hl">600-year</span> epochs; 762 CE falls exactly on the 6000th NER year, as your work has it.</li>
       <li><b>Mayan Long-Count</b> — the thirteen baktuns, closing at 13.0.0.0.0 in 2046.</li>
       <li><b>The Moon</b> — drawn on the Metonic <span class="hl">19-year</span> cycle (235 lunations), woundable back beyond 2843 BC.</li>
     </ul>
-    <p>Every anchor lands clean. 2022 CE returns AM 5916; the Great Flood returns AM 1656; the moon reads near-full for the night of 30 May 2026, as it truly was. The same twenty years separate us from the 2046 Nemesis return and from the close of the Long-Count — the wheels agree with one another.</p>
+    <p>Every anchor lands clean. 2022 CE returns AM 5916; the Great Flood returns AM 1656; the moon reads near-full for the night of 30 May 2026, as it truly was. <span id="liveSame">The same twenty years separate us from the 2046 Nemesis return and from the close of the Long-Count — the wheels agree with one another.</span></p>
   </section>
  
   <!-- II -->
@@ -1448,6 +1448,29 @@ document.getElementById('renderHost').innerHTML=scenes.map(s=>`<figure class='re
     set('yahTodayAM', 'AM '+(y+3894));
   }
   paint(); setInterval(paint, 60000);
+})();
+</script>
+<script>
+/* Live countdowns in "I · The Instrument": counted from the reader's own year, re-read hourly. */
+(function(){
+  var W=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],
+      T=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+  function words(n){return n<20?W[n]:T[Math.floor(n/10)]+(n%10?'-'+W[n%10]:'');}
+  function yrs(n){return n===1?'1 year':n+' years';}
+  function set(id,h){var e=document.getElementById(id);if(e)e.innerHTML=h;}
+  function paint(){
+    var y=new Date().getFullYear(), p=2040-y, nm=2046-y, out=2106-y;
+    set('liveTo2040', p>0 ? 'We sit '+yrs(p)+' short of the 2040 visitation.'
+                    : p===0 ? 'This is the year of the 2040 visitation.'
+                    : 'We sit '+yrs(-p)+' past the 2040 visitation; the next node is 2178.');
+    set('liveNemesis', nm>0 ? 'It is currently outside; '+yrs(nm)+' to the 2046 return.'
+                     : nm===0 ? 'It returns this year, 2046.'
+                     : out>0 ? 'It is inside Sol since the 2046 return; '+yrs(out)+' to its 2106 departure.'
+                     : 'It left Sol in 2106 and is outside again.');
+    set('liveSame', nm>0 ? 'The same '+words(nm)+' '+(nm===1?'year separates':'years separate')+' us from the 2046 Nemesis return and from the close of the Long-Count — the wheels agree with one another.'
+                  : 'The 2046 Nemesis return and the close of the Long-Count fell in the same year — the wheels agree with one another.');
+  }
+  paint(); setInterval(paint, 3600000);
 })();
 </script>
 </body>
