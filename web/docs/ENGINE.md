@@ -273,6 +273,13 @@ subjective event; absent means objective, so every objective event, and every
 file saved before the switch existed, is byte-for-byte what it was. The engine
 never reads it. The desktop app ignores it, and keeps today's X-Date either way.
 
+A subjective event may also carry `"protocol_prime_date": "MM/DD/YYYY"`, the
+X-Date that is Protocol Prime: the day the prediction was made. It is written
+only beside `"projection_kind": "subjective"`, so other files are unchanged.
+When Subjective or ☉ Today is used on a later day, the X-Date still holding
+that date is dropped and today takes its place; an X-Date the operator has
+since edited is never dropped. The engine never reads this field either.
+
 ---
 
 ## 9 · CSV export

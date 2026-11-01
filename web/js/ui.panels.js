@@ -77,6 +77,7 @@
         : "No X-Dates yet. Add at least two known occurrences of the event.") + '</p>';
     }
 
+    var pp = kind === "x" ? Sop.ppIndex(event) : -1;
     var html = '<ol class="date-rows' + (isHHMM ? " with-time" : "") + '">';
     list.forEach(function (entry, index) {
       var instant = T.xDateToInstant(event.scope, entry, event.lat, event.long, []);
@@ -89,7 +90,9 @@
       }
 
       html += '<li class="date-row' + (entry.enabled === false ? " off" : "") + '" data-kind="' + kind + '" data-index="' + index + '">' +
-        '<span class="row-label">' + UI.label(letter, index) + '</span>' +
+        '<span class="row-label">' + UI.label(letter, index) +
+          (index === pp ? '<span class="pp-badge" tabindex="0" role="img" aria-label="' + UI.esc(Sop.PP_TIP) + '"' +
+            ' data-tip="' + UI.esc(Sop.PP_TIP) + '">PP</span>' : "") + '</span>' +
         '<input type="date" class="date-input" value="' + UI.esc(toInputDate(entry.date)) + '"' +
           ' min="0001-01-01" max="9999-12-31" data-field="date" data-focus-key="' + kind + '-' + index + '-date"' +
           ' aria-label="' + UI.labelPlain(letter, index) + ' date">' +
@@ -112,7 +115,7 @@
     var subjective = Sop.isSubjective(event);
     var tip = "Protocol Prime. Objective: dates not personally tied to you — a market, a team. " +
       "Subjective: your own or a client’s dates, which must end with the day the projection is run " +
-      "as the last X-Date. Choosing Subjective adds today.";
+      "as the last X-Date. Choosing Subjective adds today as Protocol Prime; on a later day it replaces the old one.";
     return '<div class="kind-row"><span class="kind-label">Projection</span>' +
       '<div class="segmented" role="group" aria-label="Objective or subjective projection" data-tip="' + UI.esc(tip) + '">' +
       [[Sop.OBJECTIVE, "Objective"], [Sop.SUBJECTIVE, "Subjective"]].map(function (pair) {
@@ -144,7 +147,7 @@
         '<span class="count' + (enabled < C.MINIMUM_NUMBER_OF_X_DATES ? " warn" : "") + '">' + enabled + " of " + event.x_dates.length + '</span>' +
         '<span class="spacer"></span>' +
         '<button class="btn small" data-action="add-x" data-tip="Add an X-Date">+ Add</button>' +
-        '<button class="btn small" data-action="add-today" data-focus-key="add-today" data-tip="Protocol Prime: add today (the Current time date) as an X-Date, in date order">☉ Today</button>' +
+        '<button class="btn small" data-action="add-today" data-focus-key="add-today" data-tip="Protocol Prime: add today (the Current time date) as an X-Date, in date order. On a later day it replaces the earlier Protocol Prime date.">☉ Today</button>' +
         '<button class="btn small" data-action="sort-x" data-tip="Sort X-Dates oldest first">Sort</button>' +
         '<button class="btn small ghost" data-action="clear-x" data-tip="Remove every X-Date">Clear</button>' +
       '</header>' +

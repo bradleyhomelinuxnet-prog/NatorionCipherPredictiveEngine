@@ -255,6 +255,22 @@ async function main() {
       await page.evaluate(() => document.activeElement.getAttribute("data-kind")) === "subjective" &&
       await page.$$eval("#panel-xdates .date-row", rows => rows.length) === xAfter && await sopIds() === "age");
     check("…and the saved file now says subjective", /"projection_kind": "subjective"/.test(await page.evaluate(() => Ophis.Store.exportOph())));
+    const ppRow = () => page.$$eval("#panel-xdates .date-row", rows => rows.findIndex(r => !!r.querySelector(".pp-badge")));
+    check("today's X-Date carries the PP badge, with its tooltip", await ppRow() === xAfter - 1 &&
+      /Protocol Prime: the date this prediction was made\. It is replaced each time you re-run\./.test(
+        await page.getAttribute("#panel-xdates .pp-badge", "data-tip")), String(await ppRow()));
+    const ppBefore = await page.evaluate(() => Ophis.Store.currentEvent().protocol_prime_date);
+    await page.evaluate(() => Ophis.Store.setNowOffset((Ophis.Store.globalOptions.local_time_offset_in_millis || 0) + 86400000));
+    const ppToday = await page.evaluate(() => Ophis.Time.formatUtcDateOnly(Ophis.Store.nowInstant()));
+    await page.click('[data-action="add-today"]');
+    check("a re-run the next day replaces Protocol Prime, with a toast",
+      (await page.textContent("#toast")).trim() === "Protocol Prime moved from " + ppBefore + " to " + ppToday + "." &&
+      await page.$$eval("#panel-xdates .date-row", rows => rows.length) === xAfter &&
+      await page.evaluate(d => !Ophis.Store.currentEvent().x_dates.some(x => x.date === d), ppBefore) &&
+      await ppRow() === xAfter - 1, await page.textContent("#toast"));
+    check("…and the saved file records the new Protocol Prime",
+      (await page.evaluate(() => Ophis.Store.exportOph())).includes('"protocol_prime_date": "' + ppToday + '"'));
+    await page.evaluate(() => Ophis.Store.setNowOffset((Ophis.Store.globalOptions.local_time_offset_in_millis || 0) - 86400000));
     await page.click('[data-action="read-windows"]');
     const caption = await page.textContent("#panel-output .windows-table caption").catch(() => "");
     check("Read results as 7-day windows switches the rows to windows", /in \d+ windows? of up to 7 days/.test(caption) &&

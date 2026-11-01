@@ -216,6 +216,12 @@
       // Protocol Prime (ophis.sop.js). Absent, or anything else, means objective;
       // only a subjective event carries the field.
       if (raw.projection_kind === "subjective") event.projection_kind = "subjective";
+      // Which X-Date is Protocol Prime, by its date. Read only for a subjective
+      // event, and only as a real MM/DD/YYYY date; anything else is dropped.
+      if (event.projection_kind === "subjective" && typeof raw.protocol_prime_date === "string" &&
+          /^\d{2}\/\d{2}\/\d{4,}$/.test(raw.protocol_prime_date) && T.parseCalendarDate(raw.protocol_prime_date, [])) {
+        event.protocol_prime_date = raw.protocol_prime_date;
+      }
 
       events.push(event);
     });
@@ -274,7 +280,13 @@
       out.day_scope_start_time_in_millis = event.day_scope_start_time_in_millis || 0;
       // Written only for a subjective event, so an objective one, and every
       // file saved before the switch existed, stays byte-identical.
-      if (event.projection_kind === "subjective") out.projection_kind = "subjective";
+      if (event.projection_kind === "subjective") {
+        out.projection_kind = "subjective";
+        // Likewise the Protocol Prime record: a subjective event only.
+        if (typeof event.protocol_prime_date === "string" && event.protocol_prime_date) {
+          out.protocol_prime_date = event.protocol_prime_date;
+        }
+      }
       return out;
     });
 

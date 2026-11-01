@@ -177,13 +177,17 @@
     });
 
     /* ---- Protocol Prime and the SOP (ophis.sop.js) ---- */
+    function ppMoved(result) { return "Protocol Prime moved from " + result.from + " to " + result.to + "."; }
     UI.on(hosts.xDates, "click", '[data-action="add-today"]', function () {
-      if (Store.addToday().added) UI.toast("Added today as a control — every historical date now casts against it.", "ok");
+      var result = Store.addToday();
+      if (result.from) UI.toast(ppMoved(result), "ok");
+      else if (result.added) UI.toast("Added today as a control — every historical date now casts against it.", "ok");
       else UI.toast("Today is already a control.");
     });
     UI.on(hosts.xDates, "click", '[data-action="set-kind"]', function (e, target) {
       var result = Store.setProjectionKind(target.getAttribute("data-kind"));
-      if (result.changed && target.getAttribute("data-kind") === Ophis.Sop.SUBJECTIVE) {
+      if (result.from) UI.toast(ppMoved(result), "ok");
+      else if (result.changed && target.getAttribute("data-kind") === Ophis.Sop.SUBJECTIVE) {
         UI.toast(result.added
           ? "Subjective: today added as an X-Date, per Protocol Prime."
           : "Subjective: today is already an X-Date.", result.added ? "ok" : undefined);

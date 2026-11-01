@@ -336,6 +336,13 @@ input[type="date"], input[type="time"] { font-family: var(--mono); font-size: 12
 }
 .row-label.alpha { color: var(--gold-2); }
 .row-label.beta { color: var(--dim); }
+/* Protocol Prime: the X-Date that is the day the prediction was made. */
+.pp-badge {
+  display: block; width: max-content; margin: 1px 0 0 auto; padding: 0 3px;
+  font-size: 8.5px; line-height: 12px; font-weight: 700; letter-spacing: .06em;
+  color: var(--gold-2); border: 1px solid var(--gold); border-radius: 3px; cursor: help;
+}
+.pp-badge:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 .row-label.small { min-width: 18px; font-size: 10px; }
 
 /* ----------------------------------------------------------------- dates */

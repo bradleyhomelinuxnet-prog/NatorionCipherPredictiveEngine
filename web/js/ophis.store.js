@@ -245,10 +245,13 @@
 
   /* ------------------------------------- Protocol Prime (ophis.sop.js) */
 
-  /** ☉ Today: the Current time date as an X-Date, in date order, never twice. */
+  /**
+   * ☉ Today: the Current time date as an X-Date, in date order, never twice.
+   * A re-run on a later day replaces the old Protocol Prime date (Sop.rerun).
+   */
   Store.addToday = function () {
-    var result = Sop.addToday(Store.currentEvent(), Store.nowInstant());
-    if (result.added) Store.commit("dates");
+    var result = Sop.rerun(Store.currentEvent(), Store.nowInstant());
+    if (result.changed) Store.commit("dates");
     return result;
   };
 
@@ -261,15 +264,18 @@
   Store.setProjectionKind = function (kind) {
     var event = Store.currentEvent();
     var subjective = kind === Sop.SUBJECTIVE;
-    if (subjective === Sop.isSubjective(event)) return { added: false, changed: false };
-    var result = { added: false, changed: true };
+    if (subjective === Sop.isSubjective(event)) return { added: false, changed: false, from: null };
+    var result = { added: false, changed: true, from: null };
     if (subjective) {
       event.projection_kind = Sop.SUBJECTIVE;
-      result.added = Sop.addToday(event, Store.nowInstant()).added;
+      var rerun = Sop.rerun(event, Store.nowInstant());
+      result.added = rerun.added;
+      result.from = rerun.from;
+      result.to = rerun.to;
     } else {
       delete event.projection_kind;
     }
-    Store.commit(result.added ? "dates" : "event-kind");
+    Store.commit(result.added || result.from ? "dates" : "event-kind");
     return result;
   };
 

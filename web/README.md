@@ -40,7 +40,7 @@ the `.oph` format.
 
 | Panel | |
 |---|---|
-| **X-Dates** | The input dates. Enable, disable, insert, sort, delete. **☉ Today** adds the Current time date, in date order, never twice. **Objective / Subjective** is Protocol Prime: a subjective cast (your own or a client's dates) must end with the day it is run, so choosing it adds today. Under the dates, non-blocking warnings from the author's operating procedure: anchors under 6 days apart; X-Dates more than 3 years old (use 5 or more, and read the results as windows); subjective, but today missing or not last. None of them stops a cast. |
+| **X-Dates** | The input dates. Enable, disable, insert, sort, delete. **☉ Today** adds the Current time date, in date order, never twice. **Objective / Subjective** is Protocol Prime: a subjective cast (your own or a client's dates) must end with the day it is run, so choosing it adds today. Protocol Prime is only the day the prediction is made: that X-Date wears a small **PP** badge, and a re-run on a later day (Subjective or ☉ Today) drops the old PP date and adds today in its place, never both. A PP date you have edited by hand is left alone. Under the dates, non-blocking warnings from the author's operating procedure: anchors under 6 days apart; X-Dates more than 3 years old (use 5 or more, and read the results as windows); subjective, but today missing or not last. None of them stops a cast. |
 | **Intervals** | Every pair and its day-count, with any MSRF match on the interval itself. |
 | **T-Dates** | Optional target dates — with any enabled, only Z-Dates landing on them are shown. |
 | **Event** | Name, notes, scope (Days or sunset-based HH:MM), location, scoring system. |

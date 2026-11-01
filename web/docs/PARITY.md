@@ -137,7 +137,8 @@ normal JSON. Both read either.
 
 A subjective event (Protocol Prime) also carries `"projection_kind":
 "subjective"`. Objective events never do, so their files are unchanged; the
-engine does not read the field, and v12 ignores it.
+engine does not read the field, and v12 ignores it. A subjective event may
+add `"protocol_prime_date"`, which X-Date is Protocol Prime; same rules.
 
 ### 4 · Error wording
 

@@ -793,6 +793,106 @@
       assert.no("projection_kind" in FileIO.parse(JSON.stringify(odd)).events[0], "anything else reads as objective");
     });
 
+    test("Protocol Prime: a re-run on a later day replaces the old PP date", function () {
+      var evt = event({ x_dates: xdates(["01/01/2026", "06/06/2026", "01/10/2027"]), projection_kind: Sop.SUBJECTIVE,
+        protocol_prime_date: "01/10/2027" });
+      assert.eq(Sop.ppIndex(evt), 2, "the recorded date is the PP X-Date");
+      var result = Sop.rerun(evt, NOW);
+      assert.deep(dates(evt), ["01/01/2026", "06/06/2026", "01/19/2027"], "01/10/2027 dropped, today added, never both");
+      assert.eq(result.from, "01/10/2027");
+      assert.eq(result.to, "01/19/2027");
+      assert.eq(evt.protocol_prime_date, "01/19/2027", "the record moves to today");
+      assert.eq(Sop.ppIndex(evt), 2);
+      var later = event({ x_dates: xdates(["01/01/2026", "01/10/2027", "03/01/2027"]), projection_kind: Sop.SUBJECTIVE,
+        protocol_prime_date: "01/10/2027" });
+      Sop.rerun(later, NOW);
+      assert.deep(dates(later), ["01/01/2026", "01/19/2027", "03/01/2027"], "today goes in at its place in date order");
+    });
+
+    test("Protocol Prime: a same-day re-run changes nothing", function () {
+      var evt = event({ x_dates: xdates(["01/01/2026", "06/06/2026", "01/19/2027"]), projection_kind: Sop.SUBJECTIVE,
+        protocol_prime_date: "01/19/2027" });
+      var before = JSON.stringify(evt);
+      var result = Sop.rerun(evt, NOW);
+      assert.eq(JSON.stringify(evt), before, "the event is untouched");
+      assert.deep([result.added, result.from, result.changed], [false, null, false]);
+      var evening = new Date(NOW.getTime() + 20 * 3600 * 1000);
+      if (Sop.todayText(evt, evening) === "01/19/2027") {
+        Sop.rerun(evt, evening);
+        assert.eq(JSON.stringify(evt), before, "later the same day, still untouched");
+      }
+    });
+
+    test("Protocol Prime: with no record, today is added and recorded", function () {
+      var evt = event({ x_dates: xdates(["01/01/2026", "06/06/2026"]), projection_kind: Sop.SUBJECTIVE });
+      var result = Sop.rerun(evt, NOW);
+      assert.deep(dates(evt), ["01/01/2026", "06/06/2026", "01/19/2027"]);
+      assert.deep([result.added, result.from], [true, null], "nothing is dropped: there is no guess at an old PP");
+      assert.eq(evt.protocol_prime_date, "01/19/2027");
+      var typed = event({ x_dates: xdates(["01/01/2026", "01/19/2027"]), projection_kind: Sop.SUBJECTIVE });
+      var r2 = Sop.rerun(typed, NOW);
+      assert.deep([r2.added, typed.x_dates.length, typed.protocol_prime_date, r2.changed], [false, 2, "01/19/2027", true],
+        "today already typed in: recorded, not duplicated");
+      var junk = event({ x_dates: xdates(["01/01/2026", "06/06/2026"]), protocol_prime_date: "next tuesday" });
+      Sop.rerun(junk, NOW);
+      assert.deep(dates(junk), ["01/01/2026", "06/06/2026", "01/19/2027"], "an unreadable record counts as none");
+      assert.eq(junk.protocol_prime_date, "01/19/2027");
+    });
+
+    test("Protocol Prime: a PP date the user edited is not removed", function () {
+      var evt = event({ x_dates: xdates(["01/01/2026", "06/06/2026", "01/10/2027"]), projection_kind: Sop.SUBJECTIVE,
+        protocol_prime_date: "01/10/2027" });
+      evt.x_dates[2].date = "01/12/2027";   // the operator changed it by hand
+      assert.eq(Sop.ppIndex(evt), -1, "an edited PP X-Date is no longer PP");
+      var result = Sop.rerun(evt, NOW);
+      assert.deep(dates(evt), ["01/01/2026", "06/06/2026", "01/12/2027", "01/19/2027"], "kept, and today added");
+      assert.eq(result.from, null);
+      assert.eq(evt.protocol_prime_date, "01/19/2027");
+      var back = event({ x_dates: xdates(["01/01/2026", "02/01/2027"]), projection_kind: Sop.SUBJECTIVE,
+        protocol_prime_date: "02/01/2027" });
+      Sop.rerun(back, NOW);
+      assert.deep([dates(back), back.protocol_prime_date], [["01/01/2026", "01/19/2027", "02/01/2027"], "02/01/2027"],
+        "Current time set before the record: nothing dropped, record kept");
+    });
+
+    test("Protocol Prime: the SOP warning names a stale PP date", function () {
+      var evt = event({ x_dates: xdates(["01/01/2026", "06/06/2026", "01/10/2027"]), projection_kind: Sop.SUBJECTIVE,
+        protocol_prime_date: "01/10/2027" });
+      var w = Sop.warnings(evt, NOW);
+      assert.eq(ids(w), "protocol-prime");
+      assert.ok(/Protocol Prime is still 01\/10\/2027/.test(w[0].text) && /drops 01\/10\/2027 and adds today \(01\/19\/2027\)/.test(w[0].text), w[0].text);
+      Sop.rerun(evt, NOW);
+      assert.eq(ids(Sop.warnings(evt, NOW)), "", "after the re-run, nothing to say");
+    });
+
+    test("Protocol Prime: the record is saved only for a subjective event; old files round-trip byte-identically", function () {
+      var objective = event({ x_dates: xdates(["01/01/2026", "06/06/2026"]) });
+      var plain = FileIO.serialize([objective]);
+      objective.protocol_prime_date = "06/06/2026";
+      assert.eq(FileIO.serialize([objective]), plain, "an objective event never writes the record");
+      var oldSubjective = JSON.parse(JSON.stringify(objective));
+      delete oldSubjective.protocol_prime_date;
+      oldSubjective.projection_kind = Sop.SUBJECTIVE;
+      var oldText = FileIO.serialize([oldSubjective]);
+      assert.no(/protocol_prime_date/.test(oldText), "a subjective file from before the record");
+      assert.eq(FileIO.serialize(FileIO.parse(oldText).events), oldText, "round-trips unchanged");
+      assert.eq(FileIO.serialize(FileIO.parse(plain).events), plain, "and so does an objective file");
+      var withPP = JSON.parse(JSON.stringify(oldSubjective));
+      withPP.protocol_prime_date = "06/06/2026";
+      var saved = FileIO.serialize([withPP]);
+      assert.eq(saved, oldText.replace('"projection_kind": "subjective"\n', '"projection_kind": "subjective",\n      "protocol_prime_date": "06/06/2026"\n'),
+        "one field added after the kind, nothing else moved");
+      var read = FileIO.parse(saved).events[0];
+      assert.eq(read.protocol_prime_date, "06/06/2026");
+      assert.eq(FileIO.serialize([read]), saved, "round trip");
+      var odd = JSON.parse(saved);
+      odd.iso_events[0].protocol_prime_date = "6/6/26";
+      assert.no("protocol_prime_date" in FileIO.parse(JSON.stringify(odd)).events[0], "a malformed record is dropped");
+      delete odd.iso_events[0].projection_kind;
+      odd.iso_events[0].protocol_prime_date = "06/06/2026";
+      assert.no("protocol_prime_date" in FileIO.parse(JSON.stringify(odd)).events[0], "and an objective event's is ignored");
+    });
+
     test("the kind changes nothing the engine produces", function () {
       var evt = event(Object.assign({ x_dates: xdates(["01/01/2024", "06/06/2025", "01/19/2027"]) }, NO_FILTERS));
       var rows = rowsOf(run(evt));
@@ -1120,12 +1220,20 @@
         Store.setNowOffset(T.utcMillis(2027, 0, 19) - T.floorToUtcMidnight(new Date()).getTime());
         Store.dirty = false;
         var today = T.formatUtcDateOnly(Store.nowInstant());
-        assert.deep(Store.setProjectionKind("subjective"), { added: true, changed: true });
+        assert.deep(Store.setProjectionKind("subjective"), { added: true, changed: true, from: null, to: today });
         assert.ok(Store.dirty, "choosing a kind is an edit");
         assert.eq(Store.currentEvent().x_dates[3].date, today, "today is the last X-Date");
-        assert.deep(Store.addToday(), { added: false, index: 3 }, "☉ Today refuses a second copy");
+        assert.eq(Store.currentEvent().protocol_prime_date, today, "and is recorded as Protocol Prime");
+        var again = Store.addToday();
+        assert.deep([again.added, again.index, again.from], [false, 3, null], "☉ Today refuses a second copy");
         assert.ok(Store.load(), "the session is restored");
         assert.eq(Store.currentEvent().projection_kind, "subjective", "and is still subjective");
+        assert.eq(Store.currentEvent().protocol_prime_date, today, "with its Protocol Prime");
+        Store.setNowOffset(T.utcMillis(2027, 0, 20) - T.floorToUtcMidnight(new Date()).getTime());
+        var moved = Store.addToday();
+        assert.deep([moved.from, moved.to], [today, "01/20/2027"], "the next day, ☉ Today moves Protocol Prime");
+        assert.eq(Store.currentEvent().x_dates.length, 4, "replaced, not added beside it");
+        assert.eq(Store.currentEvent().x_dates[3].date, "01/20/2027");
         Store.setProjectionKind("objective");
         assert.no("projection_kind" in Store.currentEvent(), "objective is the absent field");
         assert.eq(Store.currentEvent().x_dates.length, 4, "today stays");

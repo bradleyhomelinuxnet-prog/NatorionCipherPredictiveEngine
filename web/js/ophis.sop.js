@@ -11,6 +11,11 @@
        operator, such as a market or a team. Subjective: the operator's or a
        client's own dates, which must END with the day the projection is run,
        as the last X-Date.
+     · Protocol Prime (PP) is only the date the prediction is made. When a
+       subjective prediction is re-run on a later day, the old PP date is
+       DROPPED and REPLACED by the new day's date, never kept beside it
+       (Jason Breshears, PSYFR tutorial, Aug 7 2025). The event remembers
+       which X-Date is PP in protocol_prime_date; see S.rerun.
      · Warnings: anchors under 6 days apart; X-Dates more than 3 years before
        the projection date; subjective, but today missing or not last.
      · 7-day windows: a way of reading the same Z-Dates as periods.
@@ -39,6 +44,10 @@
   S.WINDOW_DAYS = 7;
 
   var YEAR_MS = 365.25 * C.MILLIS_PER_DAY;
+
+  /** The event field naming the Protocol Prime X-Date by its date, MM/DD/YYYY. */
+  S.PP_FIELD = "protocol_prime_date";
+  S.PP_TIP = "Protocol Prime: the date this prediction was made. It is replaced each time you re-run.";
 
   S.isSubjective = function (event) { return !!event && event.projection_kind === S.SUBJECTIVE; };
 
@@ -80,6 +89,64 @@
     }
     list.splice(at, 0, T.newXDate(text, C.TIMESTAMP_TO_USE_WITHOUT_HH_MM_SCOPE));
     return { added: true, index: at };
+  };
+
+  /* The recorded Protocol Prime date as a day number, or null if there is no
+     record or it is not a readable MM/DD/YYYY date. */
+  function recordedDay(event) {
+    var text = event[S.PP_FIELD];
+    return typeof text === "string" ? dayNumber(text) : null;
+  }
+
+  /**
+   * Which X-Date is Protocol Prime: the first whose date is exactly the
+   * recorded one, or -1. A PP X-Date the operator has since edited to another
+   * date is no longer PP, so it can never be dropped by a re-run.
+   */
+  S.ppIndex = function (event) {
+    if (recordedDay(event) === null) return -1;
+    var list = event.x_dates || [];
+    for (var i = 0; i < list.length; i++) if (list[i].date === event[S.PP_FIELD]) return i;
+    return -1;
+  };
+
+  /**
+   * Protocol Prime, re-run: what Subjective and ☉ Today do.
+   *
+   *   · A day after the recorded PP date: the X-Date still holding that date
+   *     is removed, today goes in at its place in date order, and the record
+   *     moves to today.
+   *   · The same day: no date is moved or dropped (today is only put back if
+   *     it was deleted, as ☉ Today always does).
+   *   · No record: today is added and recorded.
+   *   · A record later than today (Current time set back): nothing is dropped
+   *     and the record is left alone. The rule only ever moves PP forward.
+   *
+   * @returns {{added: boolean, index: number, from: string|null, to: string, changed: boolean}}
+   *   from is the dropped PP date, or null when nothing was dropped.
+   */
+  S.rerun = function (event, now) {
+    var todayText = S.todayText(event, now);
+    var today = dayNumber(todayText);
+    var recorded = recordedDay(event);
+    var before = event[S.PP_FIELD];
+    var from = null;
+    if (recorded !== null && today > recorded) {
+      var old = S.ppIndex(event);
+      if (old >= 0) {
+        from = event.x_dates[old].date;
+        event.x_dates.splice(old, 1);
+      }
+    }
+    var result = S.addToday(event, now);
+    if (recorded === null || today > recorded) event[S.PP_FIELD] = todayText;
+    return {
+      added: result.added,
+      index: result.index,
+      from: from,
+      to: todayText,
+      changed: result.added || from !== null || event[S.PP_FIELD] !== before
+    };
   };
 
   /**
@@ -137,13 +204,18 @@
       var last = enabled.length ? enabled[enabled.length - 1] : null;
       if (!last || dayNumber(last.x.date) !== today) {
         var has = enabled.some(function (e) { return dayNumber(e.x.date) === today; });
+        var stale = S.ppIndex(event) >= 0 && recordedDay(event) < today ? event[S.PP_FIELD] : null;
         out.push({
           id: "protocol-prime",
           text: has
             ? "Subjective: today (" + todayText + ") is an X-Date but not the last one. Protocol Prime " +
               "wants the day the projection is run as the LAST X-Date, so later dates are outside it."
-            : "Subjective: today (" + todayText + ") is not an X-Date. Protocol Prime wants the day the " +
-              "projection is run as the last X-Date; ☉ Today adds it."
+            : stale
+              ? "Subjective: Protocol Prime is still " + stale + ", the day this prediction was first made. " +
+                "Protocol Prime is only the day the prediction is made, so a re-run replaces it: ☉ Today " +
+                "drops " + stale + " and adds today (" + todayText + ") as the last X-Date."
+              : "Subjective: today (" + todayText + ") is not an X-Date. Protocol Prime is the day the " +
+                "prediction is made, as the last X-Date; ☉ Today adds it, and on a later re-run replaces it."
         });
       }
     }
