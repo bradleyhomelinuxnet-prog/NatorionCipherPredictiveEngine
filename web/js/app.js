@@ -576,6 +576,8 @@
         '<li>Files are written only when you ask for them, through the browser\'s own download.</li>' +
         '<li>Saved <code>.oph</code> is ordinary JSON (the desktop app rewrites commas inside names and notes).</li>' +
       '</ul>' +
+      '<h3>Using the dates</h3>' +
+      '<p class="disclaimer-about">' + UI.esc(UI.DISCLAIMER) + '</p>' +
       '<p class="fineprint">Ophis is a worldbuilding and study instrument after the Archaix thesis of Jason Breshears. ' +
       'It is presented as that thesis, not as established science. Not affiliated with Archaix.</p>', {});
   };

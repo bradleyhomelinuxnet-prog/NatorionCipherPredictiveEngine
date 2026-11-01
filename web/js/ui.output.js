@@ -207,6 +207,8 @@
       (best.action ? ' <button class="btn small" ' + best.action + '>Turn it off</button>' : "") + '</p>';
   }
 
+  function disclaimer() { return '<p class="disclaimer">' + UI.esc(UI.DISCLAIMER) + '</p>'; }
+
   O.render = function (host) {
     var event = Store.currentEvent();
     var results = Store.results;
@@ -250,7 +252,7 @@
     }
 
     if (windows) {
-      host.innerHTML = head + windowsTable(results);
+      host.innerHTML = head + windowsTable(results) + disclaimer();
       return;
     }
 
@@ -313,7 +315,7 @@
         '</tr>';
     });
 
-    host.innerHTML = html + "</tbody></table></div>";
+    host.innerHTML = html + "</tbody></table></div>" + disclaimer();
   };
 
   /**

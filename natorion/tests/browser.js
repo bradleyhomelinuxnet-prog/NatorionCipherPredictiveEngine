@@ -127,6 +127,8 @@ async function main() {
       check("the " + s + " screen opens", visible);
       await shot(page, s);
     }
+    check("the guide says Ophis is a prediction tool, not a betting tool", await page.evaluate(() =>
+      document.getElementById("disclaimer").textContent === "Ophis is a prediction tool, not a betting tool. How you use its dates is your decision and your responsibility; there are no guarantees. Never wager money you and your family can't live without."));
     check("the guide lists the three MSRF sets with their counts", await page.evaluate(() => {
       const t = document.getElementById("msrfSets").textContent, n = re => +((re.exec(t) || [])[1] || 0);
       return n(/Vortex, within 0\.1 \((\d+)\)/) === NC.C.MSRF_VORTEX.length && n(/Important \((\d+)\)/) === NC.C.MSRF_IMPORTANT.length && n(/Normal \((\d+)\)/) === NC.C.MSRF_NORMAL.length && NC.C.MSRF_NORMAL.length > 0;
