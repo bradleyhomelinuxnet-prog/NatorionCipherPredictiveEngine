@@ -59,7 +59,13 @@
     if (!Number.isFinite(Y)) { out.textContent = "Give Y a number."; return; }
     var z = c.fn(Y), m = NC.msrfMatch(NC.round1(NC.round2(z)));
     out.textContent = "normalised  " + c.normalized + "\nZ = " + NC.round2(z) + " days from X" + c.startingX +
-      (m ? "\nMSRF " + m.cls.name.toLowerCase() + " match: " + m.number + " (×" + m.cls.mult + ")" : "\nno MSRF match");
+      (m ? "\nMSRF " + m.cls.name.toLowerCase() + " match: " + m.number + " (×" + m.cls.mult + ")" : "\nno MSRF match") +
+      (NC.formulas ? tierLine(NC.formulas.magnitude(NC.round2(z))) + "\nphi shadow of Z  " + NC.round2(NC.formulas.phiShadow(z).shadow) : "");
+  }
+  // The MSRF tier of the matched (or nearest whole) number: see formulas.html.
+  function tierLine(t) {
+    if (!t.tier) return "\nno MSRF tier";
+    return "\n" + t.tier + (t.apex ? " (Apex " + t.apex + ")" : "") + " · " + t.dims + (t.apex ? "+" : "") + " dimensions" + (t.exact ? "" : " · nearest whole " + t.number);
   }
 
   /* The constants panel: every name the grammar knows, grouped, with a

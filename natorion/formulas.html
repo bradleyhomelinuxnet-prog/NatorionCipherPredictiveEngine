@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MSRF Formulas</title>
+<meta name="description" content="Natorion Cipher formulas: the MSRF Magnitude calculator (Tiers I–VII by dimensions of arithmetic) and the Phi Shadow, x − x/φ = x/φ².">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%2308080d' stroke='%23d8a943' stroke-width='3'/%3E%3Cpath d='M32 8 L32 56 M14 20 L50 44 M50 20 L14 44' stroke='%23f3d27a' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23d3402f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08080d; --panel: #14141f; --ink: #ece5d2; --ink-2: #c9c0a8; --dim: #938c77;
+  --line: rgba(216,169,67,.22); --line-2: rgba(216,169,67,.45);
+  --gold: #d8a943; --gold-2: #f3d27a; --cyan: #54b8c9; --red: #e25544; --violet: #9b7fd0;
+  --field: rgba(8,8,13,.7);
+  --f-display: "Cinzel", Georgia, serif; --f-prose: "EB Garamond", Georgia, serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f3ede0; --panel: #fffaf0; --ink: #1f1a12; --ink-2: #3f372a; --dim: #6f6552;
+    --line: rgba(138,100,18,.22); --line-2: rgba(138,100,18,.45);
+    --gold: #8a6412; --gold-2: #6b4c08; --cyan: #1f6f7d; --red: #b0301f; --violet: #5d3f99; --field: #fff;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f3ede0; --panel: #fffaf0; --ink: #1f1a12; --ink-2: #3f372a; --dim: #6f6552;
+  --line: rgba(138,100,18,.22); --line-2: rgba(138,100,18,.45);
+  --gold: #8a6412; --gold-2: #6b4c08; --cyan: #1f6f7d; --red: #b0301f; --violet: #5d3f99; --field: #fff;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 19px/1.5 var(--f-prose); }
+a { color: var(--gold-2); }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+h1 { font: 700 clamp(26px, 5vw, 38px)/1.1 var(--f-display); letter-spacing: .06em; margin: 0; color: var(--gold-2); }
+h2 { font: 700 20px/1.2 var(--f-display); letter-spacing: .08em; margin: 0 0 4px; color: var(--gold); }
+.lede { color: var(--ink-2); margin: 12px 0 0; max-width: 62ch; }
+nav a { font: 500 14px var(--f-mono); margin-left: 14px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 20px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; }
+.card p.sub { color: var(--dim); margin: 0 0 12px; font-size: 16px; }
+label { font: 500 13px var(--f-mono); color: var(--dim); display: block; margin-bottom: 4px; letter-spacing: .04em; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+input[type=number], select { font: 500 18px var(--f-mono); background: var(--field); color: var(--ink); border: 1px solid var(--line-2); border-radius: 6px; padding: 8px 10px; width: 150px; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--gold-2); outline-offset: 2px; }
+.out { font: 15px/1.6 var(--f-mono); margin-top: 14px; }
+.out dt { color: var(--dim); }
+.out dd { margin: 0 0 6px; color: var(--ink); }
+.big { font: 600 30px var(--f-mono); color: var(--gold-2); }
+.meter { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin: 8px 0 4px; }
+.meter i { height: 12px; border-radius: 3px; background: var(--line); }
+.meter i.on { background: var(--gold); }
+.meter.apex i.on { background: var(--red); }
+.pill { display: inline-block; font: 600 12px var(--f-mono); padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
+.pill.normal { color: var(--cyan); } .pill.important { color: var(--gold); } .pill.vortex { color: var(--red); } .pill.none { color: var(--dim); }
+table { width: 100%; border-collapse: collapse; font: 14px var(--f-mono); }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--dim); font-weight: 500; }
+.scroll { overflow-x: auto; }
+.tiers { margin-top: 20px; }
+.tier { border-top: 1px solid var(--line); padding: 12px 0; }
+.tier h3 { font: 700 15px var(--f-display); letter-spacing: .08em; margin: 0 0 6px; color: var(--ink); display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.tier h3 small { font: 13px var(--f-mono); color: var(--dim); letter-spacing: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chips button { font: 13px var(--f-mono); background: transparent; color: var(--ink-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; cursor: pointer; }
+.chips button:hover { border-color: var(--gold); color: var(--gold-2); }
+.chips button.hit { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+code { font: 14px var(--f-mono); background: var(--field); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; }
+.eqs code { display: inline-block; margin: 3px 6px 3px 0; cursor: pointer; }
+.fine { color: var(--dim); font-size: 15px; }
+.note { border-left: 3px solid var(--gold); padding: 4px 12px; color: var(--ink-2); font-size: 16px; margin: 12px 0 0; }
+.toggle { font: 13px var(--f-mono); background: transparent; border: 1px solid var(--line-2); color: var(--ink-2); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>MSRF Formulas</h1>
+    <nav><a href="index.html">Natorion Cipher</a><a href="FORMULAS.md">Notes</a><button class="toggle" id="theme" type="button">Theme</button></nav>
+  </header>
+  <p class="lede">Two tools beside the Ophis v12 engine. They read its numbers and never change its scores: the <b>MSRF Magnitude</b> (how many dimensions of arithmetic a number appears in) and the <b>Phi Shadow</b>.</p>
+
+  <div class="grid">
+    <section class="card" aria-labelledby="mag-h">
+      <h2 id="mag-h">MSRF Magnitude</h2>
+      <p class="sub">Type a Z-value or MSRF number. The app class comes from v12's own match rule; the tier and dimension count come from the Ophis 2.0 hierarchy.</p>
+      <div class="row">
+        <div><label for="magIn">Number</label><input id="magIn" type="number" step="any" value="138"></div>
+      </div>
+      <div class="out" id="magOut" aria-live="polite"></div>
+    </section>
+
+    <section class="card" aria-labelledby="sh-h">
+      <h2 id="sh-h">Phi Shadow</h2>
+      <p class="sub">Divide by φ. The difference between the answer and the root is the shadow, and it equals the answer divided by φ again: x − x/φ = x/φ².</p>
+      <div class="row">
+        <div><label for="shIn">Root</label><input id="shIn" type="number" step="any" value="138"></div>
+        <div><label for="shPhi">φ</label>
+          <select id="shPhi"><option value="exact">1.6180339887 (true)</option><option value="ophis">1.618 (OPH_PHI)</option></select></div>
+      </div>
+      <div class="out" id="shOut" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:16px" aria-labelledby="lad-h">
+    <h2 id="lad-h">Shadow ladder</h2>
+    <p class="sub">The root divided by φ again and again. Each rung is the shadow of the rung two above it, checked against the MSRF table.</p>
+    <div class="scroll"><table id="ladder"><thead><tr><th>Step</th><th>Value</th><th>Nearest whole</th><th>App class</th><th>Tier</th><th>Dimensions</th></tr></thead><tbody></tbody></table></div>
+    <p class="note">360 → 222.49 → <b>137.51</b>: the shadow of a full circle is the golden angle, 137.5°, whose nearest whole is 138 (Tier II). v12 itself does not count 137.5 as a match: a value ending in exactly .5 is never one.</p>
+  </section>
+
+  <section class="card" style="margin-top:16px" aria-labelledby="eq-h">
+    <h2 id="eq-h">Use it as an Operation</h2>
+    <p class="sub">The shadow written in the Operations grammar. Click one to copy it, then paste it into the try-it box or add it as an extra operation.</p>
+    <p class="eqs" id="eqs"></p>
+    <p class="fine">With OPH_PHI = 1.618 the two forms differ in the third decimal (for Y = 138: 52.714 against 52.710). With the true φ they are the same number.</p>
+  </section>
+
+  <section class="tiers card" style="margin-top:16px" aria-labelledby="t-h">
+    <h2 id="t-h">The tiers</h2>
+    <p class="sub">A hierarchy by orders of magnitude. Click a number to load it into the calculator. Apex Projections (Tier VII) that target a date also hit by a lower tier override the Core Algorithm's dates.</p>
+    <div id="tierList"></div>
+  </section>
+
+  <p class="fine" style="margin-top:24px">The datasets, filters and tier work are Jason Breshears' (Archaix), from the original Ophis website and the Ophis 2.0 data dump. The magnitude reading and the tier compilation follow the community paper <i>Ophis MSRF Details: Sources for the MSRF Magnitude Calculator</i>. Data notes: 468 is listed twice in Tier I and 480 sits in Tiers I and III (counted in III); 63 numbers in the v12 table have no tier yet. This is a pattern tool for study, not a betting tool.</p>
+</div>
+
+<script src="js/engine/core.js"></script>
+<script src="js/engine/formulas.js"></script>
+<script>
+(function () {
+  "use strict";
+  var F = NC.formulas, $ = function (id) { return document.getElementById(id); };
+  var fmt = function (v, d) { return Number.isFinite(v) ? (+v.toFixed(d == null ? 4 : d)).toString() : "—"; };
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function pill(cls) { var k = cls ? cls.toLowerCase() : "none"; return '<span class="pill ' + k + '">' + esc(cls || "no match") + "</span>"; }
+  function meter(m) {
+    var h = '<div class="meter' + (m.apex ? " apex" : "") + '" role="img" aria-label="' + m.dims + ' of 8 dimensions">';
+    for (var i = 1; i <= 8; i++) h += "<i" + (i <= m.dims ? ' class="on"' : "") + "></i>";
+    return h + "</div>";
+  }
+
+  function renderMag() {
+    var v = parseFloat($("magIn").value), out = $("magOut");
+    if (!Number.isFinite(v)) { out.textContent = "Give it a number."; return; }
+    var m = F.magnitude(v);
+    var h = '<div class="big">' + (m.dims ? m.dims + " dim" + (m.dims === 1 ? "" : "s") : "—") + "</div>" + meter(m) + "<dl>";
+    h += "<dt>v12 app class</dt><dd>" + pill(m.appClass) + (m.appClass ? " on " + m.number : "") + "</dd>";
+    h += "<dt>Tier</dt><dd>" + (m.tier ? esc(m.tier) + (m.apex ? " · Apex Projection, " + esc(m.apex) : "") + (m.exact ? "" : " (nearest whole, " + m.number + ")") : "no tier assigned") + "</dd>";
+    h += "<dt>Rank</dt><dd>" + (m.rank ? m.rank + " of 9" : "—") + "</dd></dl>";
+    out.innerHTML = h;
+    document.querySelectorAll(".chips button").forEach(function (b) { b.classList.toggle("hit", m.number != null && +b.dataset.n === m.number); });
+  }
+
+  function renderShadow() {
+    var x = parseFloat($("shIn").value), phi = $("shPhi").value === "ophis" ? F.PHI_OPHIS : F.PHI;
+    if (!Number.isFinite(x)) { $("shOut").textContent = "Give it a number."; return; }
+    var s = F.phiShadow(x, phi);
+    $("shOut").innerHTML = "<dl><dt>" + fmt(x) + " ÷ φ</dt><dd>" + fmt(s.answer) + "</dd>" +
+      "<dt>shadow = " + fmt(x) + " − " + fmt(s.answer, 2) + "</dt><dd class=\"big\">" + fmt(s.shadow) + "</dd>" +
+      "<dt>check: " + fmt(s.answer, 2) + " ÷ φ</dt><dd>" + fmt(s.shadowByPhi) + (Math.abs(s.shadow - s.shadowByPhi) < 1e-9 ? " ✓ identical" : " (Δ " + fmt(Math.abs(s.shadow - s.shadowByPhi), 4) + ", from rounding φ)") + "</dd></dl>";
+    var rows = F.phiLadder(x, 8, phi).map(function (r) {
+      var m = r.msrf;
+      return "<tr><td>" + r.step + "</td><td>" + fmt(r.value) + "</td><td>" + Math.round(r.value) + "</td><td>" + pill(m.appClass) + "</td><td>" + esc(m.tier || "—") + "</td><td>" + (m.dims || "—") + "</td></tr>";
+    });
+    $("ladder").tBodies[0].innerHTML = rows.join("");
+  }
+
+  function renderTiers() {
+    $("tierList").innerHTML = F.MSRF_TIERS.slice().reverse().map(function (t) {
+      return '<div class="tier"><h3>' + (t.apex ? "Tier VII · " + esc(t.apex) : esc(t.name)) + " <small>" + (t.apex ? "8+" : t.dims) + " dimensions · " + t.numbers.length + " numbers</small></h3><div class=\"chips\">" +
+        t.numbers.map(function (n) { return '<button type="button" data-n="' + n + '">' + n + "</button>"; }).join("") + "</div></div>";
+    }).join("");
+    $("tierList").addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-n]"); if (!b) return;
+      $("magIn").value = b.dataset.n; $("shIn").value = b.dataset.n; renderMag(); renderShadow();
+      $("magIn").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }
+
+  function renderEqs() {
+    $("eqs").innerHTML = F.SHADOW_EQUATIONS.map(function (q) { return "<code tabindex=\"0\" title=\"Copy\">" + esc(q) + "</code>"; }).join("");
+    $("eqs").addEventListener("click", function (e) {
+      var c = e.target.closest("code"); if (!c) return;
+      try { navigator.clipboard.writeText(c.textContent); c.title = "Copied"; } catch (_) {}
+    });
+  }
+
+  $("theme").addEventListener("click", function () {
+    var r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    r.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("nc-formulas-theme", r.dataset.theme); } catch (_) {}
+  });
+  try { var th = localStorage.getItem("nc-formulas-theme"); if (th) document.documentElement.dataset.theme = th; } catch (_) {}
+
+  renderTiers(); renderEqs(); renderMag(); renderShadow();
+  $("magIn").addEventListener("input", renderMag);
+  $("shIn").addEventListener("input", renderShadow);
+  $("shPhi").addEventListener("change", renderShadow);
+})();
+</script>
+</body>
+</html>

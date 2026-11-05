@@ -38,6 +38,8 @@ jobs:
           node-version: 22
       - name: Self-check
         run: node natorion/tests/self-check.js
+      - name: MSRF tiers and phi shadow
+        run: node natorion/tests/formulas.js
       - name: Studio examples match the code
         run: node natorion/examples/generate.js && git diff --exit-code natorion/examples
       - name: Install Playwright Chromium
