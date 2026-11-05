@@ -1,5 +1,5 @@
 /* NATORION · engine/core.js
-   The fixed tables of Ophis v12, restated. Every number here is copied from the
+   The fixed tables of the original v12, restated. Every number here is copied from the
    shipped source (src/ophis_config.js, src/ophis_model__params.js,
    src/ophis_utils.js); where the source was wrong or odd, the note says so and
    the value is kept, because results depend on it. */
@@ -57,7 +57,7 @@
 
   // Every name an equation may use. The first four are the original
   // program's (the values just above, which the parity test pins). The other
-  // sixteen are Natorion's, shared with the single-file build; Ophis v12 does
+  // sixteen are Natorion's, shared with the single-file build; the original v12 does
   // not know them, so a file that uses one opens here but not there.
   // `spoken` is how the Studio reads the name aloud.
   C.CONSTANTS = [
@@ -192,7 +192,7 @@
     op("X2+YxOPH_HEP", A)                // hepta-cycle onto X2, December 2025
   ];
 
-  // The "Extra Ophis Operations" list (ophis-xtras.txt), numbered 17-26.
+  // The "Extra Natorion Operations" list (ophis-xtras.txt), numbered 17-26.
   C.EXTRA_OPERATIONS = [
     op("X1+Yx2.718", B, false), op("X2+Yx2.718", B, false),
     op("X1+Yx1.38", B, false), op("X2+Yx1.38", B, false),

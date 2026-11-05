@@ -1,6 +1,6 @@
 # The engine, end to end
 
-What Ophis actually computes, in the order it computes it. Every rule here is
+What Natorion actually computes, in the order it computes it. Every rule here is
 ported from the v12 renderer extracted from the shipped `.exe`; file and line
 references point at `src/` in this repository.
 

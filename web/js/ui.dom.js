@@ -34,7 +34,7 @@
     return letter + "<sub>" + (zeroBasedOrdinal + 1) + "</sub>";
   };
   /** Said once in About and once, quietly, under the results. */
-  UI.DISCLAIMER = "Ophis is a prediction tool, not a betting tool. How you use its dates is your decision " +
+  UI.DISCLAIMER = "Natorion is a prediction tool, not a betting tool. How you use its dates is your decision " +
     "and your responsibility; there are no guarantees. Never wager money you and your family can't live without.";
 
   UI.labelPlain = function (letter, zeroBasedOrdinal) {

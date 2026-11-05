@@ -5,10 +5,10 @@
 <base target="_blank">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Natorion Cipher</title>
-<meta name="description" content="Natorion Cipher: the Ophis v12 date-projection engine rebuilt as a browser app, joined to the Chronicon calendrics and clocks. No install, nothing leaves your machine.">
+<meta name="description" content="Natorion Cipher: the v12 date-projection engine rebuilt as a browser app, joined to the Chronicon calendrics and clocks. No install, nothing leaves your machine.">
 <meta name="color-scheme" content="dark light">
 <meta property="og:title" content="Natorion Cipher">
-<meta property="og:description" content="Seed the dates. Cast the numbers. Read what survives. A front-end rebuild of the Ophis v12 engine with the Chronicon.">
+<meta property="og:description" content="Seed the dates. Cast the numbers. Read what survives. A front-end rebuild of the v12 engine with the Chronicon.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/">
 <meta property="og:image" content="https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/docs/cipher.png">
@@ -112,11 +112,11 @@
     <p class="eyebrow">A date-projection engine · in your browser</p>
     <h1>Natorion Cipher</h1>
     <p class="tagline">Seed the dates · cast the numbers · read what survives</p>
-    <p class="lede">The Ophis v12 engine rebuilt as a plain web page, joined to the Chronicon's clocks, cycles and calendars. Nothing to install, no account, and nothing leaves your machine.</p>
+    <p class="lede">The v12 engine rebuilt as a plain web page, joined to the Chronicon's clocks, cycles and calendars. Nothing to install, no account, and nothing leaves your machine.</p>
     <div class="cta">
       <a class="btn big" href="natorion/index.html">Open the app</a>
-      <a class="btn ghost big" href="ophis/index.html" title="The Ophis v12 desktop program itself, running in your browser">Open the original Ophis v12</a>
-      <a class="btn ghost big" href="web/index.html" title="The Ophis v12 engine with a modern interface: same results as the desktop program, no Chronicon">Open Ophis Web</a>
+      <a class="btn ghost big" href="ophis/index.html" title="The v12 desktop program itself, running in your browser">Open the original v12</a>
+      <a class="btn ghost big" href="web/index.html" title="The v12 engine with a modern interface: same results as the desktop program, no Chronicon">Open Natorion Web</a>
       <a class="btn ghost big" href="https://github.com/bradleyhomelinuxnet-prog/NatorionCipherPredictiveEngine/blob/main/natorion/MANUAL.md">Read the manual</a>
     </div>
     <div class="hero-shot"><img src="natorion/docs/cipher.png" alt="The Cipher screen: X-Dates on the left, the timeline and ranked Z-Dates on the right" width="1200" height="760"></div>
@@ -139,7 +139,7 @@
       <li><b>Change the X-Dates</b> to your own — click a date, or <b>Paste…</b> a list like <code>07/04/2026, 08/20/2026, 03/09/2027</code>. The table and the timeline update as you go.</li>
       <li><b>Sort by Score</b>, click a row to see its derivation, and <b>Save .oph</b> (Ctrl+S) to keep a file. Your work also stays in the browser between visits.</li>
     </ol>
-    <p class="fine">Files from the original Ophis desktop app open as they are, and files saved here open in Ophis.</p>
+    <p class="fine">Files from the original desktop app open as they are, and files saved here open in Natorion.</p>
   </section>
 
   <section id="screens">
@@ -162,7 +162,7 @@
     <div class="sec-no">IV · Trust</div>
     <h2>Checked against the original, line for line</h2>
     <div class="grid">
-      <div class="card"><div class="big">1003<small>of 1003</small></div><p>Random events run through the original Ophis v12 code and through Natorion, side by side. Every Z-Date, score, hit and MSRF match agreed.</p></div>
+      <div class="card"><div class="big">1003<small>of 1003</small></div><p>Random events run through the original v12 code and through Natorion, side by side. Every Z-Date, score, hit and MSRF match agreed.</p></div>
       <div class="card"><div class="big">72<small>browser checks</small></div><p>The real app, driven in Chromium: every screen, a known projection, files in and out, sunset scope, persistence, phone width.</p></div>
       <div class="card"><div class="big">29<small>of 30</small></div><p>Deliberate breaks to the app that the browser test catches. The thirtieth is a stylesheet rule that other rules already cover.</p></div>
       <div class="card"><div class="big">0<small>eval</small></div><p>Formulas are parsed by a small grammar and never run as code. A shared <code>.oph</code> file cannot carry anything but arithmetic.</p></div>
@@ -173,14 +173,14 @@
   <section id="study">
     <div class="sec-no">V · The study</div>
     <h2>Where it came from</h2>
-    <p>Ophis v12 is an offline Electron app whose source ships un-obfuscated. This repository took it apart as a white-box study of <code>.exe</code> packaging and Electron attack surface, found the code-execution hole in its shared preset files, and then rebuilt the engine so that hole cannot exist. The write-up is the portfolio piece; the app is the proof.</p>
+    <p>The original v12 is an offline Electron app whose source ships un-obfuscated. This repository took it apart as a white-box study of <code>.exe</code> packaging and Electron attack surface, found the code-execution hole in its shared preset files, and then rebuilt the engine so that hole cannot exist. The write-up is the portfolio piece; the app is the proof.</p>
     <p>The original is here too: the v12 <code>.exe</code>'s own code, unchanged, running in your browser with a small stand-in for Electron. It behaves exactly like the desktop program, including that hole, so open only <code>.oph</code> files you trust.</p>
-    <p><b>Ophis Web</b> sits between the two: the same v12 engine rewritten as a plain web page with a new interface and without the Chronicon. It parses formulas instead of running them as code, and its own test runs it side by side with the original. The <b>Hardened Engine Lab</b> shows the fix on a single page: the original <code>new Function()</code> path and the safe parser, fed the same formulas and the same attack strings. The <b>single-file build</b> is an earlier ground-up rebuild of Ophis in one self-contained HTML file. The <b>Field Guide</b> reads the v12 engine out in plain language: the sixteen default operations, the 138 and 19 lattice, and a live cast you can drive.</p>
+    <p><b>Natorion Web</b> sits between the two: the same v12 engine rewritten as a plain web page with a new interface and without the Chronicon. It parses formulas instead of running them as code, and its own test runs it side by side with the original. The <b>Hardened Engine Lab</b> shows the fix on a single page: the original <code>new Function()</code> path and the safe parser, fed the same formulas and the same attack strings. The <b>single-file build</b> is an earlier ground-up rebuild of Natorion in one self-contained HTML file. The <b>Field Guide</b> reads the v12 engine out in plain language: the sixteen default operations, the 138 and 19 lattice, and a live cast you can drive.</p>
     <div class="cta" style="justify-content:flex-start">
-      <a class="btn ghost" href="ophis/index.html">Open the original Ophis v12</a>
+      <a class="btn ghost" href="ophis/index.html">Open the original v12</a>
       <a class="btn ghost" href="OPHIS.html">Read the v12 Field Guide</a>
       <a class="btn ghost" href="natorion/formulas.html">Open the MSRF Formulas</a>
-      <a class="btn ghost" href="web/index.html">Open Ophis Web</a>
+      <a class="btn ghost" href="web/index.html">Open Natorion Web</a>
       <a class="btn ghost" href="Ophis_v12_ReverseEngineering_Report.html">Read the reverse-engineering report</a>
       <a class="btn ghost" href="Ophis_v12_Hardened_Engine_Lab.html">Open the Hardened Engine Lab</a>
       <a class="btn ghost" href="OPHIS-Natorion-Cipher.html">Open the single-file build</a>
@@ -191,9 +191,9 @@
   </main>
 
   <footer>
-    Ophis is a study instrument after the work of Jason Breshears (Archaix). Natorion studies and rebuilds the software; it makes no claim that the projections predict anything. Not affiliated with Archaix.
+    Natorion is a study instrument after the work of Jason Breshears (Archaix). Natorion studies and rebuilds the software; it makes no claim that the projections predict anything. Not affiliated with Archaix.
     &nbsp;·&nbsp; <a href="https://github.com/bradleyhomelinuxnet-prog/NatorionCipherPredictiveEngine">Source on GitHub</a>
-    <p class="disclaimer">Ophis is a prediction tool, not a betting tool. How you use its dates is your decision and your responsibility; there are no guarantees. Never wager money you and your family can't live without.</p>
+    <p class="disclaimer">Natorion is a prediction tool, not a betting tool. How you use its dates is your decision and your responsibility; there are no guarantees. Never wager money you and your family can't live without.</p>
   </footer>
 </div>
 </body>

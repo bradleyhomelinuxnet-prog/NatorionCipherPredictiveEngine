@@ -2,7 +2,7 @@
    Reading and writing .oph documents.
 
    A .oph file is JSON: { "app_version": "12", "iso_events": [ ...events ] }
-   (a bare array of events is accepted too). Files written here open in Ophis
+   (a bare array of events is accepted too). Files written here open in Natorion
    v12, and v12 files open here.
 
    Three strictness modes, as in v12:

@@ -1,6 +1,6 @@
 # Parity with the desktop engine
 
-How this rewrite is checked against Ophis v12, what matches, and the places it
+How this rewrite is checked against the original v12, what matches, and the places it
 deliberately does not.
 
 ---

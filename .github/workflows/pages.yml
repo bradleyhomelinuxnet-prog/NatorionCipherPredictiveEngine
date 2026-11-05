@@ -1,5 +1,5 @@
-# Publishes the landing page, the three apps (Natorion, Ophis Web, and the
-# original Ophis v12 in a browser), the reverse-engineering report, the
+# Publishes the landing page, the three apps (Natorion, Natorion Web, and the
+# original v12 in a browser), the reverse-engineering report, the
 # Hardened Engine Lab, and the single-file build with every page it links to,
 # to GitHub Pages on every push to main. Pages itself is switched on once, in
 # the repository's Settings → Pages (Source: GitHub Actions).
@@ -39,7 +39,7 @@ jobs:
           done
           cp -R natorion site/natorion
           cp -R ophis site/ophis
-          # Ophis Web: the v12 engine with a new interface, kept apart from the
+          # Natorion Web: the v12 engine with a new interface, kept apart from the
           # Chronicon and the clocks. It reads four data files from ../lib.
           cp -R web site/web
           rm -rf site/web/tests

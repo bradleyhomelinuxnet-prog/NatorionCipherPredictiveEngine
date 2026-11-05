@@ -1,6 +1,6 @@
-# Ophis Web
+# Natorion Web
 
-The Ophis v12 ("PSYFR") date-projection engine, rebuilt as a web page. Same
+The v12 date-projection engine, rebuilt as a web page. Same
 arithmetic, same `.oph` files, same output as the desktop build extracted from
 the `.exe` — with a UI that fits on a screen and no Electron underneath.
 
@@ -51,7 +51,7 @@ the `.oph` format.
 | **Optional tags** | Settings for three rules from the author's later documents that the original program never ran, all off by default and remembered by this browser (never saved in the `.oph`): the **Fibonacci Sequence Filter** (Op 1: when Y is in F = 8 … 1597, project F forward from X2; Op 2: from X1 and X2), **Geodetic Chronometry (138)** (138 × k, 365.25 × 1.38k, and 365.25 ÷ (1.38 × k) ≈ 264, 132, 88, 66, 53, 44) and **Diurnal projections** (365.25 × k, and × and ÷ 1.618 and 3.14, up to 2559.08). Every list is generated from its formula. A hit shows as a dashed pill in a Tags column, apart from the MSRF pills and labelled "author's list, not in the shipped MSRF". Tags read the finished results and change no score, hit or rank. |
 | **Cycles** | Cycle echoes: Z-Dates that sit a whole number of Metonic (19-year) or 138-year cycles from an X-Date, each count set against what chance alone would give. It reads the engine's results and never changes them. Its settings are kept in this browser, not in the `.oph` file. |
 | **Backtest** | Would the cast have projected your later events from your earlier ones? Each step is measured against chance near the real date: how much of the 60 days either side of it the projections happen to cover. A random date anywhere in the years ahead would flatter the cast, since projections crowd the weeks after the last event, and so do real events. One known limit: when events are only weeks apart, the top-10 verdict is a little generous (noise dated about a month apart is called above chance about 7% of the time, not 5%); the verdict on all projections stays fair. Events still in the future, or beyond the projection horizon, are shown but not scored. |
-| **Chronicon ↗** | Opens the Natorion app's Chronicon (clocks, cycles, calendars) in its own window; nothing of it is loaded into Ophis Web. |
+| **Chronicon ↗** | Opens the Natorion app's Chronicon (clocks, cycles, calendars) in its own window; nothing of it is loaded into Natorion Web. |
 
 Keyboard: `Ctrl/Cmd+O` open, `Ctrl/Cmd+S` save, `Esc` clear the selection.
 Everything is kept in `localStorage`, so a reload resumes where you left off.
@@ -186,7 +186,7 @@ The licence and the copyright notices are in [css/OFL.txt](css/OFL.txt).
 
 ## Note
 
-Ophis is a worldbuilding and study instrument after the Archaix thesis of Jason
+Natorion is a worldbuilding and study instrument after the Archaix thesis of Jason
 Breshears — presented as that thesis, not as established science. This rewrite
 reproduces the software faithfully and takes no position on the cosmology. Not
 affiliated with Archaix.

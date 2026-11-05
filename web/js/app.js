@@ -551,7 +551,7 @@
     var hasSunset = T.sunsetAvailable();
     var hasEclipses = T.eclipsesAvailable();
     UI.modal("About this build", '' +
-      '<p><b>Ophis Web</b> — a browser rebuild of Ophis v12 ("PSYFR"), the offline date-projection tool. ' +
+      '<p><b>Natorion Web</b> — a browser rebuild of the original v12, the offline date-projection tool. ' +
       'Same arithmetic, same file format, same output; no Electron, no filesystem access, no network.</p>' +
       '<h3>How a Z-Date is made</h3>' +
       '<ol class="doc-list">' +
@@ -578,7 +578,7 @@
       '</ul>' +
       '<h3>Using the dates</h3>' +
       '<p class="disclaimer-about">' + UI.esc(UI.DISCLAIMER) + '</p>' +
-      '<p class="fineprint">Ophis is a worldbuilding and study instrument after the Archaix thesis of Jason Breshears. ' +
+      '<p class="fineprint">Natorion is a worldbuilding and study instrument after the Archaix thesis of Jason Breshears. ' +
       'It is presented as that thesis, not as established science. Not affiliated with Archaix.</p>', {});
   };
 

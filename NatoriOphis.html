@@ -182,7 +182,7 @@
 <body>
 
 <nav>
-  <div class="brand">OPHION <span>· Ophis × Chronicon</span></div>
+  <div class="brand">OPHION <span>· Natorion × Chronicon</span></div>
   <div class="links">
     <a data-go="oracle">The Oracle</a><a data-go="wheels">The Wheels</a><a data-go="ledger">The Ledger</a><a data-go="about">Method</a>
   </div>
@@ -350,7 +350,7 @@
 <section id="about">
   <div class="sec-no">IV · Method &amp; lineage</div>
   <h2>How the cast is weighed</h2>
-  <p class="lead">OPHION fuses two instruments: the <b>Ophis</b> predictive grammar (X-Dates → Y interval → operations → Z-Dates) and the <b>Chronicon</b> calendrics (the Breshears cycle lattice). The fusion is the scoring — and you can switch the lens.</p>
+  <p class="lead">OPHION fuses two instruments: the <b>Natorion</b> predictive grammar (X-Dates → Y interval → operations → Z-Dates) and the <b>Chronicon</b> calendrics (the Breshears cycle lattice). The fusion is the scoring — and you can switch the lens.</p>
   <div class="grid2" style="margin-top:8px">
     <div class="panel"><h3>V8 · Chronology-first (default)</h3>
       <p style="font-size:14px">Rewards projections that land on the real timeline:</p>
@@ -364,7 +364,7 @@
       </ul>
     </div>
     <div class="panel"><h3>V7 · Numbers-first (legacy lens)</h3>
-      <p style="font-size:14px">The Ophis-flavoured lens — the sacred numbers dominate, chronology is secondary:</p>
+      <p style="font-size:14px">The Natorion-flavoured lens — the sacred numbers dominate, chronology is secondary:</p>
       <ul style="margin:6px 0 0 1.1em;color:#ddd6c4;font-size:13.5px;line-height:1.7">
         <li><b style="color:#ff9d8f">138</b> in digits <b>+4</b> · <b style="color:var(--gold2)">Palindrome</b> <b>+4</b></li>
         <li><b style="color:var(--violet)">MSRF</b> on interval/offset <b>+3</b></li>
@@ -385,7 +385,7 @@
     </div>
     <div class="panel"><h3>ECHO &amp; the novel filter</h3>
       <p style="font-size:14px;line-height:1.7">A projection that lands back on one of your input anchors (±1 day) is an <b style="color:var(--dim)">ECHO</b> — a confirmation, not a discovery. It still scores, but it's dimmed and tagged. The <b style="color:var(--violet)">✦ NOVEL ONLY</b> filter hides echoes so you see only the dates the chronology doesn't already name.</p>
-      <p style="font-size:12.5px;color:var(--dim);font-style:italic;margin-top:6px">19 is in the resonance set at your request — it is not in the stock Ophis MSRF table.</p>
+      <p style="font-size:12.5px;color:var(--dim);font-style:italic;margin-top:6px">19 is in the resonance set at your request — it is not in the stock Natorion MSRF table.</p>
     </div>
   </div>
   <div class="note-card">
@@ -395,7 +395,7 @@
 </section>
 
 <footer>
-  <b>OPHION · The Predictive Chronology Engine.</b> Ophis predictive grammar × Chronicon calendrics, fused over the Breshears lattice (Phoenix 138 · Nemesis 792 · NER 600 · Metonic 19). Self-contained &amp; air-gap friendly — no data leaves this page. Annus Mundi = 3895 − BC year; Long-Count year = astro + 3112; šar = a turning of the stars (a day) per Archaix. <b>You Are Here:</b> <span id="youAreHere">—</span>
+  <b>OPHION · The Predictive Chronology Engine.</b> Natorion predictive grammar × Chronicon calendrics, fused over the Breshears lattice (Phoenix 138 · Nemesis 792 · NER 600 · Metonic 19). Self-contained &amp; air-gap friendly — no data leaves this page. Annus Mundi = 3895 − BC year; Long-Count year = astro + 3112; šar = a turning of the stars (a day) per Archaix. <b>You Are Here:</b> <span id="youAreHere">—</span>
 </footer>
 </div>
 
@@ -426,7 +426,7 @@ const am=a=>a+AM_OFFSET, lcYear=a=>a+LC_OFFSET;
 const AM_EPOCH=jdn(-3894,1,1);
 const MAY_NODES=[-3112,-2712,-2312,-1912,-1512,-1112,-712,-318,76,470,864,1258,1652,2046];
 
-/* MSRF resonance set (Ophis NORMAL+IMPORTANT key members) + 19 added per request */
+/* MSRF resonance set (Natorion NORMAL+IMPORTANT key members) + 19 added per request */
 const MSRF=new Set([19,12,21,24,36,40,42,48,49,54,56,60,63,66,72,76,84,90,96,108,114,119,120,126,132,
  133,135,138,140,144,147,153,162,168,180,189,207,216,222,234,252,270,276,288,297,306,315,324,330,360,
  378,414,432,441,459,468,504,540,552,567,576,594,600,612,648,666,693,720,756,792,810,828,831,864,882,
@@ -636,7 +636,7 @@ function cast(anchors, ops, system){
       const key=ZJD+'|'+op.eq+'|'+x1.jd+'|'+x2.jd;
       if(seen.has(key))continue; seen.set(key,1);
       const sc=scoreZDate(zd.year, ZJD, system);
-      // MSRF resonance on interval Y and on the offset (classic Ophis core)
+      // MSRF resonance on interval Y and on the offset (classic Natorion core)
       const offAbs=Math.abs(Math.round(off));
       if(MSRF.has(Y)||MSRF.has(offAbs)){sc.pts+=(system===SCORING.V7?3:2);sc.tags.push(['MSRF','msrf']);}
       // ECHO: lands back on an input anchor (±1 day)

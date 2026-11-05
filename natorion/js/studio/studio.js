@@ -447,8 +447,8 @@
     /* -------------------------------------------------------- origins -- */
     cand = [];
     cand = cand.concat(beat("origins", "etymology", [
-      "The method is called Ophis, and Ophis is Greek for serpent: a line that curls back to bite its own tail. You feed it dates. It feeds you dates back.",
-      "Its name is Ophis, Greek for serpent, the line that curls round to bite its own tail. Give it dates and it gives you dates."
+      "The method moves like a serpent: a line that curls back to bite its own tail. You feed it dates. It feeds you dates back.",
+      "It moves like a serpent, the line that curls round to bite its own tail. Give it dates and it gives you dates."
     ], sc(["anchor"], "study", A + " tracing a serpent drawn in the ledger's margin with one ink-stained finger, head tilted", { shot: "OVER-SHOULDER", duration: 7 }), true));
     D.xs.slice(1).forEach(function (x, i) {
       var prev = D.xs[i], y = D.ys.find(function (p) { return p.x2 === x.i && p.x1 === prev.i; }) || D.ys[i] || y1;
@@ -765,13 +765,13 @@
     var tag = title.replace(/[^A-Za-z0-9]+/g, "");
     var description = [
       n + " dates. " + ops + " formulas. One day they all agree on" + (away ? ", and it hasn't happened yet." : "."),
-      "This animated history of " + title + " follows " + n + " dates through the Ophis method, the serpent's arithmetic that turns the days between events into projected dates, and reads them on the Chronicon's nineteen calendars. " + cap(title) + " becomes a story of day-counts, mirrored numbers and the strongest day in the cast, " + starLong + ". If you have ever wondered what " + title + " looks like as pure arithmetic, this is it.",
+      "This animated history of " + title + " follows " + n + " dates through the Natorion method, the serpent's arithmetic that turns the days between events into projected dates, and reads them on the Chronicon's nineteen calendars. " + cap(title) + " becomes a story of day-counts, mirrored numbers and the strongest day in the cast, " + starLong + ". If you have ever wondered what " + title + " looks like as pure arithmetic, this is it.",
       sectionsOut.map(function (s) { return s.at + " — " + s.name; }).join("\n"),
       "Subscribe for more animated history every week!",
       "This video is for educational and entertainment purposes. Some events have been simplified for clarity. The chronology follows the Archaix thesis of Jason Breshears, presented as a study instrument, not as established history.",
       "#AnimatedHistory #" + (tag || "History") + " #HistoryExplained"
     ].join("\n\n");
-    var tags = [seoTitle, title + " history", title + " explained", title + " in " + L + " minutes", "Ophis", "Natorion Cipher", "date projection", "Archaix", "Jason Breshears", "Phoenix 138", "Metonic cycle", "Chronicon", "animated history", "history explained", "entire history", "cycles of history", "Great Pyramid", "calendar systems", "Annus Mundi", "number patterns"];
+    var tags = [seoTitle, title + " history", title + " explained", title + " in " + L + " minutes", "Natorion", "Natorion Cipher", "date projection", "Archaix", "Jason Breshears", "Phoenix 138", "Metonic cycle", "Chronicon", "animated history", "history explained", "entire history", "cycles of history", "Great Pyramid", "calendar systems", "Annus Mundi", "number patterns"];
     var seen = {}; tags = tags.filter(function (t) { var k = t.toLowerCase(); if (seen[k]) return false; seen[k] = true; return true; }).slice(0, 20);
 
     var plan = {

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ==========================================================================
-   browser.js — Ophis Web in headless Chromium
+   browser.js — Natorion Web in headless Chromium
    --------------------------------------------------------------------------
    Drives the real page the way a person would and checks what the Node
    tests cannot see: dialogs, tooltips, focus, touch, the sticky bars, the
@@ -96,7 +96,7 @@ async function main() {
     section("start-up");
     check("boots in the light theme", await page.getAttribute("html", "data-theme") === "light");
     check("the sample event projects Z-Dates", (await page.$$(".z-row")).length > 0);
-    const DISCLAIMER = "Ophis is a prediction tool, not a betting tool. How you use its dates is your decision and your " +
+    const DISCLAIMER = "Natorion is a prediction tool, not a betting tool. How you use its dates is your decision and your " +
       "responsibility; there are no guarantees. Never wager money you and your family can't live without.";
     check("one quiet line under the results says it is not a betting tool",
       (await page.$$eval("#panel-output .disclaimer", ps => ps.map(p => p.textContent))).join("|") === DISCLAIMER);

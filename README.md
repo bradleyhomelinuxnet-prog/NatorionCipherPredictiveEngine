@@ -1,12 +1,12 @@
-# Ophis v12 (“PSYFR”) — Reverse-Engineering Case Study
+# Natorion — a v12 Reverse-Engineering Case Study
 
 [![tests](https://github.com/bradleyhomelinuxnet-prog/NatorionCipherPredictiveEngine/actions/workflows/tests.yml/badge.svg)](https://github.com/bradleyhomelinuxnet-prog/NatorionCipherPredictiveEngine/actions/workflows/tests.yml) [![Live site](https://img.shields.io/badge/live-site-d8a943)](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/) [![license: CC BY-NC-SA 4.0](https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-3d6fb4)](https://github.com/bradleyhomelinuxnet-prog/NatorionCipherPredictiveEngine/blob/main/LICENSE) ![Runs in the browser](https://img.shields.io/badge/runs-in%20the%20browser-54b8c9)
 
-<img src="PSYFR.jpg" alt="PSYFR poster: a hooded figure and a white rabbit before a glowing gate onto a future city" width="200" align="right">
+<img src="PSYFR.jpg" alt="Natorion poster: a hooded figure and a white rabbit before a glowing gate onto a future city" width="200" align="right">
 
 > **Live site: [bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/)** — three browser apps, the report and the Hardened Engine Lab. Nothing to install, and nothing leaves your machine.
 
-A white-box reverse-engineering study of **Ophis v12**, an offline Electron date-projection / cycle-prediction tool, taken apart as an educational study of `.exe` packaging and Electron attack surface — then rebuilt more safely.
+A white-box reverse-engineering study of **the original v12**, an offline Electron date-projection / cycle-prediction tool, taken apart as an educational study of `.exe` packaging and Electron attack surface — then rebuilt more safely.
 
 > **Authorization.** This is the owner’s own software, studied with permission for a portfolio write-up. All work is white-box on artifacts in this repo; nothing here targets third-party systems.
 
@@ -14,18 +14,18 @@ A white-box reverse-engineering study of **Ophis v12**, an offline Electron date
 
 | App | What it is | Open |
 |---|---|---|
-| **Natorion Cipher** · [`natorion/`](natorion/) | The flagship: the Ophis v12 engine rebuilt front-end-only and joined to the Chronicon's clocks, cycles and calendars, with a Studio that writes an animated-documentary production package (script, look cards, image and animation prompts, thumbnail, upload text) from the numbers. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/) · [quick start](natorion/README.md) · [manual](natorion/MANUAL.md) |
-| **Ophis Web** · [`web/`](web/) | The same v12 engine with a new interface and no Chronicon: plain HTML, CSS and JavaScript, no build step. The ten extra operations and the ten [Mirrors](MIRRORS.md) are one click away. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/web/) · [README](web/README.md) · [how it works](web/docs/ENGINE.md) |
-| **Ophis v12, in a browser** · [`ophis/`](ophis/) | The original `.exe`'s own renderer, copied out of `app.asar`, with Electron replaced by a small browser bridge. It behaves like the desktop app, including its `new Function()` evaluator, so open only `.oph` files you trust. The bridge saves only to files you pick, or as a download. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/ophis/) · [README](ophis/README.md) |
+| **Natorion Cipher** · [`natorion/`](natorion/) | The flagship: the v12 engine rebuilt front-end-only and joined to the Chronicon's clocks, cycles and calendars, with a Studio that writes an animated-documentary production package (script, look cards, image and animation prompts, thumbnail, upload text) from the numbers. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/) · [quick start](natorion/README.md) · [manual](natorion/MANUAL.md) |
+| **Natorion Web** · [`web/`](web/) | The same v12 engine with a new interface and no Chronicon: plain HTML, CSS and JavaScript, no build step. The ten extra operations and the ten [Mirrors](MIRRORS.md) are one click away. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/web/) · [README](web/README.md) · [how it works](web/docs/ENGINE.md) |
+| **The original v12, in a browser** · [`ophis/`](ophis/) | The original `.exe`'s own renderer, copied out of `app.asar`, with Electron replaced by a small browser bridge. It behaves like the desktop app, including its `new Function()` evaluator, so open only `.oph` files you trust. The bridge saves only to files you pick, or as a download. | [live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/ophis/) · [README](ophis/README.md) |
 
-Both rebuilds parse formulas instead of running them as code, and each is checked against the original v12 engine by a parity test that runs both on the same events and compares every result (see [Tests](#tests)). Natorion Cipher and Ophis Web also open straight from their `index.html` with no server; the
+Both rebuilds parse formulas instead of running them as code, and each is checked against the original v12 engine by a parity test that runs both on the same events and compares every result (see [Tests](#tests)). Natorion Cipher and Natorion Web also open straight from their `index.html` with no server; the
 `ophis/` build wants one for PDF export (see its README). The landing page is [`index.html`](index.html); [`.github/workflows/pages.yml`](.github/workflows/pages.yml) publishes the site on every push to `main`.
 
 ---
 
-## What Ophis is
+## What Natorion is
 
-You give it ≥2 anchor dates (**X-Dates**); it counts the whole days between each pair (**Y**), runs a table of small formulas that turn `Y` into day-offsets, and projects **Z-Dates** that it scores against resonance number-sets (“MSRF”) and bundled eclipse/moon tables. It’s Gann-style cycle work in astronomical dress — fully offline, no live data, no telemetry. Branded **PSYFR**; the codebase calls itself Ophis v12.
+You give it ≥2 anchor dates (**X-Dates**); it counts the whole days between each pair (**Y**), runs a table of small formulas that turn `Y` into day-offsets, and projects **Z-Dates** that it scores against resonance number-sets (“MSRF”) and bundled eclipse/moon tables. It’s Gann-style cycle work in astronomical dress — fully offline, no live data, no telemetry. Branded **Natorion**; the codebase calls itself the original v12.
 
 ## The headline finding
 
@@ -53,14 +53,14 @@ malicious .oph  →  operation string hits new Function()  →  renderer code ex
 | [`METHOD.md`](METHOD.md) | Reproducible `.exe` → source extraction (NSIS → 7z → asar). |
 | [`SECURITY.md`](SECURITY.md) | Findings, threat model, remediation status. |
 | `src/`, `lib/`, `img/`, [`package.json`](package.json), [`README.txt`](README.txt) | The original v12 renderer as extracted: 24 first-party modules, the third-party libraries, the images, and the app's own manifest and README, kept byte-for-byte. `lib/` also holds files the app never loads (the full eclipse tables `*_orig.js`, `solar.csv`, `lunar.csv`, an unminified `chart.js`). |
-| `OPHIS-Natorion-Cipher.html` | The single-file build: an earlier ground-up rebuild of Ophis in one self-contained HTML file — [open it on the site](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/OPHIS-Natorion-Cipher.html). |
+| `OPHIS-Natorion-Cipher.html` | The single-file build: an earlier ground-up rebuild of Natorion in one self-contained HTML file — [open it on the site](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/OPHIS-Natorion-Cipher.html). |
 | `PSYFR1.html`, `PSYFR2.html`, `NatoriOphis.html`, `Natori-On-PSYFR-Main-UI.html` | Earlier single-file browser experiments (the chronology engine and its field guide), kept for lineage. |
-| [`OPHIS.html`](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/OPHIS.html) | **The Ophis v12 Field Guide**: the sixteen v12 default operations translated, the 138/19 lattice, the grammar, a live cast and worked examples. Not the app's loader (that is `ophis.html` inside the asar). |
+| [`OPHIS.html`](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/OPHIS.html) | **The v12 Field Guide**: the sixteen v12 default operations translated, the 138/19 lattice, the grammar, a live cast and worked examples. Not the app's loader (that is `ophis.html` inside the asar). |
 | `Ophis_v9_*` | The prior v9 report and field guide, kept as a historical record. `Ophis_v9_Explained.html` is marked as the v9 edition and points to `OPHIS.html`. |
 | [`tests/`](tests/) | The parity test for the single-file pages. |
 | [`phoenix-player/`](phoenix-player/) | **Phoenix Player**: paste or drop a Phoenix Production *master asset index* and it plays the stills and clips in order (oldest first, or as listed), from their links or from your downloads matched by `FILE` stem. Filters, search, stars, a still timer, shuffle and loop, and `.m3u` export for VLC. The index stays in your browser. [Open it on the site](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/phoenix-player/). |
-| `*.oph` | Sample Ophis files. Both parity tests also run them as fixtures. |
-| `chronicon-clocks-calendrics.txt`, `ophis-xtras.txt`, `PSYFR.jpg` | Source material: the Chronicon page the clocks were built from, ten extra operations (numbered 17–26), and the PSYFR poster. [`MIRRORS.md`](MIRRORS.md) notes the ten Mirrors (27–36). |
+| `*.oph` | Sample Natorion files. Both parity tests also run them as fixtures. |
+| `chronicon-clocks-calendrics.txt`, `ophis-xtras.txt`, `PSYFR.jpg` | Source material: the Chronicon page the clocks were built from, ten extra operations (numbered 17–26), and the Natorion poster. [`MIRRORS.md`](MIRRORS.md) notes the ten Mirrors (27–36). |
 | [`.github/`](.github/) | The Pages and Tests workflows, and Dependabot for the actions they use. |
 | [`tools/`](tools/) | `ComfyUI-Local-Setup.ps1`: a Windows PowerShell script that installs Python, PyTorch and ComfyUI for a chosen backend (`cuda`, `directml`, `xpu` or `cpu`) and writes a launcher. Not part of the study, and not run in the environment that wrote it; read it before running it. |
 
@@ -72,7 +72,7 @@ node natorion/tests/self-check.js     # engine and Chronicon checks, no dependen
 node natorion/tests/browser.js        # the real app in headless Chromium (needs Playwright; see natorion/README.md)
 node natorion/tests/parity.js 300     # against the original v12 code: the sample files plus 300 random events
 
-# Ophis Web
+# Natorion Web
 node web/tests/unit.node.js                            # behaviour tests, no dependencies
 node web/tests/cycles.node.js                          # cycle echoes and the backtest, no dependencies
 node web/tests/browser.js                              # the page in headless Chromium (needs Playwright)
@@ -118,11 +118,11 @@ Detail with `file:line` citations: [SECURITY.md](SECURITY.md) / the report §6.
 
 ## Note
 
-Ophis is a **worldbuilding & study instrument** after the Archaix thesis of Jason Breshears — presented as that thesis, not as established science. This repository studies the *software*, not the cosmology. Not affiliated with Archaix.
+Natorion is a **worldbuilding & study instrument** after the Archaix thesis of Jason Breshears — presented as that thesis, not as established science. This repository studies the *software*, not the cosmology. Not affiliated with Archaix.
 
 ## License
 
 [CC BY-NC-SA 4.0](LICENSE), the same terms as [natori-on-psyfr](https://github.com/bradleyhomelinuxnet-prog/natori-on-psyfr): use it, study it, take it apart and
 pass it on, with credit, not for sale, and with adaptations under the same terms. The third-party libraries in `lib/` (and their copies in `ophis/lib/` and
-`natorion/js/vendor/`) belong to their authors and keep their own licenses; the fonts embedded in Ophis Web are under the
+`natorion/js/vendor/`) belong to their authors and keep their own licenses; the fonts embedded in Natorion Web are under the
 SIL Open Font License 1.1 ([`web/css/OFL.txt`](web/css/OFL.txt)).

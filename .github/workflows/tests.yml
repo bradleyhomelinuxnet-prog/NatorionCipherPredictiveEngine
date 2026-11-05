@@ -1,8 +1,8 @@
 # Runs every test suite on every push and pull request.
 #   natorion — the stand-alone self-check, the Studio examples regenerated
 #              unchanged, the browser test in headless
-#              Chromium, and the parity test against the original Ophis v12 source.
-#   web      — Ophis Web's unit tests, the cycle-echo and backtest tests, its
+#              Chromium, and the parity test against the original v12 source.
+#   web      — Natorion Web's unit tests, the cycle-echo and backtest tests, its
 #              differential test against the same original engine plus 500
 #              random events (seeded, so a failure reproduces), and the page
 #              itself in headless Chromium.

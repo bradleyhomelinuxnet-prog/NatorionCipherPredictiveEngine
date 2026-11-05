@@ -7,7 +7,7 @@ _Written by Natorion Studio from the event “The Eclipse Ledger” on 8 October
 ## Production plan
 
 📏 VIDEO LENGTH: 10 minutes (600 seconds)  
-📝 SCRIPT: 1,663 words (at 160–175 words per minute; the brief asks 1,600–1,750)  
+📝 SCRIPT: 1,658 words (at 160–175 words per minute; the brief asks 1,600–1,750)  
 📸 TOTAL IMAGES NEEDED: 70  
 📦 IMAGE BATCHES: 14 rounds (5 images per round)  
 🎬 TOTAL VIDEO CLIPS: 70  
@@ -15,7 +15,7 @@ _Written by Natorion Studio from the event “The Eclipse Ledger” on 8 October
 🖼️ THUMBNAIL: 1 image  
 📋 SEO PACKAGE: Title + Description + Tags  
 
-Sections: 0:00 The hook (131 words) · 0:47 Origins and context (378 words) · 3:03 Escalation (656 words) · 6:59 Climax and resolution (380 words) · 9:15 Legacy and ending (118 words)
+Sections: 0:00 The hook (131 words) · 0:47 Origins and context (373 words) · 3:01 Escalation (656 words) · 6:57 Climax and resolution (380 words) · 9:13 Legacy and ending (118 words)
 
 ## Voiceover script
 
@@ -31,7 +31,7 @@ Only the spoken narration. Every paragraph is one scene.
 
 §5 Stay to the end. The film closes where it opened, on the same page, the same date underlined twice, with the serpent's tail in its mouth.
 
-§6 The method is called Ophis, and Ophis is Greek for serpent: a line that curls back to bite its own tail. You feed it dates. It feeds you dates back.
+§6 The method moves like a serpent: a line that curls back to bite its own tail. You feed it dates. It feeds you dates back.
 
 §7 X2: 28 August 2026, a Friday, 16 days on. The Hebrew reckoning calls it 15 Elul 5786.
 
@@ -231,7 +231,7 @@ Aspect Ratio: 16:9 Horizontal
 
 IMAGE 6 — for Script §6
 
-Script Line: “The method is called Ophis, and Ophis is Greek for serpent: a line that curls back to bite its own tail. You feed it dates. It feeds you dates back.”
+Script Line: “The method moves like a serpent: a line that curls back to bite its own tail. You feed it dates. It feeds you dates back.”
 
 Image Prompt: “Natori tracing a serpent drawn in the ledger's margin with one ink-stained finger, head tilted. One character, exactly as the Look Card describes: NATORI — THE CHRONICLER — “A semi-stylized animated character with tall lean proportions and a slightly oversized head. Dramatically oversized long drooping nose tinted rosy pink at the tip and bridge, protruding far from the face. Large round solid-black dot eyes with tiny white catchlight dots, no colored iris detail. Warm olive skin with matte rough painterly brush-stroke texture, rosy pink tint on nose tip and cheeks. Long face with high cheekbones and a narrow chin. Thick auburn hair pulled back and rendered in chunky simplified painted masses, two painted strands loose at the temple. Wearing a charcoal-grey wool doublet with one faded burgundy sleeve, a white linen collar gone to cream, a leather-bound ledger at the belt, the wool heavy and creased with true weight in its folds, a reed pen or quill behind one ear and a leather ledger chained to the belt. Three small gold glyph marks painted at the throat, ink stains on the right thumb, and a habit of tilting the head when a number does not add up.” Background: a timber-beamed study: a cluttered oak table under a brass astrolabe, stacked ledgers, a wax-sealed letter, a wall clock stopped at 1:38, rain on leaded glass, every surface with visible painted texture, weathered and lived-in. Environmental storytelling: a globe with a cracked ocean, a candle guttering in a brass stick, quills in a jar, a cat on the ledgers, a half-eaten pear. Camera: OVER-SHOULDER — from behind the character's shoulder, looking at what they see. Lighting: Single dominant warm amber light from a candle in a brass stick at frame right, 55% of the frame in deep shadow, warm amber rim light separating the character from the background, volumetric light through drifting dust and lamp smoke, atmospheric haze in the far corners. Color mood: dark warm brown and deep blue with forest green and burgundy, and one candlelit amber accent, like a classical oil painting. Cinematic painterly art-house 3D animation frame, European animated feature film quality, semi-stylized character proportions with oversized prominent rosy-tipped noses and large dark-dot eyes with white catchlights, matte hand-painted brush-stroke textures on all surfaces, rich warm natural color palette, strong directional atmospheric lighting with volumetric haze, depth layers with atmospheric perspective, 16:9 horizontal. NOT Pixar, NOT Disney, NOT DreamWorks, NOT clean CGI, NOT cute, NOT chibi, NOT storybook illustration, NOT flat 2D, NOT anime.”
 
@@ -961,7 +961,7 @@ Duration: 5 seconds · Model: Seedance 2.5 · Aspect Ratio: 16:9
 
 VIDEO CLIP 6 — from Image 6
 
-Narration during this clip: “The method is called Ophis, and Ophis is Greek for serpent: a line that curls back to bite its own tail. You feed it dates. It feeds you dates back.”
+Narration during this clip: “The method moves like a serpent: a line that curls back to bite its own tail. You feed it dates. It feeds you dates back.”
 
 Seedance Animation Prompt: “Camera: slow pull-back. Natori: a small turn of the head, one hand lifting in a slow gesture, weight shifting to the other foot. Environment: the candle flame dancing, rain streaking the leaded glass, the cat's tail curling, the astrolabe turning a degree on its cord. Lighting: The flame gutters once and steadies; the shadows breathe with it. Maintain painterly matte textured art-house animation quality throughout. Smooth natural character movement. Deep atmospheric lighting. NO style shift to clean CGI. NO morphing. NO Pixar/Disney look.”
 
@@ -1645,13 +1645,13 @@ DESCRIPTION:
 
 7 dates. 15 formulas. One day they all agree on, and it hasn't happened yet.
 
-This animated history of The Eclipse Ledger follows 7 dates through the Ophis method, the serpent's arithmetic that turns the days between events into projected dates, and reads them on the Chronicon's nineteen calendars. The Eclipse Ledger becomes a story of day-counts, mirrored numbers and the strongest day in the cast, 7 November 2028. If you have ever wondered what The Eclipse Ledger looks like as pure arithmetic, this is it.
+This animated history of The Eclipse Ledger follows 7 dates through the Natorion method, the serpent's arithmetic that turns the days between events into projected dates, and reads them on the Chronicon's nineteen calendars. The Eclipse Ledger becomes a story of day-counts, mirrored numbers and the strongest day in the cast, 7 November 2028. If you have ever wondered what The Eclipse Ledger looks like as pure arithmetic, this is it.
 
 0:00 — The hook
 0:47 — Origins and context
-3:03 — Escalation
-6:59 — Climax and resolution
-9:15 — Legacy and ending
+3:01 — Escalation
+6:57 — Climax and resolution
+9:13 — Legacy and ending
 
 Subscribe for more animated history every week!
 
@@ -1659,11 +1659,11 @@ This video is for educational and entertainment purposes. Some events have been 
 
 #AnimatedHistory #TheEclipseLedger #HistoryExplained
 
-TAGS (20): A Day in the Life of a Chronicler in 2026, The Eclipse Ledger history, The Eclipse Ledger explained, The Eclipse Ledger in 10 minutes, Ophis, Natorion Cipher, date projection, Archaix, Jason Breshears, Phoenix 138, Metonic cycle, Chronicon, animated history, history explained, entire history, cycles of history, Great Pyramid, calendar systems, Annus Mundi, number patterns
+TAGS (20): A Day in the Life of a Chronicler in 2026, The Eclipse Ledger history, The Eclipse Ledger explained, The Eclipse Ledger in 10 minutes, Natorion, Natorion Cipher, date projection, Archaix, Jason Breshears, Phoenix 138, Metonic cycle, Chronicon, animated history, history explained, entire history, cycles of history, Great Pyramid, calendar systems, Annus Mundi, number patterns
 
 ## Checks
 
-- 1,663 words in 70 paragraphs, within the brief; every paragraph 15–40 words: yes
+- 1,658 words in 70 paragraphs, within the brief; every paragraph 15–40 words: yes
 - Etymology drops: 3 · “still exists today” anchors: 3 · closes with the call to subscribe: yes
 - Banned phrases and banned visual words: none
 - Style tag on every image: yes · no shot type repeated twice running: yes

@@ -2,7 +2,7 @@
   "name": "natorion-cipher",
   "version": "1.0.0",
   "private": true,
-  "description": "Natorion Cipher: a front-end rebuild of the Ophis v12 date-projection engine, with the Chronicon. The app needs no install; this file only runs the tests.",
+  "description": "Natorion Cipher: a front-end rebuild of the v12 date-projection engine, with the Chronicon. The app needs no install; this file only runs the tests.",
   "scripts": {
     "test": "node tests/self-check.js && node tests/browser.js",
     "test:self": "node tests/self-check.js",

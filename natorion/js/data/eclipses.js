@@ -1,4 +1,4 @@
-/* Solar and lunar eclipses, years 0-3000, from the tables bundled with Ophis v12
+/* Solar and lunar eclipses, years 0-3000, from the tables bundled with the original v12
    (lib/solar_eclipses_processed.js, lib/lunar_eclipses_processed.js; NASA five-millennium catalogue).
    Compact form: t = one type char per eclipse (f = total/annular/hybrid or total lunar, p = partial);
    s = comma-separated instants in base-36 seconds since 1970-01-01 UTC. */

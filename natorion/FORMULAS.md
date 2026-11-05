@@ -1,6 +1,6 @@
 # MSRF Formulas
 
-Two formulas added beside the Ophis v12 engine. They read the engine's numbers and **never change its scores**: the parity tests against the original v12 still pass unchanged.
+Two formulas added beside the v12 engine. They read the engine's numbers and **never change its scores**: the parity tests against the original v12 still pass unchanged.
 
 - **Page:** [`formulas.html`](formulas.html) ([live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/formulas.html))
 - **Code:** [`js/engine/formulas.js`](js/engine/formulas.js) (`NC.formulas`)
@@ -52,7 +52,7 @@ The paper's suggested reading order: 1) note the score, 2) look at the MSRF numb
 x − x/φ  =  x/φ²
 ```
 
-So the shadow is always the root divided by φ twice. With the true φ (1.6180339887…) the two routes give exactly the same number. With Ophis' rounded `OPH_PHI = 1.618` they differ in the third decimal (52.710 against 52.714 for 138), which is the only difference you'll see.
+So the shadow is always the root divided by φ twice. With the true φ (1.6180339887…) the two routes give exactly the same number. With the rounded `OPH_PHI = 1.618` they differ in the third decimal (52.710 against 52.714 for 138), which is the only difference you'll see.
 
 **The ladder.** Keep dividing: x, x/φ, x/φ², x/φ³ … Each rung is the shadow of the rung two above it. `NC.formulas.phiLadder(x, steps, phi)` returns the rungs, each checked against the MSRF table.
 
@@ -70,4 +70,4 @@ X1+Y-Y/OPH_PHI
 
 ## Sources and credit
 
-The datasets, filter definitions and tier work are **Jason Breshears' (Archaix)**, from the original Ophis website and the Ophis 2.0 beta data dump; the original MSRF table image was posted by Jason on X on 6 December 2024. The tier compilation and the magnitude reading come from the community paper *Ophis MSRF Details: Sources for the MSRF Magnitude Calculator*. The phi-shadow observation was shared in the PSYFR/Ophis community. The filter descriptions are the source's claims, restated here; this repo makes no claim that they predict anything. It is a pattern tool for study, not a betting tool.
+The datasets, filter definitions and tier work are **Jason Breshears' (Archaix)**, from Jason’s original website and the v2.0 beta data dump; the original MSRF table image was posted by Jason on X on 6 December 2024. The tier compilation and the magnitude reading come from the community paper *Ophis MSRF Details: Sources for the MSRF Magnitude Calculator*. The phi-shadow observation was shared in the Natorion/Natorion community. The filter descriptions are the source's claims, restated here; this repo makes no claim that they predict anything. It is a pattern tool for study, not a betting tool.

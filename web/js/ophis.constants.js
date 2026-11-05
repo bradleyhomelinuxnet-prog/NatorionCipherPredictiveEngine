@@ -2,7 +2,7 @@
    ophis.constants.js — immutable configuration, ported 1:1 from the desktop app
    --------------------------------------------------------------------------
    Source of truth: src/ophis_config.js and src/ophis_model__params.js of the
-   Ophis v12 Electron renderer (extracted from the shipped .exe, see METHOD.md).
+   The original v12 Electron renderer (extracted from the shipped .exe, see METHOD.md).
 
    Every number in this file is a straight port. If a value here and a value in
    src/ disagree, src/ wins and this file is the bug.
@@ -246,7 +246,7 @@
     });
   };
 
-  /* The ten "extra" operations of the Ophis extras list (ophis-xtras.txt,
+  /* The ten "extra" operations of the Natorion extras list (ophis-xtras.txt,
      where they are numbered 17–26). Not part of v12: plain multipliers, all
      beta, appended on request by the Extras button. */
   C.EXTRA_OPERATIONS = [

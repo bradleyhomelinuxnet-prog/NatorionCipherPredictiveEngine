@@ -123,7 +123,7 @@
       assert.ok(operations.every(function (op) { return op.enabled === true; }));
     });
 
-    test("the extras are the ten of the Ophis extras list, all beta", function () {
+    test("the extras are the ten of the Natorion extras list, all beta", function () {
       var extras = C.extraOperations();
       assert.eq(extras.length, 10);
       assert.eq(extras[0].equation, "X1+Yx2.718");

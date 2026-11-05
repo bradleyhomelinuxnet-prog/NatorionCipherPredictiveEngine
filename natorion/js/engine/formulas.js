@@ -1,7 +1,7 @@
 /* NATORION · engine/formulas.js
    Two additions that sit beside the v12 engine and never change its results:
 
-   1. MSRF TIERS — the hierarchy from the Ophis 2.0 data dump, as gathered in
+   1. MSRF TIERS — the hierarchy from the v2.0 data dump, as gathered in
       the community paper "Ophis MSRF Details: Sources for the MSRF Magnitude
       Calculator". Each MSRF number belongs to a Tier by how many "dimensions
       of arithmetic" (appearances across the six MSRF filters) it shows up in:
@@ -29,7 +29,7 @@
   var NC = root.NC || (root.NC = {});
 
   var PHI = (1 + Math.sqrt(5)) / 2;      // 1.6180339887…
-  var PHI_OPHIS = 1.618;                 // OPH_PHI, as Ophis ships it
+  var PHI_OPHIS = 1.618;                 // OPH_PHI, as v12 ships it
 
   var TIERS = [
     { key: "I",     name: "Tier I",            dims: 2, numbers: [

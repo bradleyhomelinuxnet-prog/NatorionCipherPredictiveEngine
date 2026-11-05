@@ -5,14 +5,14 @@
 <base target="_blank">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Natorion Cipher</title>
-<meta name="description" content="Natorion Cipher: a front-end rebuild of the Ophis v12 date-projection engine, joined to the Chronicon calendrics and clocks, with a Studio that writes an animated-documentary production package from the numbers.">
+<meta name="description" content="Natorion Cipher: a front-end rebuild of the v12 date-projection engine, joined to the Chronicon calendrics and clocks, with a Studio that writes an animated-documentary production package from the numbers.">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#08080d" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f3ede0" media="(prefers-color-scheme: light)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Natorion Cipher">
 <meta property="og:title" content="Natorion Cipher">
-<meta property="og:description" content="A front-end rebuild of the Ophis v12 date-projection engine, joined to the Chronicon calendrics and clocks. It runs entirely in your browser.">
+<meta property="og:description" content="A front-end rebuild of the v12 date-projection engine, joined to the Chronicon calendrics and clocks. It runs entirely in your browser.">
 <meta property="og:url" content="https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/">
 <meta property="og:image" content="https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/docs/cipher.png">
 <meta property="og:image:width" content="1200">
@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="The Cipher screen: X-Dates on the left, the timeline and ranked Z-Dates on the right">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Natorion Cipher">
-<meta name="twitter:description" content="A front-end rebuild of the Ophis v12 date-projection engine, joined to the Chronicon calendrics and clocks. It runs entirely in your browser.">
+<meta name="twitter:description" content="A front-end rebuild of the v12 date-projection engine, joined to the Chronicon calendrics and clocks. It runs entirely in your browser.">
 <meta name="twitter:image" content="https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/docs/cipher.png">
 <meta name="twitter:image:alt" content="The Cipher screen: X-Dates on the left, the timeline and ranked Z-Dates on the right">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%2308080d' stroke='%23d8a943' stroke-width='3'/%3E%3Cpath d='M32 8 L32 56 M14 20 L50 44 M50 20 L14 44' stroke='%23f3d27a' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23d3402f'/%3E%3C/svg%3E">
@@ -204,7 +204,7 @@
           <div class="table-wrap const-wrap">
             <table class="kv const-table"><tbody id="constBody"></tbody></table>
           </div>
-          <p class="hint">The first four are the original program's. The other sixteen are Natorion's, shared with the single-file build; a file that uses one of them opens here but not in Ophis v12, which does not know the name. Click a name to try it.</p>
+          <p class="hint">The first four are the original program's. The other sixteen are Natorion's, shared with the single-file build; a file that uses one of them opens here but not in the original v12, which does not know the name. Click a name to try it.</p>
         </div>
         <div class="panel">
           <h2>Grammar</h2>
@@ -614,7 +614,7 @@
       <p>The Marks column adds the Chronicon's readings to each Z-Date: <b>⮌</b> when its MMDDYYYY form is a palindrome, <b>19</b> or <b>138</b> when its distance in days from today is a multiple of that number, and a glyph when a new moon (🌑), full moon (🌕) or eclipse falls within a day of it. The other moon phases can be switched on as timeline layers.</p>
 
       <h2>How this was rebuilt</h2>
-      <p>Ophis v12 is an offline Electron app whose source ships un-obfuscated. Natorion re-derives its engine from that source and runs in any browser with no install and no server. <code>tests/parity.js</code> runs the original v12 code and this engine side by side on the sample files and on randomly generated events, and checks that every Z-Date, score, hit count and match agrees.</p>
+      <p>The original v12 is an offline Electron app whose source ships un-obfuscated. Natorion re-derives its engine from that source and runs in any browser with no install and no server. <code>tests/parity.js</code> runs the original v12 code and this engine side by side on the sample files and on randomly generated events, and checks that every Z-Date, score, hit count and match agrees.</p>
       <p>Deliberate differences:</p>
       <ul>
         <li>Equations are parsed by a small grammar, never compiled with <code>new Function()</code>, which closes v12's code-execution hole in shared <code>.oph</code> files. <code>^</code> now means power; v12 validated it as power and then ran it as XOR.</li>
@@ -623,11 +623,11 @@
         <li>At high latitudes near the equinoxes, v12 swapped its sunset library for less accurate ones; Natorion keeps the accurate one.</li>
         <li>In HH:MM scope, T-Dates are read at the event's location (v12 read them in the computer's own time zone).</li>
         <li>An operation whose result is not a number for some Y is skipped for that Y instead of failing the whole run.</li>
-        <li>Time zones come from your browser's current time-zone database. Ophis v12 shipped 2023 data, so places whose rules changed since (Kazakhstan moved to UTC+5 in 2024, for one) show local times an hour apart in HH:MM scope. The instants and scores are the same.</li>
+        <li>Time zones come from your browser's current time-zone database. The original v12 shipped 2023 data, so places whose rules changed since (Kazakhstan moved to UTC+5 in 2024, for one) show local times an hour apart in HH:MM scope. The instants and scores are the same.</li>
       </ul>
       <h2>Using the dates</h2>
-      <p id="disclaimer">Ophis is a prediction tool, not a betting tool. How you use its dates is your decision and your responsibility; there are no guarantees. Never wager money you and your family can't live without.</p>
-      <p class="fine">Ophis is a study instrument after the work of Jason Breshears (Archaix). Natorion studies and rebuilds the software; it makes no claim that the projections predict anything.</p>
+      <p id="disclaimer">Natorion is a prediction tool, not a betting tool. How you use its dates is your decision and your responsibility; there are no guarantees. Never wager money you and your family can't live without.</p>
+      <p class="fine">Natorion is a study instrument after the work of Jason Breshears (Archaix). Natorion studies and rebuilds the software; it makes no claim that the projections predict anything.</p>
     </article>
   </section>
 </main>

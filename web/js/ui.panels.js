@@ -226,7 +226,7 @@
         '<span class="count' + (live < 1 ? " warn" : "") + '">' + live + " of " + event.operations.length + '</span>' +
         '<span class="spacer"></span>' +
         '<button class="btn small" data-action="add-operation" data-tip="Add an operation">+ Add</button>' +
-        '<button class="btn small ghost" data-action="add-extra-operations" data-tip="Add the ten extra operations (17–26 of the Ophis extras list)">Extras</button>' +
+        '<button class="btn small ghost" data-action="add-extra-operations" data-tip="Add the ten extra operations (17–26 of the Natorion extras list)">Extras</button>' +
         '<button class="btn small ghost" data-action="add-mirror-operations" data-tip="Add the ten mirror operations, switched off (they complete the X1/X2 grid of the sixteen)">Mirrors</button>' +
         '<button class="btn small ghost" data-action="ops-all-on" data-tip="Enable every operation">All</button>' +
         '<button class="btn small ghost" data-action="ops-all-off" data-tip="Disable every operation">None</button>' +
@@ -307,7 +307,7 @@
       '<h3>The shipped set</h3>' +
       '<table class="doc-table"><tbody>' + rows + '</tbody></table>' +
       '<h3>The extras</h3>' +
-      '<p>Ten more from the Ophis extras list, numbered on from the sixteen. They are not part of v12 and are all beta. ' +
+      '<p>Ten more from the Natorion extras list, numbered on from the sixteen. They are not part of v12 and are all beta. ' +
       'The <b>Extras</b> button adds whichever of them are not in the list yet.</p>' +
       '<table class="doc-table"><tbody>' + extras + '</tbody></table>' +
       '<h3>The mirrors</h3>' +

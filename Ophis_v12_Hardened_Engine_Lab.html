@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <base target="_blank">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ophis v12 · Hardened Engine Lab</title>
+<title>Natorion · Hardened Engine Lab</title>
 <!-- 'unsafe-eval' is here for one reason: the side-by-side reference engine
      reproduces the vulnerable new Function() path so the page can show what it
      does with each payload. The payloads are fixed strings in this file, and
@@ -77,9 +77,9 @@
   <div class="eyebrow">Proof-of-fix · Finding #1 remediation</div>
   <h1>Hardened Engine Lab</h1>
   <div class="tagline">a real parser, not <code>new Function()</code></div>
-  <p class="sub">The v12 report's #1 Critical finding is that Ophis compiles <code>.oph</code>-controlled formula strings with
+  <p class="sub">The v12 report's #1 Critical finding is that the original v12 compiles <code>.oph</code>-controlled formula strings with
   <code>new&nbsp;Function()</code>. This page implements the recommended fix — a sandboxed recursive-descent evaluator over the
-  Ophis grammar — and <b>proves</b> two things at load: it computes <b>identically</b> to the current engine on every shipped
+  Natorion grammar — and <b>proves</b> two things at load: it computes <b>identically</b> to the current engine on every shipped
   operation, and it <b>rejects</b> injection payloads that <code>new&nbsp;Function()</code> would execute. Open it; the tests run themselves.</p>
 </header>
 
@@ -111,7 +111,7 @@
   <div class="tblwrap"><table id="secTable"><thead><tr>
     <th>Payload (after <code>X2+</code>)</th><th>What it targets</th><th><code>new Function()</code></th><th><code>safeEval</code></th>
   </tr></thead><tbody></tbody></table></div>
-  <div class="note-card warn"><h4>Why the current regex filter isn't enough</h4><p>The PSYFR rewrites gate input with a character-allowlist
+  <div class="note-card warn"><h4>Why the current regex filter isn't enough</h4><p>The Natorion rewrites gate input with a character-allowlist
   (blank the known tokens, reject leftover letters). That stops casual misuse, but it's a denylist in front of a live compiler — one
   new function alias, or a payload built only from allowed characters, and it's back to arbitrary code. A parser that only ever
   produces an AST it knows how to walk has no such escape hatch.</p></div>
@@ -133,7 +133,7 @@
 </main>
 
 <footer>
-  <b>Ophis v12 · Hardened Engine Lab.</b> Proof-of-fix companion to the Reverse-Engineering Report (§7/§8). Implements the
+  <b>Natorion · Hardened Engine Lab.</b> Proof-of-fix companion to the Reverse-Engineering Report (§7/§8). Implements the
   "parser instead of <code>new&nbsp;Function</code>" recommendation and self-verifies parity + injection resistance in the browser.
   No dependencies, no network, its own CSP forbids external script.
 </footer>
@@ -141,7 +141,7 @@
 
 <script>
 /* ============================================================================
-   OPHIS GRAMMAR — shared definitions (both engines use the SAME functions/constants,
+   NATORION GRAMMAR — shared definitions (both engines use the SAME functions/constants,
    so the only variable under test is HOW the expression is evaluated).
    ========================================================================== */
 const CONSTS = { OPH_PI:3.14, OPH_PHI:1.618, OPH_CRV:5.08, OPH_HEP:7.01 };

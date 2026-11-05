@@ -2,7 +2,7 @@
 
 *Seed the controls. Cast them. Read what survives.*
 
-This manual assumes you have never used Ophis, never written a formula, and just want to get useful results. It comes in nineteen short chapters. Read 1–5 to get going; the rest is there when you need it.
+This manual assumes you have never used Natorion, never written a formula, and just want to get useful results. It comes in nineteen short chapters. Read 1–5 to get going; the rest is there when you need it.
 
 **Contents**
 
@@ -32,7 +32,7 @@ This manual assumes you have never used Ophis, never written a formula, and just
 
 Natorion Cipher is a **date-projection** tool. It takes dates that mattered in the past and, using a fixed set of number patterns, points to dates in the future that "rhyme" with them.
 
-It is a faithful rebuild of **Ophis v12**, the desktop app built around the work of Jason Breshears (Archaix). The same inputs give the same results as the original. It runs in a browser instead of as a Windows program, and it adds the **Chronicon**, a calendar and cycle explorer.
+It is a faithful rebuild of **the original v12** desktop app built around the work of Jason Breshears (Archaix). The same inputs give the same results as the original. It runs in a browser instead of as a Windows program, and it adds the **Chronicon**, a calendar and cycle explorer.
 
 A few words you'll see everywhere:
 
@@ -152,7 +152,7 @@ Take two X-Dates: **X1 = 07/04/2026** and **X2 = 08/20/2026**.
 
 The same pair feeds all thirty-six operations. #2 reverses the digits of 47 to get 74 and lands on 11/02/2026 (74 is also on the list). #1 simply adds 47 days to X2, landing on 10/06/2026. With more X-Dates there are more pairs: six dates make 15 pairs, and 15 pairs × 36 formulas give up to 540 projections. When several land on the **same day**, they merge into one row, and that row's score climbs.
 
-> A small precision note, kept from the original: 76.05 rounds to 76.1, exactly 0.1 from the vortex number 76.2, on the very edge of its ±0.1 window. In the computer's floating-point arithmetic, 76.2 − 76.1 comes out a hair over 0.1 (0.10000000000000853), so it counts as the normal number 76, not the vortex. Natorion reproduces Ophis v12's arithmetic exactly, down to cases like this.
+> A small precision note, kept from the original: 76.05 rounds to 76.1, exactly 0.1 from the vortex number 76.2, on the very edge of its ±0.1 window. In the computer's floating-point arithmetic, 76.2 − 76.1 comes out a hair over 0.1 (0.10000000000000853), so it counts as the normal number 76, not the vortex. Natorion reproduces the original v12's arithmetic exactly, down to cases like this.
 
 ---
 
@@ -177,7 +177,7 @@ In the worked example, 11/04/2026 has one alpha hit (1 point) and one normal MSR
 
 A Z that ends in exactly **.5** (such as 137.5) matches nothing; the rule is that it leans to neither side. The full lists are in the **Guide** screen under *The three MSRF sets*.
 
-**Scoring system.** Files from Ophis v7 and earlier used plain addition with no multiplier. A file can ask for that older system, and Natorion honours it.
+**Scoring system.** Files from the original v7 and earlier used plain addition with no multiplier. A file can ask for that older system, and Natorion honours it.
 
 ---
 
@@ -234,7 +234,7 @@ Add one under **T-Dates**. While at least one T-Date is ticked, the table shows 
 
 Under **Event → Scope** there are two ways to count:
 
-**Days** (the default). Dates are whole calendar days, counted in UTC exactly as Ophis did. **Day begins at (UTC)** can shift where each day starts, for advanced use.
+**Days** (the default). Dates are whole calendar days, counted in UTC exactly as v12 did. **Day begins at (UTC)** can shift where each day starts, for advanced use.
 
 **HH:MM · sunset.** This follows the ancient reckoning in which a day begins at sunset:
 
@@ -250,7 +250,7 @@ HH:MM takes a moment longer, since it calculates real sunsets.
 
 ## 12. Operations: the thirty-six formulas
 
-The **Operations** screen lists the current event's formulas. A new event runs **all thirty-six**, every one switched on: the standard sixteen from Ophis v12 (#1–16), the ten extras (#17–26) and the ten mirrors (#27–36). The sixteen from Ophis v12:
+The **Operations** screen lists the current event's formulas. A new event runs **all thirty-six**, every one switched on: the standard sixteen from the original v12 (#1–16), the ten extras (#17–26) and the ten mirrors (#27–36). The sixteen from the original v12:
 
 | # | Formula | Says | Class |
 |---|---|---|---|
@@ -284,7 +284,7 @@ The mirrors, #27–36, all beta, complete the X1/X2 grid of the sixteen: `X1+oph
 - **Add extras 17–26** / **Add mirrors** — put back whichever of those ten are missing.
 - **Restore all 36 defaults** — undo all your changes: the thirty-six, all on.
 
-A copy saved in your browser before the thirty-six became the default moves up to them the first time you open it, if its event was still on the untouched sixteen. A `.oph` file that leaves its operations out still means the sixteen, exactly as in Ophis v12.
+A copy saved in your browser before the thirty-six became the default moves up to them the first time you open it, if its event was still on the untouched sixteen. A `.oph` file that leaves its operations out still means the sixteen, exactly as in the original v12.
 
 The **Z at Y=100** column shows what each formula gives when Y is 100, as a quick sanity check.
 
@@ -344,13 +344,13 @@ The constants, as the screen lists them (click a name there to try it):
 | `OPH_E` | 2.718281828459045 | Euler's number |
 | `OPH_TAU` | 6.283185307179586 | τ, one full turn in radians |
 
-The first four are the original program's. The other sixteen are Natorion's, shared with the single-file build: a file that uses one of them opens here but not in Ophis v12, which does not know the name.
+The first four are the original program's. The other sixteen are Natorion's, shared with the single-file build: a file that uses one of them opens here but not in the original v12, which does not know the name.
 
 The formula must give a number above zero when Y is 10, or it is flagged.
 
 **Try one** at the bottom of the screen tests a formula on any Y. It shows the result and whether it hits an MSRF number. Put in `X2+oph_flip(oph_round(Y))` with Y = 138 and you get 831: 138 in the mirror.
 
-> **Safe by design.** Formulas are read by a strict little grammar and never run as program code. A shared `.oph` file can't make the app do anything except arithmetic. The original Ophis could be tricked this way; Natorion can't.
+> **Safe by design.** Formulas are read by a strict little grammar and never run as program code. A shared `.oph` file can't make the app do anything except arithmetic. The original v12 could be tricked this way; Natorion can't.
 
 ---
 
@@ -374,10 +374,10 @@ A document can hold many **events**. Each is a separate set of X-Dates with its 
 
 **Save a file:** **Files → Save .oph** (or **Ctrl+S** / **⌘S**). Give it a name first under **File name**. **Readable** saves a neat file you can read; **Minified** makes the smallest file, leaving out anything at its default.
 
-**Open a file:** **Files → Choose .oph…** (or **Ctrl+O**), or drag a `.oph` file anywhere onto the page. Files from the original Ophis app open as they are.
+**Open a file:** **Files → Choose .oph…** (or **Ctrl+O**), or drag a `.oph` file anywhere onto the page. Files from the original app open as they are.
 
 - **Replace these events** swaps in the file's events; **Add to them** appends them.
-- **Checking** decides how fussy to be about damaged files. **Loose** repairs what it can and tells you what it fixed. **Original** behaves like Ophis v10. **Strict** refuses anything imperfect.
+- **Checking** decides how fussy to be about damaged files. **Loose** repairs what it can and tells you what it fixed. **Original** behaves like the original v10. **Strict** refuses anything imperfect.
 - **Paste text instead** lets you paste a file's contents directly.
 
 **Export results** of the current event:
@@ -503,7 +503,7 @@ The **Studio** screen turns the open event into a production package for an anim
 
 **It says "Not saved" at the top.** This browser won't let pages store anything (common in private windows). Everything still works; save a file before you close.
 
-**Are the results the same as the original Ophis?** Yes. The test `tests/parity.js` runs the original Ophis v12 code and Natorion side by side. In the last run, all 1,003 test cases matched, down to every date, score and hit. The deliberate differences are safety fixes, more accurate astronomy, and up-to-date time zones (the original ships 2023 zone data); the **Guide** screen lists them.
+**Are the results the same as the original v12?** Yes. The test `tests/parity.js` runs the original v12 code and Natorion side by side. In the last run, all 1,003 test cases matched, down to every date, score and hit. The deliberate differences are safety fixes, more accurate astronomy, and up-to-date time zones (the original ships 2023 zone data); the **Guide** screen lists them.
 
 **Does it send anything anywhere?** No. It runs entirely in your browser. The only outside request is for the display fonts, and the app works without them.
 

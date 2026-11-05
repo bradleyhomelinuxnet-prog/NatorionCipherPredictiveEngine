@@ -1,4 +1,4 @@
-NatorionCipherPredictiveEngine · PSYFR
+NatorionCipherPredictiveEngine
 Copyright (c) 2026 Bradley Rogue (BeeRadicalStuff)
 
 SPDX-License-Identifier: CC-BY-NC-SA-4.0
@@ -30,7 +30,7 @@ WHAT IT DOES NOT COVER
 1. THIRD-PARTY LIBRARIES. The files in `lib/`, `ophis/lib/` and
    `natorion/js/vendor/` belong to their authors and keep their own licences.
 
-2. THE TYPEFACES embedded in Ophis Web are under the SIL Open Font License
+2. THE TYPEFACES embedded in Natorion Web are under the SIL Open Font License
    1.1; the notice travels with them in `web/css/OFL.txt`.
 
 3. THE ARCHAIX THESIS. The ideas these instruments render are the copyrighted

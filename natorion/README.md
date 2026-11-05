@@ -2,7 +2,7 @@
 
 **Natorion Cipher** is a date-projection tool that runs in your web browser. You give it two or more dates that matter to you; it counts the days between them, runs those counts through sixteen number formulas, and lists the future dates they point to, strongest first. It also includes **the Chronicon**, a page of live clocks, long historical cycles, the moon, and nineteen calendars, and **the Studio**, which writes a production package for an animated history documentary from the numbers: the script, the character look cards, an image and an animation prompt for every paragraph, the thumbnail and the upload text.
 
-It rebuilds **Ophis v12** (the Windows desktop app also called PSYFR) as a plain web page. Nothing to install, no account, and nothing leaves your computer. Opened from a copy of its folder, it needs no internet at all.
+It rebuilds **the original v12** Windows desktop app as a plain web page. Nothing to install, no account, and nothing leaves your computer. Opened from a copy of its folder, it needs no internet at all.
 
 > The full manual, with every button explained, is in **[MANUAL.md](MANUAL.md)**.
 
@@ -64,7 +64,7 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 
 - **It saves itself** in your browser as you go ("Saved" at the top right).
 - To keep a **file** you can back up or share: **Files → Save .oph**. (Or press **Ctrl+S**.)
-- To open a file later, or one from the original Ophis app: **Files → Choose .oph…**, or just drag the file onto the page.
+- To open a file later, or one from the original app: **Files → Choose .oph…**, or just drag the file onto the page.
 - To get the results into Excel: **Files → Results .xls** or **Results CSV**.
 
 > **Important:** the browser copy lives in *that* browser on *that* computer. Clearing your browser history, or using a private window, can erase it. Save a `.oph` file for anything you care about.
@@ -104,7 +104,7 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 ## 7. For the technical folks
 
 - Pure front end: `index.html` + `css/` + `js/`. No build step, no server, no framework. Works from `file://`.
-- The engine re-derives the Ophis v12 source in this repo (`../src`). **`tests/parity.js`** runs the original v12 code and this engine side by side on the sample files and on randomly generated events — Days and HH:MM scope, T-Dates, every filter, disabled and unreadable dates, both scoring systems, all five sorts, extra and duplicate operations, "today" placed inside the date range — comparing every Z-Date, score, hit count, MSRF match and contributing operation. Last runs: **1,003 of 1,003** identical (seed 138) and **403 of 403** (seed 19). The one known class of difference is time-zone *data*: v12 ships 2023 zone rules, the browser's are current, so a place whose rules changed since (Kazakhstan moved to UTC+5 in 2024) shows local times an hour apart in HH:MM scope while the instants and scores still match.
+- The engine re-derives the v12 source in this repo (`../src`). **`tests/parity.js`** runs the original v12 code and this engine side by side on the sample files and on randomly generated events — Days and HH:MM scope, T-Dates, every filter, disabled and unreadable dates, both scoring systems, all five sorts, extra and duplicate operations, "today" placed inside the date range — comparing every Z-Date, score, hit count, MSRF match and contributing operation. Last runs: **1,003 of 1,003** identical (seed 138) and **403 of 403** (seed 19). The one known class of difference is time-zone *data*: v12 ships 2023 zone rules, the browser's are current, so a place whose rules changed since (Kazakhstan moved to UTC+5 in 2024) shows local times an hour apart in HH:MM scope while the instants and scores still match.
 - **`tests/self-check.js`** runs 47 checks without the original source, thirteen of them on the Studio: that the demo, a sunset-scope copy and a two-date copy meet the brief at all three lengths (the word and paragraph counts, 15–40 words a paragraph, three etymology drops, three "still exists today" anchors, the closing call to subscribe, the style tag on every image, no shot type twice running, no banned phrase), that the same event gives the same package, and that a variation changes the words but not the numbers.
 - **`tests/browser.js`** drives the real app in headless Chromium: every screen, a known projection with a known score, opening v9 and v12 files, refusing a document with no events, duplicating and deleting events around the open one, pasting dates, editing operations, the Chronicon bridge and Dossier, the Studio (the plan, the numbered script, the 15-minute cut, image prompts in batches of five each ending with the style tag, the clips, the upload text, the saved Markdown, renaming the chronicler), the skip link, keyboard focus kept clear of the sticky top bar, the three exports, HH:MM scope, persistence across a reload, the timeline, and phone widths with no sideways scrolling. It fails on any script error and on any unexpected dialog. 86 checks.
 - **`tests/mutants.js`** proves the browser test can fail: it breaks the app in 33 deliberate ways (a save that drops every X-Date, a CSV with no rows, a frozen clock, a chart that draws nothing, sunsets at midnight, a parser that lets names through, image prompts without the style tag, the wrong call to subscribe, batches of six …) and runs the browser test against each. It catches 32; the other is a CSS rule that other rules already make redundant.
@@ -122,10 +122,10 @@ node tests/browser.js --shots shots/   # browser test, saving a screenshot of ev
 
 The app itself needs none of this; `npm` is only for the tests.
 
-Bundled third-party code: [Astronomy Engine](https://github.com/cosinekitty/astronomy) (MIT, sunsets and moon phases) and [tz-lookup](https://github.com/darkskyapp/tz-lookup-oss) (time zone from a map position). The eclipse tables are the NASA-derived ones Ophis shipped.
+Bundled third-party code: [Astronomy Engine](https://github.com/cosinekitty/astronomy) (MIT, sunsets and moon phases) and [tz-lookup](https://github.com/darkskyapp/tz-lookup-oss) (time zone from a map position). The eclipse tables are the NASA-derived ones the original v12 shipped.
 
 ---
 
-*Ophis is a study instrument after the work of Jason Breshears (Archaix). Natorion rebuilds the software. It does not claim the projections predict anything.*
+*Natorion is a study instrument after the work of Jason Breshears (Archaix). Natorion rebuilds the software. It does not claim the projections predict anything.*
 
 *Seed the dates · cast the numbers · read what survives — read, cast, seed.*

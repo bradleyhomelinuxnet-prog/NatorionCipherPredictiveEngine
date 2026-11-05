@@ -1,7 +1,7 @@
 /* NATORION · engine/expr.js
    The equation language, parsed rather than eval'd.
 
-   Ophis v12 compiled every operation string with new Function(), after
+   The original v12 compiled every operation string with new Function(), after
    checking a *different*, stripped copy of it with math.js. A crafted .oph
    could therefore run code. Here one parser both validates and evaluates, and
    it knows only: numbers, Y, the OPH_ constants (C.CONSTANTS), the oph_* functions,

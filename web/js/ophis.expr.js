@@ -8,7 +8,7 @@
        X1 + (Y/2.0)xOPH_PI
 
    SECURITY NOTE — this is the one place this rewrite deliberately does NOT
-   copy the desktop app. Ophis v12 compiles the formula body with
+   copy the desktop app. The original v12 compiles the formula body with
    `new Function("Y", "return " + body)` (src/ophis_model__validation.js:158),
    which makes any .oph file a script: the string is validated in a *stripped*
    form and then a *different* string is compiled. That is finding #1 of the

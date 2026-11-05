@@ -3,7 +3,7 @@
    --------------------------------------------------------------------------
    An analysis layer that sits beside the engine and never inside it. It
    reads what Engine.run returns and reports on it; nothing here changes a
-   Z-Date, a hit, a score or a filter, so Ophis still reproduces the desktop
+   Z-Date, a hit, a score or a filter, so Natorion still reproduces the desktop
    program exactly.
 
    Two questions, each answered against chance rather than on its own:
