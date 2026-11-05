@@ -17,6 +17,7 @@
     var list = ops(), body = $("opsBody");
     var on = list.filter(function (o) { return o.enabled === true; }).length;
     $("opsCount").textContent = on + " of " + list.length + " on";
+    renderSets();
     D.fill(body, list.map(function (o, i) {
       var chk = o.enabled === true ? sample(o, i, list) : { text: "off", err: null };
       var eq = el("input", { type: "text", value: o.equation, spellcheck: "false", autocomplete: "off", "aria-label": "Formula " + (i + 1) + " equation", "aria-invalid": chk.err ? "true" : null });
@@ -82,6 +83,50 @@
     });
     D.fill($("constBody"), rows);
     $("constCount").textContent = C.CONSTANTS.length + " names";
+  }
+
+  /* Formula sets: on = every formula of the set is present and switched on.
+     Switching on adds any that are missing; switching off only unticks them,
+     so an edited row is never thrown away. */
+  function setState(set) {
+    var list = ops(), norm = NC.expr.normalize;
+    var rows = set.ops.map(function (x) { var k = norm(x.equation); return list.find(function (o) { return norm(o.equation) === k; }); });
+    var on = rows.filter(function (r) { return r && r.enabled === true; }).length;
+    return { on: on, total: set.ops.length, rows: rows };
+  }
+  function farOutHidden() {
+    var e = S.event();
+    return C.fieldOn(e, "iso_event_filter_beyond_max_days") && C.fieldValue(e, "iso_event_filter_beyond_max_days") < C.METONIC_DAYS;
+  }
+  function renderSets() {
+    var box = $("opsSets"); if (!box) return;
+    D.fill(box, C.OPERATION_SETS.map(function (set) {
+      var st = setState(set), all = st.on === st.total;
+      var cb = el("input", { type: "checkbox", id: "set-" + set.id, "aria-describedby": "set-" + set.id + "-note" });
+      cb.checked = all; cb.indeterminate = st.on > 0 && !all;
+      cb.addEventListener("change", function () { toggleSet(set, cb.checked); });
+      var warn = set.farOut && st.on && farOutHidden()
+        ? el("span.set-warn", { text: " Hidden right now: the “Beyond N days” filter is set below " + Math.ceil(C.METONIC_DAYS) + ". Raise it or switch it off on the Cipher screen to see these dates." }) : null;
+      return el("div.op-set", {}, [
+        el("label.op-set-head", { for: "set-" + set.id }, [cb, el("b", { text: set.label }), el("small.mono", { text: " " + set.ops.map(function (o) { return o.equation; }).join(" · ") })]),
+        el("p.hint.small", { id: "set-" + set.id + "-note" }, [set.note, warn])
+      ]);
+    }));
+  }
+  function toggleSet(set, on) {
+    var norm = NC.expr.normalize, added = 0;
+    S.change(function () {
+      var list = ops();
+      set.ops.forEach(function (x) {
+        var k = norm(x.equation), row = list.find(function (o) { return norm(o.equation) === k; });
+        if (row) row.enabled = on;
+        else if (on) { list.push({ equation: x.equation, weight: x.weight, enabled: true }); added++; }
+      });
+    });
+    render();
+    var msg = set.label + (on ? " is on" + (added ? " (" + added + " formula" + (added === 1 ? "" : "s") + " added)" : "") : " is off") + ".";
+    if (on && set.farOut && farOutHidden()) msg += " Its dates are 19 years out, past the “Beyond N days” filter.";
+    D.toast(msg);
   }
 
   function init() {

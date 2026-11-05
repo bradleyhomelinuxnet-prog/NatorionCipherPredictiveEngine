@@ -213,6 +213,25 @@
     op("X1+Y/OPH_PI", B, false), op("X2+Y/OPH_PI", B, false)
   ];
 
+  // Formula sets: small themed groups switched on and off together on the
+  // Formulas screen. Not part of the 36 defaults except "138 & 360", whose
+  // three formulas are extras 19, 20 and 26 and so are on in every new event.
+  //  - Lucky 19 follows the 138 pattern with 19: Y x 1.9 from either anchor,
+  //    and Y x 0.19 (as 0.360 is 360 scaled down) onto the later one.
+  //  - Metonic adds one Metonic cycle (19 years = 235 lunar months =
+  //    6,939.69 days) to each anchor. It ignores Y on purpose: it is the
+  //    19-year echo of each date. Those dates fall far beyond the usual
+  //    2,559-day horizon, so they show only with that filter raised or off.
+  C.METONIC_DAYS = 6939.69;
+  C.OPERATION_SETS = [
+    { id: "s138", label: "138 & 360", ops: [op("X1+Yx1.38", B), op("X2+Yx1.38", B), op("X2+Yx0.360", B)],
+      note: "Y × 1.38 from either anchor and Y × 0.360 onto the later one. Already among the 36 defaults (extras 19, 20 and 26)." },
+    { id: "s19", label: "Lucky 19", ops: [op("X1+Yx1.9", B), op("X2+Yx1.9", B), op("X2+Yx0.19", B)],
+      note: "The same pattern with 19: Y × 1.9 from either anchor and Y × 0.19 onto the later one." },
+    { id: "metonic", label: "Metonic · 19 years", ops: [op("X1+6939.69", B), op("X2+6939.69", B)], farOut: true,
+      note: "One Metonic cycle (19 years, 235 lunar months, 6,939.69 days) after each anchor date: the date's 19-year echo." }
+  ];
+
   C.cloneDefaultOperations = function () { return C.DEFAULT_OPERATIONS.map(function (o) { return op(o.equation, o.weight, o.enabled); }); };
 
   // All thirty-six: the sixteen, the extras 17-26 and the ten mirrors, every

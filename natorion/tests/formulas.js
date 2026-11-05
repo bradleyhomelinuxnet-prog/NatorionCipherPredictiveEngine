@@ -43,5 +43,13 @@ check("ladder: each rung is the shadow of the one two above", (L => L.slice(2).e
 check("shadow equations parse in the Operations grammar", F.SHADOW_EQUATIONS.map(q => !!NC.expr.compileOperation(q, 0, []).fn), [true, true, true]);
 check("X1+Y/OPH_PHI/OPH_PHI on Y=138", r(NC.expr.compileOperation(F.SHADOW_EQUATIONS[0], 0, []).fn(138), 2), 52.71);
 
+console.log("formula sets");
+const setEqs = id => C.OPERATION_SETS.find(s => s.id === id).ops.map(o => o.equation);
+check("138 & 360 is extras 19, 20 and 26", setEqs("s138"), [C.ALL_OPERATIONS[18], C.ALL_OPERATIONS[19], C.ALL_OPERATIONS[25]].map(o => o.equation));
+check("every set formula compiles", C.OPERATION_SETS.every(s => s.ops.every(o => !!NC.expr.compileOperation(o.equation, 0, []).fn)), true);
+check("Lucky 19 on Y = 100: 190, 190, 19", setEqs("s19").map(q => NC.expr.compileOperation(q, 0, []).fn(100)), [190, 190, 19]);
+check("Metonic adds 6,939.69 days whatever the gap", setEqs("metonic").map(q => NC.expr.compileOperation(q, 0, []).fn(1234)), [6939.69, 6939.69]);
+check("the 36 defaults are unchanged", C.ALL_OPERATIONS.length, 36);
+
 console.log("\n" + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);

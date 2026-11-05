@@ -526,3 +526,12 @@ dialog h2 { margin-bottom: 8px; }
 .bt-h { font-family: var(--f-display); font-size: 14px; letter-spacing: .1em; margin: 18px 0 4px; color: var(--gold); }
 .bt-h small, .test-panel h2 small { color: var(--dim); font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; }
 .bt-echoes { margin: 6px 0; padding-left: 18px; font-family: var(--f-mono); font-size: 12.5px; line-height: 1.7; }
+
+/* ------------------------------------------------------- formula sets -- */
+.op-sets { display: grid; gap: 4px 20px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); padding: 4px 0; }
+.op-set { min-width: 0; }
+.op-set-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; cursor: pointer; }
+.op-set-head input { transform: translateY(2px); }
+.op-set-head small { color: var(--dim); overflow-wrap: anywhere; }
+.op-set .hint { margin: 2px 0 8px 24px; }
+.set-warn { color: var(--gold-2); }

@@ -144,6 +144,19 @@ async function main() {
     await page.keyboard.press("Escape");
     check("Escape closes the drawer", !(await page.$("#detailDialog[open]")));
 
+    console.log("formula sets");
+    await page.click('button[data-screen="operations"]');
+    check("the 138 & 360 set starts on, Lucky 19 and Metonic off", await page.evaluate(() =>
+      document.getElementById("set-s138").checked && !document.getElementById("set-s19").checked && !document.getElementById("set-metonic").checked));
+    const countBefore = await text(page, "#opsCount");
+    await page.click("#set-s19");
+    check("switching Lucky 19 on adds its three formulas, on", /^(\d+) of \1 on$/.test(await text(page, "#opsCount")) && (await text(page, "#opsCount")) !== countBefore);
+    await page.click("#set-metonic");
+    check("Metonic warns that the Beyond-N-days filter hides its 19-year dates", /Hidden right now/.test(await text(page, "#opsSets")));
+    await page.click("#set-s19"); await page.click("#set-metonic");
+    check("switching them off unticks them and keeps the rows", /^36 of 41 on$/.test(await text(page, "#opsCount")), await text(page, "#opsCount"));
+    await page.click('button[data-screen="cipher"]');
+
     console.log("the Test it panel");
     await page.click("#testPanel > summary");
     await page.click("#btRun");

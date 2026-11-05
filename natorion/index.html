@@ -199,7 +199,11 @@
     <div class="page">
       <p class="eyebrow">The functions of Y</p>
       <h1 id="h-ops" tabindex="-1">Formulas <small>operations</small></h1>
-      <p class="lede">Each operation turns the day-count <b>Y</b> between two X-Dates into a day-offset <b>Z</b>, added to the earlier anchor (<code>X1+</code>) or the later one (<code>X2+</code>). An alpha operation's hit is worth 1 point, a beta's ½.</p>
+      <p class="lede">Each formula turns the <b>gap</b> (Y, the days between two anchor dates) into a day-offset <b>Z</b>, added to the earlier anchor (<code>X1+</code>) or the later one (<code>X2+</code>). A strong (alpha) formula's match is worth 1 point, a light (beta) one's ½.</p>
+      <div class="panel">
+        <div class="panel-head"><h2>Formula sets <small>switch a whole set on or off</small></h2></div>
+        <div id="opsSets" class="op-sets"></div>
+      </div>
       <div class="panel">
         <div class="panel-head">
           <h2>This event's operations <small id="opsCount"></small></h2>

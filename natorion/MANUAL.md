@@ -289,6 +289,16 @@ The mirrors, #27–36, all light (beta), complete the X1/X2 grid of the sixteen:
 - **Add extras 17–26** / **Add mirrors** — put back whichever of those ten are missing.
 - **Restore all 36 defaults** — undo all your changes: the thirty-six, all on.
 
+**Formula sets** sit above the list. Each box switches a whole set on or off. Switching on adds any formula of the set that's missing; switching off only unticks them, so nothing you edited is lost. A half-filled box means some of the set is on.
+
+| Set | Formulas | What it is |
+|---|---|---|
+| **138 & 360** | `X1+Yx1.38`, `X2+Yx1.38`, `X2+Yx0.360` | Already among the 36 defaults (extras 19, 20 and 26), so it starts on. |
+| **Lucky 19** | `X1+Yx1.9`, `X2+Yx1.9`, `X2+Yx0.19` | The same pattern with 19. Starts off. |
+| **Metonic · 19 years** | `X1+6939.69`, `X2+6939.69` | One Metonic cycle (19 years, 235 lunar months) after each anchor date: each date's 19-year echo. It ignores the gap on purpose. Starts off. |
+
+The Metonic dates land about 6,940 days out, past the usual **Beyond N days** filter (2,559). The app tells you when that filter is hiding them; raise it above 6,940 or switch it off on the Cipher screen to see them. The **Test it** panel's cycle echoes look at the same 19-year cycle the other way round: which projected dates already sit a whole Metonic cycle from an anchor.
+
 A copy saved in your browser before the thirty-six became the default moves up to them the first time you open it, if its event was still on the untouched sixteen. A `.oph` file that leaves its operations out still means the sixteen, exactly as in the original v12.
 
 The **Z at Y=100** column shows what each formula gives when Y is 100, as a quick sanity check.
