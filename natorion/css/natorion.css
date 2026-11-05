@@ -514,3 +514,15 @@ dialog h2 { margin-bottom: 8px; }
 .render .am small { color: var(--dim); }
 .render .note { font-size: 13px; color: var(--dim); margin-top: 3px; }
 @media (max-width: 720px) { .chapter { padding: 2px 12px 4px; } .chapter > summary { font-size: 14px; } }
+
+/* ---------------------------------------------------- Test it (backtest) -- */
+.test-panel { margin-top: var(--gap); }
+.bt-controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 10px 0; }
+.bt-line { margin: 8px 0; font-size: 15px; }
+.bt-line .bt-verdict { color: var(--dim); }
+.bt-line.strong .bt-verdict { color: var(--green); font-weight: 600; }
+.bt-line.some .bt-verdict { color: var(--gold-2); }
+.bt-table tr.hit td { color: var(--gold-2); }
+.bt-h { font-family: var(--f-display); font-size: 14px; letter-spacing: .1em; margin: 18px 0 4px; color: var(--gold); }
+.bt-h small, .test-panel h2 small { color: var(--dim); font-family: var(--f-mono); font-size: 11px; letter-spacing: .06em; }
+.bt-echoes { margin: 6px 0; padding-left: 18px; font-family: var(--f-mono); font-size: 12.5px; line-height: 1.7; }

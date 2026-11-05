@@ -144,6 +144,15 @@ async function main() {
     await page.keyboard.press("Escape");
     check("Escape closes the drawer", !(await page.$("#detailDialog[open]")));
 
+    console.log("the Test it panel");
+    await page.click("#testPanel > summary");
+    await page.click("#btRun");
+    await page.waitForFunction(() => /Any match/.test(document.getElementById("btOut").textContent), null, { timeout: 15000 });
+    check("the backtest scores the sample's later anchor dates against luck", await page.evaluate(() =>
+      /Any match: \d+ of 4/.test(document.getElementById("btOut").textContent) && document.querySelectorAll("#btOut tbody tr").length === 4));
+    check("cycle echoes say when the span is too short for a cycle", /too short for one cycle/.test(await text(page, "#echoOut")));
+    await page.click("#testPanel > summary");
+
     console.log("a known projection (the manual's worked example)");
     await page.click("#xPasteBtn");
     await page.fill("#pasteDates", "07/04/2026, 08/20/2026");

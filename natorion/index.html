@@ -171,6 +171,25 @@
           </div>
           <div class="empty" id="emptyState" hidden></div>
         </section>
+
+        <details class="panel test-panel" id="testPanel">
+          <summary><h2>Test it <small>backtest &amp; cycle echoes</small></h2></summary>
+          <p class="hint">Would these formulas have pointed to your later dates from your earlier ones? Each answer is set against what luck alone would give.</p>
+          <div class="bt-controls">
+            <label class="inline"><span>Match</span>
+              <select id="btTol" aria-label="How close a projection must be to count as a hit">
+                <option value="0">exact day</option><option value="1">±1 day</option><option value="3">±3 days</option><option value="7">±7 days</option>
+              </select>
+            </label>
+            <label class="inline"><span>Top</span>
+              <select id="btTop" aria-label="How many of the strongest projections count as the top"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select>
+            </label>
+            <button type="button" id="btRun">Run backtest</button>
+          </div>
+          <div id="btOut" aria-live="polite"></div>
+          <h3 class="bt-h">Cycle echoes <small>☾ Metonic 19 years · ◆ 138 years</small></h3>
+          <div id="echoOut"></div>
+        </details>
       </div>
     </div>
   </section>
@@ -660,6 +679,7 @@
 <script src="js/engine/sky.js"></script>
 <script src="js/engine/engine.js"></script>
 <script src="js/engine/oph.js"></script>
+<script src="js/engine/backtest.js"></script>
 <script src="js/chronicon/chronicon.js"></script>
 <script src="js/chronicon/dossier.js"></script>
 <script src="js/studio/studio.js"></script>
@@ -671,6 +691,7 @@
 <script src="js/ui/chronicon-view.js"></script>
 <script src="js/ui/files.js"></script>
 <script src="js/ui/studio-view.js"></script>
+<script src="js/ui/backtest-view.js"></script>
 <script src="js/ui/app.js"></script>
 </body>
 </html>

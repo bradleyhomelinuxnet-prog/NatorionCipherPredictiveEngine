@@ -709,3 +709,7 @@ body.dropping::after {
   .panel { border: 1px solid #ccc; break-inside: avoid; margin-bottom: 10px; }
   .table-scroll { max-height: none; overflow: visible; }
 }
+
+/* Archive notice: Natorion Web is kept for reference; Natorion is the current app. */
+.archive-note { margin: 0; padding: 8px 16px; background: #14141f; color: #ece5d2; border-bottom: 1px solid #d8a943; font: 14px/1.45 Georgia, serif; text-align: center; }
+.archive-note a { color: #f3d27a; font-weight: bold; }

@@ -61,7 +61,7 @@
     S.load();
     applyTheme();
     keepClearOfBar();
-    NC.cipher.init(); NC.opsView.init(); NC.chronView.init(); NC.files.init(); NC.studioView.init();
+    NC.cipher.init(); NC.opsView.init(); NC.chronView.init(); NC.files.init(); NC.studioView.init(); NC.backtestView.init();
     renderMsrfSets();
     renderEventPicker();
     NC.cipher.renderEvent();
