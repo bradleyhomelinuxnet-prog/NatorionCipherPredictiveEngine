@@ -5,6 +5,7 @@ Two formulas added beside the Ophis v12 engine. They read the engine's numbers a
 - **Page:** [`formulas.html`](formulas.html) ([live](https://bradleyhomelinuxnet-prog.github.io/NatorionCipherPredictiveEngine/natorion/formulas.html))
 - **Code:** [`js/engine/formulas.js`](js/engine/formulas.js) (`NC.formulas`)
 - **Test:** [`tests/formulas.js`](tests/formulas.js)
+- **Backtest:** [`BACKTEST.md`](BACKTEST.md): the tiers were tested as a scoring weight and did not improve ranking, so they stay a reading aid.
 - **In the app:** the Operations try-it box now prints the tier and the phi shadow under the MSRF match.
 
 ## 1 · MSRF Magnitude (the tiers)
