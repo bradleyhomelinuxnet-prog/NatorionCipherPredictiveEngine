@@ -115,7 +115,7 @@ async function main() {
     check("… and moved again", (await ymd()) === "2026-9-23", await ymd());
     const rows0 = await page.$$eval("#resultsBody tr[data-key]", r => r.length);
     check("the demo event projects Z-Dates", rows0 > 0, rows0);
-    check("the status line counts Y-pairs", /15\s*Y-pairs/.test(await text(page, "#status")), await text(page, "#status"));
+    check("the status line counts the gaps (Y-pairs)", /15\s*gaps/.test(await text(page, "#status")), await text(page, "#status"));
     check("marks render as text, never as [object …]", !/\[object /.test(await text(page, "#resultsBody")));
     const inked = () => page.$eval("#chart", c => { const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i]) n++; return n; });
     check("the timeline is drawn (inked pixels)", (await inked()) > 5000, await inked());
@@ -139,7 +139,7 @@ async function main() {
     await page.click("#resultsBody tr[data-key]");
     await page.waitForSelector("#detailDialog[open]");
     const detail = await text(page, "#detailBody");
-    check("clicking a row opens its derivation", /score/.test(detail) && /Y = /.test(detail), detail.slice(0, 120));
+    check("clicking a row opens its derivation", /strength/.test(detail) && /Y = /.test(detail), detail.slice(0, 120));
     await shot(page, "detail");
     await page.keyboard.press("Escape");
     check("Escape closes the drawer", !(await page.$("#detailDialog[open]")));
@@ -200,7 +200,7 @@ async function main() {
     await go(page, "cipher");
     await settle(page);
     check("Event 1 is the open event again", (await page.evaluate(() => NC.store.state.current)) === 0);
-    check("its seven anchors give 21 Y-pairs", /\b21\s*Y-pairs/.test(await text(page, "#status")) && (await page.$$eval("#xList input[type=date]", i => i.length)) === 7, await text(page, "#status"));
+    check("its seven anchors give 21 gaps (Y-pairs)", /\b21\s*gaps/.test(await text(page, "#status")) && (await page.$$eval("#xList input[type=date]", i => i.length)) === 7, await text(page, "#status"));
     check("the opened event projects", (await page.$$eval("#resultsBody tr[data-key]", r => r.length)) > 0);
 
     console.log("pasting dates");
@@ -210,7 +210,7 @@ async function main() {
     await settle(page);
     const xs = await page.$$eval("#xList input[type=date]", i => i.map(x => x.value));
     check("the file-name date style pastes as three X-Dates", JSON.stringify(xs) === JSON.stringify(["2026-07-04", "2026-08-20", "2027-03-09"]), xs.join(","));
-    check("three dates give three Y-pairs", /3\s*Y-pairs/.test(await text(page, "#status")), await text(page, "#status"));
+    check("three dates give three gaps (Y-pairs)", /3\s*gaps/.test(await text(page, "#status")), await text(page, "#status"));
 
     console.log("operations");
     await go(page, "operations");

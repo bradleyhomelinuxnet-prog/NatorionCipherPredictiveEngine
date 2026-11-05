@@ -130,7 +130,7 @@
         items.push(el("li", {}, [el("button.ghost", { type: "button", text: T.msToDateString(t.start, res.zone) + " · " + t.score, title: "Open this day", onclick: function () { setAstro(w.y, w.m, w.d); } })]));
       });
     }
-    if (!items.length) items = [el("li.none", { text: "No shown Z-Date of “" + (S.event().name || "this event") + "” falls in this year." })];
+    if (!items.length) items = [el("li.none", { text: "No shown projected date of “" + (S.event().name || "this event") + "” falls in this year." })];
     D.fill($("chZList"), items.slice(0, 60));
   }
 
@@ -185,7 +185,7 @@
     $("chToday").addEventListener("click", function () { now0 = new Date(); setAstro(now0.getFullYear(), now0.getMonth() + 1, now0.getDate()); });
     $("chToX").addEventListener("click", function () {
       var a = astro(), p = md();
-      if (a < 1 || a > NC.C.MAX_YEAR) { NC.dom.toast("X-Dates run from 1 CE to " + NC.C.MAX_YEAR + " CE.", true); return; }
+      if (a < 1 || a > NC.C.MAX_YEAR) { NC.dom.toast("Anchor dates run from 1 CE to " + NC.C.MAX_YEAR + " CE.", true); return; }
       var date = T.pad(p.m) + "/" + T.pad(p.d) + "/" + a;
       S.change(function (e) { e.x_dates = (e.x_dates || []).concat([{ date: date, time: "00:00", enabled: true }]); });
       NC.cipher.renderDates("x");

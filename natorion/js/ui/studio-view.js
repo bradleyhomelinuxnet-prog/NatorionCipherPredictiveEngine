@@ -46,7 +46,7 @@
     $("stSave").disabled = $("stCopyAll").disabled = $("stCopyStep").disabled = !plan;
     if (!plan) {
       var res = S.state.results, why = res && res.errors.length ? res.errors[0] : "The Studio writes from the Cipher's results, and there are none yet.";
-      D.fill(empty, [el("b", { text: "Seed the anchors first" }), why + " Add two or more X-Dates on the Cipher screen."]);
+      D.fill(empty, [el("b", { text: "Seed the anchors first" }), why + " Add two or more anchor dates on the Cipher screen."]);
       empty.hidden = false;
       D.fill($("stPlan"), []); $("stSections").textContent = ""; D.fill($("stChecks"), []); D.fill($("stBody"), []);
       $("stBatchNav").hidden = true;

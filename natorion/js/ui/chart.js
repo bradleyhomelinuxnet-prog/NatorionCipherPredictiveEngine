@@ -166,7 +166,7 @@
     var mono = "11px " + (css("--f-mono") || "monospace");
     if (!data || !view) {
       ctx.fillStyle = dim; ctx.font = mono; ctx.textAlign = "center";
-      ctx.fillText("Add two X-Dates to draw the timeline.", W / 2, H / 2);
+      ctx.fillText("Add two anchor dates to draw the timeline.", W / 2, H / 2);
       return;
     }
     var by = baseY(), top = M.t, hMax = by - top - 44;
@@ -267,7 +267,7 @@
     if (!p) { tip.hidden = true; return; }
     var lines;
     if (p.astro) lines = [p.astro.name, NC.time.msToDateString(p.astro.ms, "UTC") + " " + NC.time.msToTimeString(p.astro.ms, "UTC") + " UTC"];
-    else lines = [p.z.label, "score " + p.z.score + " · " + p.z.hits + " hit" + (p.z.hits === 1 ? "" : "s"), p.z.msrfText || "no MSRF match"];
+    else lines = [p.z.label, "strength " + p.z.score + " · " + p.z.hits + " match" + (p.z.hits === 1 ? "" : "es"), p.z.msrfText || "no resonance match"];
     NC.dom.fill(tip, lines.map(function (l, i) { return i === 0 ? NC.dom.el("b", { text: l }) : NC.dom.el("div", { text: l }); }));
     tip.hidden = false;
     var tw = tip.offsetWidth, th = tip.offsetHeight;

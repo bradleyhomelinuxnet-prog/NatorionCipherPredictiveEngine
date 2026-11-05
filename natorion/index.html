@@ -39,7 +39,7 @@
   </div>
   <nav class="tabs" id="tabs" aria-label="Screens">
     <button type="button" data-screen="cipher" aria-current="page">Cipher</button>
-    <button type="button" data-screen="operations">Operations</button>
+    <button type="button" data-screen="operations">Formulas</button>
     <button type="button" data-screen="chronicon">Chronicon</button>
     <button type="button" data-screen="studio">Studio</button>
     <button type="button" data-screen="files">Files</button>
@@ -78,7 +78,7 @@
               <label class="field"><span>Place</span><select id="placeSel"><option value="">Choose a place…</option></select></label>
               <div class="field"><span>Time zone</span><output id="evZone" class="mono">—</output></div>
             </div>
-            <p class="hint">In HH:MM scope a day runs sunset to sunset at this place, and each Z-Date is the window between two sunsets.</p>
+            <p class="hint">In HH:MM scope a day runs sunset to sunset at this place, and each projected date is the window between two sunsets.</p>
           </div>
           <div id="dayStartBox" class="field"><span>Day begins at (UTC)</span>
             <input id="evDayStart" type="time" step="60" value="00:00" aria-label="Day begins at (UTC)">
@@ -87,7 +87,7 @@
 
         <div class="panel">
           <div class="panel-head">
-            <h2>X-Dates <small>anchors</small></h2>
+            <h2>Anchor dates <small>X-Dates</small></h2>
             <div class="head-tools">
               <button type="button" class="ghost" id="xPasteBtn" title="Paste many dates at once">Paste…</button>
               <button type="button" id="xAddBtn">+ Add</button>
@@ -99,11 +99,11 @@
 
         <div class="panel">
           <div class="panel-head">
-            <h2>T-Dates <small>targets</small></h2>
+            <h2>Target dates <small>T-Dates</small></h2>
             <div class="head-tools"><button type="button" id="tAddBtn">+ Add</button></div>
           </div>
           <ol class="dates" id="tList"></ol>
-          <p class="hint">Optional. With any T-Date enabled, only projections landing on a T-Date are shown.</p>
+          <p class="hint">Optional. With any target date switched on, only projections landing on a target date are shown.</p>
         </div>
 
         <details class="panel" id="filterPanel" open>
@@ -134,20 +134,20 @@
               <button type="button" class="ghost" id="chartPng" title="Save the timeline as a PNG">PNG</button>
             </div>
           </div>
-          <div class="chart-wrap"><canvas id="chart" role="img" aria-label="Timeline of X-Dates and projected Z-Dates"></canvas><div class="chart-tip" id="chartTip" hidden></div></div>
+          <div class="chart-wrap"><canvas id="chart" role="img" aria-label="Timeline of anchor dates and projected dates"></canvas><div class="chart-tip" id="chartTip" hidden></div></div>
         </section>
 
         <section class="panel results-panel" aria-label="Projections">
           <div class="panel-head">
-            <h2>Z-Dates <small id="resultCount"></small></h2>
+            <h2>Projected dates <small>Z-Dates</small> <small id="resultCount"></small></h2>
             <div class="head-tools">
               <label class="inline"><span>Sort</span>
                 <select id="sortSel">
                   <option value="SORT_TYPE__DATE">Date</option>
-                  <option value="SORT_TYPE__SCORE">Score</option>
-                  <option value="SORT_TYPE__MSRF">MSRF</option>
-                  <option value="SORT_TYPE__HIT_COUNT">Hits</option>
-                  <option value="SORT_TYPE__OPERATIONS">Operations</option>
+                  <option value="SORT_TYPE__SCORE">Strength</option>
+                  <option value="SORT_TYPE__MSRF">Resonance</option>
+                  <option value="SORT_TYPE__HIT_COUNT">Matches</option>
+                  <option value="SORT_TYPE__OPERATIONS">Formulas</option>
                 </select>
               </label>
               <input type="search" id="zSearch" placeholder="Find…" aria-label="Find in results" size="10">
@@ -158,12 +158,12 @@
             <table class="results" id="results">
               <thead><tr>
                 <th scope="col" class="num">#</th>
-                <th scope="col">Z-Date</th>
-                <th scope="col" class="num" title="Days after the last X-Date">+Days</th>
-                <th scope="col" class="num">Score</th>
-                <th scope="col" class="num">Hits</th>
-                <th scope="col">MSRF</th>
-                <th scope="col">Operations</th>
+                <th scope="col">Projected date</th>
+                <th scope="col" class="num" title="Days after the last anchor date">+Days</th>
+                <th scope="col" class="num" title="The score">Strength</th>
+                <th scope="col" class="num" title="How many formulas landed here (hits)">Matches</th>
+                <th scope="col" title="MSRF numbers the day-count matched">Resonance</th>
+                <th scope="col">Formulas</th>
                 <th scope="col" title="Resonance marks: ⮌ palindromic date, 19 and 138 day counts, moon and eclipse">Marks</th>
               </tr></thead>
               <tbody id="resultsBody"></tbody>
@@ -179,7 +179,7 @@
   <section class="screen" data-screen="operations" aria-labelledby="h-ops">
     <div class="page">
       <p class="eyebrow">The functions of Y</p>
-      <h1 id="h-ops" tabindex="-1">Operations</h1>
+      <h1 id="h-ops" tabindex="-1">Formulas <small>operations</small></h1>
       <p class="lede">Each operation turns the day-count <b>Y</b> between two X-Dates into a day-offset <b>Z</b>, added to the earlier anchor (<code>X1+</code>) or the later one (<code>X2+</code>). An alpha operation's hit is worth 1 point, a beta's ½.</p>
       <div class="panel">
         <div class="panel-head">
@@ -228,7 +228,7 @@
     <div class="page wide">
       <p class="eyebrow">Calendrics &amp; clocks</p>
       <h1 id="h-chron" tabindex="-1">The Chronicon</h1>
-      <p class="lede">One moment, read on every wheel at once: the living clocks, the long cycles of the Archaix chronology, the moon, and nineteen calendars. Any day here can become an X-Date; any Z-Date can be opened here.</p>
+      <p class="lede">One moment, read on every wheel at once: the living clocks, the long cycles of the Archaix chronology, the moon, and nineteen calendars. Any day here can become an anchor date; any projected date can be opened here.</p>
 
       <div class="clocks" id="clocks" role="group" aria-label="Living clocks"></div>
 
@@ -242,7 +242,7 @@
           <label class="field"><span>Month</span><input id="chMonth" type="number" min="1" max="12" step="1"></label>
           <label class="field"><span>Day</span><input id="chDay" type="number" min="1" max="31" step="1"></label>
           <button type="button" id="chToday">Today</button>
-          <button type="button" class="ghost" id="chToX" title="Add this day to the current event's X-Dates">Use as X-Date</button>
+          <button type="button" class="ghost" id="chToX" title="Add this day to the current event's anchor dates">Use as anchor date</button>
         </div>
         <input type="range" id="chSlider" min="-5238" max="2178" step="1" aria-label="Scrub through the chronology">
         <div class="dial-jumps" id="chJumps"></div>
@@ -263,7 +263,7 @@
           <h2>Resonance</h2>
           <div class="flags" id="chFlags"></div>
           <p class="mono small" id="chPal"></p>
-          <h3>Z-Dates in this year</h3>
+          <h3>Projected dates in this year</h3>
           <ul class="zlink-list" id="chZList"></ul>
         </div>
       </div>
@@ -520,7 +520,7 @@
       <div class="panel">
         <div class="panel-head"><h2>Events in this document</h2>
           <div class="head-tools"><button type="button" id="evNew">+ New event</button></div></div>
-        <div class="table-wrap"><table class="events-table"><thead><tr><th scope="col">Event</th><th scope="col">Scope</th><th scope="col" class="num">X-Dates</th><th scope="col" class="num">Ops</th><th scope="col"><span class="sr">Actions</span></th></tr></thead><tbody id="eventsBody"></tbody></table></div>
+        <div class="table-wrap"><table class="events-table"><thead><tr><th scope="col">Event</th><th scope="col">Scope</th><th scope="col" class="num">Anchors</th><th scope="col" class="num">Ops</th><th scope="col"><span class="sr">Actions</span></th></tr></thead><tbody id="eventsBody"></tbody></table></div>
       </div>
 
       <div class="grid2">
@@ -593,25 +593,25 @@
 
       <h2>The loop</h2>
       <ol>
-        <li><b>X-Dates.</b> Two or more anchor dates, oldest first.</li>
-        <li><b>Y.</b> For every pair of enabled X-Dates, Y is the number of days between them — whole days in Days scope, sunsets in HH:MM scope.</li>
-        <li><b>Operations.</b> Each turns Y into Z days, counted from the earlier (X1) or the later (X2) date of the pair.</li>
-        <li><b>Z-Dates.</b> Every projection landing on the same day merges into one Z-Date. It scores for each hit and for each MSRF match of its Z-value.</li>
-        <li><b>Filters and sort.</b> By default only Z-Dates after the last X-Date and after today are shown, up to 2559 days out.</li>
+        <li><b>Anchor dates</b> (X-Dates). Two or more dates when something happened, oldest first.</li>
+        <li><b>Gap</b> (Y). For every pair of anchor dates, the gap is the number of days between them — whole days in Days scope, sunsets in HH:MM scope.</li>
+        <li><b>Formulas</b> (operations). Each turns the gap into a number of days (Z), counted from the earlier (X1) or the later (X2) date of the pair.</li>
+        <li><b>Projected dates</b> (Z-Dates). Every projection landing on the same day merges into one projected date. Its strength (score) grows with each formula that lands there (a match, or hit) and with each resonance number (MSRF) its Z-value matches.</li>
+        <li><b>Filters and sort.</b> By default only projected dates after the last anchor date and after today are shown, up to 2559 days out.</li>
       </ol>
 
       <h2>Scoring</h2>
-      <p>Each operation hit adds the operation's weight: <b>1</b> for alpha, <b>½</b> for beta. A Z-value that matches an MSRF number adds <b>1</b> (Normal) or <b>2</b> (Important, Vortex). Under the current system (v8 and later), the best MSRF class <em>multiplies</em> instead: ×1.5 for Normal, ×2 for Important or Vortex, and its first match is left out of the points it multiplies.</p>
+      <p>Each formula that lands adds its weight: <b>1</b> for a strong formula (alpha), <b>½</b> for a light one (beta). A Z-value that matches a resonance number (MSRF) adds <b>1</b> (Common, called Normal) or <b>2</b> (Key, called Important, or Vortex). Under the current system (v8 and later), the best MSRF class <em>multiplies</em> instead: ×1.5 for Normal, ×2 for Important or Vortex, and its first match is left out of the points it multiplies.</p>
       <p class="formula mono">score = (operation points + MSRF points, less the multiplying match) × best multiplier</p>
       <p>A Z-value matches a Vortex number within 0.1. Otherwise it is rounded to a whole number and looked up — except that a value ending in exactly .5 matches nothing, because it leans to neither side.</p>
-      <details><summary>The three MSRF sets</summary><div id="msrfSets" class="mono small"></div></details>
+      <details><summary>The three resonance (MSRF) sets</summary><div id="msrfSets" class="mono small"></div></details>
       <p>How strong is a match? The <a href="formulas.html" target="_blank">MSRF Formulas</a> page gives each number its tier (I to VII) by how many dimensions of arithmetic it appears in, and works the Phi Shadow, x − x/φ = x/φ². The Operations try-it box shows both for any Z.</p>
 
       <h2>Scope</h2>
-      <p><b>Days</b> counts calendar days in UTC, as v12 did. <b>HH:MM · sunset</b> reads each X-Date as a local time at the event's latitude and longitude, counts days as sunsets, and reports each Z-Date as the window from one sunset to the next.</p>
+      <p><b>Days</b> counts calendar days in UTC, as v12 did. <b>HH:MM · sunset</b> reads each anchor date as a local time at the event's latitude and longitude, counts days as sunsets, and reports each projected date as the window from one sunset to the next.</p>
 
       <h2>Resonance marks</h2>
-      <p>The Marks column adds the Chronicon's readings to each Z-Date: <b>⮌</b> when its MMDDYYYY form is a palindrome, <b>19</b> or <b>138</b> when its distance in days from today is a multiple of that number, and a glyph when a new moon (🌑), full moon (🌕) or eclipse falls within a day of it. The other moon phases can be switched on as timeline layers.</p>
+      <p>The Marks column adds the Chronicon's readings to each projected date: <b>⮌</b> when its MMDDYYYY form is a palindrome, <b>19</b> or <b>138</b> when its distance in days from today is a multiple of that number, and a glyph when a new moon (🌑), full moon (🌕) or eclipse falls within a day of it. The other moon phases can be switched on as timeline layers.</p>
 
       <h2>How this was rebuilt</h2>
       <p>The original v12 is an offline Electron app whose source ships un-obfuscated. Natorion re-derives its engine from that source and runs in any browser with no install and no server. <code>tests/parity.js</code> runs the original v12 code and this engine side by side on the sample files and on randomly generated events, and checks that every Z-Date, score, hit count and match agrees.</p>
@@ -633,16 +633,16 @@
 </main>
 
 <dialog id="detailDialog" class="drawer" aria-labelledby="detailTitle">
-  <form method="dialog" class="drawer-head"><h2 id="detailTitle">Z-Date</h2><button class="icon-btn" value="close" aria-label="Close">✕</button></form>
+  <form method="dialog" class="drawer-head"><h2 id="detailTitle">Projected date</h2><button class="icon-btn" value="close" aria-label="Close">✕</button></form>
   <div id="detailBody" class="drawer-body"></div>
 </dialog>
 
 <dialog id="pasteDialog" aria-labelledby="pasteTitle">
   <form method="dialog">
-    <h2 id="pasteTitle">Paste X-Dates</h2>
+    <h2 id="pasteTitle">Paste anchor dates</h2>
     <p class="hint">One date per line or separated by commas: <code>07/04/2026</code>, <code>2026-07-04</code>, or with a time <code>07/04/2026 18:30</code>. A file-name style list like <code>7-4-26-8-20-26</code> works too.</p>
     <textarea id="pasteDates" rows="8" spellcheck="false" aria-label="Dates to paste"></textarea>
-    <label class="check"><input type="checkbox" id="pasteReplace" checked> <span>Replace the current X-Dates</span></label>
+    <label class="check"><input type="checkbox" id="pasteReplace" checked> <span>Replace the current anchor dates</span></label>
     <div class="row-tools end"><button value="cancel" class="ghost">Cancel</button><button value="ok" id="pasteOk">Add dates</button></div>
   </form>
 </dialog>

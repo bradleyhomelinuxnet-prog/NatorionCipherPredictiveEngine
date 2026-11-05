@@ -6,7 +6,7 @@ It rebuilds **the original v12** Windows desktop app as a plain web page. Nothin
 
 > The full manual, with every button explained, is in **[MANUAL.md](MANUAL.md)**.
 
-![The Cipher screen: X-Dates on the left, the timeline and ranked Z-Dates on the right](docs/cipher.png)
+![The Cipher screen: anchor dates on the left, the timeline and ranked projected dates on the right](docs/cipher.png)
 
 ---
 
@@ -33,14 +33,14 @@ Works in Chrome, Edge, Firefox and Safari, on a computer, tablet or phone.
 The app opens with an example already loaded, so you can see results immediately. To make your own:
 
 1. Click **Cipher** at the top (it's the first screen).
-2. Under **X-Dates**, change the dates to your own. These are the "anchor" dates — the events you want to project forward from. Put the oldest first.
+2. Under **Anchor dates**, change the dates to your own. These are the "anchor" dates — the events you want to project forward from. Put the oldest first.
    - Click **+ Add** for more dates.
    - Or click **Paste…** and paste a list like `07/04/2026, 08/20/2026, 03/09/2027`.
-3. Look right. The **Z-Dates** table fills in by itself: every future date the formulas point to.
+3. Look right. The **Projected dates** table fills in by itself: every future date the formulas point to.
 4. Change **Sort** to **Score** to see the strongest dates first.
 5. Click any row to see exactly how that date was worked out.
 
-You need **at least two X-Dates**. With only one, there is nothing to count between.
+You need **at least two anchor dates**. With only one, there is nothing to count between.
 
 ---
 
@@ -48,15 +48,15 @@ You need **at least two X-Dates**. With only one, there is nothing to count betw
 
 | Column | What it means |
 |---|---|
-| **Z-Date** | The projected date. |
-| **+Days** | How many days after your last X-Date it falls. |
+| **Projected date** | The projected date. |
+| **+Days** | How many days after your last anchor date it falls. |
 | **Score** | How strong it is. Higher is stronger. |
 | **Hits** | How many different formulas landed on this same day. ● 1 · ▲ 2 · ◆ 3 · ★ 4 or more. |
 | **MSRF** | Special numbers the day-count matched (blue = normal, gold = important, red = vortex). Matches multiply the score. |
 | **Operations** | Which of the formulas (#1–#16) produced it. Solid = full point, dashed = half point. |
 | **Marks** | Extras: ⮌ the date reads the same backwards · **19** / **138** the date is a multiple of 19 or 138 days from today · a moon or eclipse on that day. |
 
-The **Timeline** above the table shows the same thing as a picture: gold lines are your X-Dates, and each Z-Date is a stalk whose height is its score. Scroll to zoom, drag to move, double-click to reset. Click a stalk to see which X-Dates it came from.
+The **Timeline** above the table shows the same thing as a picture: gold lines are your anchor dates, and each projected date is a stalk whose height is its score. Scroll to zoom, drag to move, double-click to reset. Click a stalk to see which anchor dates it came from.
 
 ---
 
@@ -77,14 +77,14 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 |---|---|
 | **Cipher** | Enter dates, see and sort the projections. The main screen. |
 | **Operations** | See or edit the thirty-six formulas a new event runs (the sixteen of v12, ten extras, ten mirrors), try a formula with any of the twenty constants. |
-| **Chronicon** | Look at any day in history on every calendar and cycle. Read the Dossier — the written chapters on the Stone, Petrie ↔ Breshears and the 138-faced year. Send a day to your X-Dates, or open a Z-Date here. |
+| **Chronicon** | Look at any day in history on every calendar and cycle. Read the Dossier — the written chapters on the Stone, Petrie ↔ Breshears and the 138-faced year. Send a day to your anchor dates, or open a projected date here. |
 | **Studio** | Turn the event into an animated-documentary production package: a 5-, 10- or 15-minute voiceover script in numbered paragraphs, look cards for the characters, an image prompt and an animation prompt for every paragraph in batches of five, a thumbnail, and the title, description and tags. Copy each step or save it all as one Markdown file. A finished one: [`examples/`](examples/). |
 | **Files** | Open, save, export, manage several events, copy settings between them. |
 | **Guide** | The short version of how the scoring works. |
 
 ---
 
-![Click any Z-Date to see how it was derived](docs/derivation.png)
+![Click any projected date to see how it was derived](docs/derivation.png)
 
 ![The Chronicon: living clocks, the long cycles, the moon, the calendar wall](docs/chronicon.png)
 
@@ -92,7 +92,7 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 
 | You see | Do this |
 |---|---|
-| "At least 2 X-Dates are required." | Add a second date, and make sure both have their tick box ticked. |
+| "At least 2 X-Dates are required." | Add a second anchor date, and make sure both have their tick box ticked. |
 | "X2 must come after X1." | Put your dates in order, oldest first (use the ↑ button). |
 | "Every projection was filtered out." | Open **Filters** on the left and untick **Before today** or raise **Beyond N days**. |
 | A red formula on the Operations screen | That formula has a mistake. The red message under it says what it is. |
@@ -104,10 +104,10 @@ The **Timeline** above the table shows the same thing as a picture: gold lines a
 ## 7. For the technical folks
 
 - Pure front end: `index.html` + `css/` + `js/`. No build step, no server, no framework. Works from `file://`.
-- The engine re-derives the v12 source in this repo (`../src`). **`tests/parity.js`** runs the original v12 code and this engine side by side on the sample files and on randomly generated events — Days and HH:MM scope, T-Dates, every filter, disabled and unreadable dates, both scoring systems, all five sorts, extra and duplicate operations, "today" placed inside the date range — comparing every Z-Date, score, hit count, MSRF match and contributing operation. Last runs: **1,003 of 1,003** identical (seed 138) and **403 of 403** (seed 19). The one known class of difference is time-zone *data*: v12 ships 2023 zone rules, the browser's are current, so a place whose rules changed since (Kazakhstan moved to UTC+5 in 2024) shows local times an hour apart in HH:MM scope while the instants and scores still match.
+- The engine re-derives the v12 source in this repo (`../src`). **`tests/parity.js`** runs the original v12 code and this engine side by side on the sample files and on randomly generated events — Days and HH:MM scope, target dates, every filter, disabled and unreadable dates, both scoring systems, all five sorts, extra and duplicate operations, "today" placed inside the date range — comparing every projected date, score, hit count, MSRF match and contributing operation. Last runs: **1,003 of 1,003** identical (seed 138) and **403 of 403** (seed 19). The one known class of difference is time-zone *data*: v12 ships 2023 zone rules, the browser's are current, so a place whose rules changed since (Kazakhstan moved to UTC+5 in 2024) shows local times an hour apart in HH:MM scope while the instants and scores still match.
 - **`tests/self-check.js`** runs 47 checks without the original source, thirteen of them on the Studio: that the demo, a sunset-scope copy and a two-date copy meet the brief at all three lengths (the word and paragraph counts, 15–40 words a paragraph, three etymology drops, three "still exists today" anchors, the closing call to subscribe, the style tag on every image, no shot type twice running, no banned phrase), that the same event gives the same package, and that a variation changes the words but not the numbers.
 - **`tests/browser.js`** drives the real app in headless Chromium: every screen, a known projection with a known score, opening v9 and v12 files, refusing a document with no events, duplicating and deleting events around the open one, pasting dates, editing operations, the Chronicon bridge and Dossier, the Studio (the plan, the numbered script, the 15-minute cut, image prompts in batches of five each ending with the style tag, the clips, the upload text, the saved Markdown, renaming the chronicler), the skip link, keyboard focus kept clear of the sticky top bar, the three exports, HH:MM scope, persistence across a reload, the timeline, and phone widths with no sideways scrolling. It fails on any script error and on any unexpected dialog. 86 checks.
-- **`tests/mutants.js`** proves the browser test can fail: it breaks the app in 33 deliberate ways (a save that drops every X-Date, a CSV with no rows, a frozen clock, a chart that draws nothing, sunsets at midnight, a parser that lets names through, image prompts without the style tag, the wrong call to subscribe, batches of six …) and runs the browser test against each. It catches 32; the other is a CSS rule that other rules already make redundant.
+- **`tests/mutants.js`** proves the browser test can fail: it breaks the app in 33 deliberate ways (a save that drops every anchor date, a CSV with no rows, a frozen clock, a chart that draws nothing, sunsets at midnight, a parser that lets names through, image prompts without the style tag, the wrong call to subscribe, batches of six …) and runs the browser test against each. It catches 32; the other is a CSS rule that other rules already make redundant.
 - **`js/studio/studio.js`** writes the documentary package as pure functions of the event, its results and four settings: a seeded choice among phrasings, sections filled to the brief's word budgets from the event's own numbers, paragraphs balanced to its counts, and one image and one animation prompt per paragraph. Nothing in it fetches, and nothing is generated by a model. **`examples/generate.js`** runs it on a sample file and writes [`examples/`](examples/); the Tests workflow regenerates it and fails if it changed.
 - Formulas are parsed by a small grammar. They are never executed as code, which closes the code-execution hole in v12's shared `.oph` files. Nothing from a file is ever inserted into the page as HTML.
 

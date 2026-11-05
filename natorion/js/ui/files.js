@@ -113,7 +113,7 @@
 
   /* ---------------------------------------------------------------- swap -- */
   var SWAP = [
-    { key: "ops", label: "Operations", apply: function (from, to) { to.operations = JSON.parse(JSON.stringify(from.operations)); to.scoring_system = from.scoring_system; } },
+    { key: "ops", label: "Formulas", apply: function (from, to) { to.operations = JSON.parse(JSON.stringify(from.operations)); to.scoring_system = from.scoring_system; } },
     { key: "filters", label: "Filters", apply: function (from, to) { C.FILTERS.forEach(function (f) { to[f.key] = from[f.key]; if (f.valueKey) to[f.valueKey] = from[f.valueKey]; }); } },
     { key: "layers", label: "Timeline layers", apply: function (from, to) { C.CHART_LAYERS.forEach(function (f) { to[f.key] = from[f.key]; }); } },
     { key: "scope", label: "Scope, place and day start", apply: function (from, to) { to.scope = from.scope; to.lat = from.lat; to.long = from.long; to.location_enabled = from.location_enabled; to.day_scope_start_time_in_millis = from.day_scope_start_time_in_millis; } },

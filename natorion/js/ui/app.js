@@ -54,7 +54,7 @@
 
   function renderMsrfSets() {
     function p(label, arr) { return el("p", {}, [el("b", { text: label + " (" + arr.length + "): " }), arr.slice().sort(function (a, b) { return a - b; }).join(", ")]); }
-    D.fill($("msrfSets"), [p("Vortex, within 0.1", C.MSRF_VORTEX), p("Important", C.MSRF_IMPORTANT), p("Normal", C.MSRF_NORMAL)]);
+    D.fill($("msrfSets"), [p("Vortex, within 0.1", C.MSRF_VORTEX), p("Key · Important", C.MSRF_IMPORTANT), p("Common · Normal", C.MSRF_NORMAL)]);
   }
 
   function start() {

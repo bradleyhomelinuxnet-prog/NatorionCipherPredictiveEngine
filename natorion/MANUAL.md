@@ -10,14 +10,14 @@ This manual assumes you have never used Natorion, never written a formula, and j
 2. [Opening the app](#2-opening-the-app)
 3. [A tour of the screen](#3-a-tour-of-the-screen)
 4. [Your first projection](#4-your-first-projection)
-5. [Reading the Z-Dates table](#5-reading-the-z-dates-table)
-6. [How a Z-Date is made — a worked example](#6-how-a-z-date-is-made--a-worked-example)
-7. [Scores, hits and MSRF numbers](#7-scores-hits-and-msrf-numbers)
+5. [Reading the projected dates table](#5-reading-the-projected-dates-table)
+6. [How a projected date is made — a worked example](#6-how-a-projected-date-is-made--a-worked-example)
+7. [Strength, matches and resonance numbers](#7-strength-matches-and-resonance-numbers)
 8. [The timeline](#8-the-timeline)
 9. [Filters](#9-filters)
-10. [T-Dates: asking about one particular day](#10-t-dates-asking-about-one-particular-day)
+10. [Target dates: asking about one particular day](#10-target-dates-asking-about-one-particular-day)
 11. [Days scope and HH:MM · sunset scope](#11-days-scope-and-hhmm--sunset-scope)
-12. [Operations: the thirty-six formulas](#12-operations-the-thirty-six-formulas)
+12. [Formulas: the thirty-six operations](#12-formulas-the-thirty-six-operations)
 13. [Writing your own formula](#13-writing-your-own-formula)
 14. [Several events in one document](#14-several-events-in-one-document)
 15. [Opening, saving and exporting](#15-opening-saving-and-exporting)
@@ -34,17 +34,22 @@ Natorion Cipher is a **date-projection** tool. It takes dates that mattered in t
 
 It is a faithful rebuild of **the original v12** desktop app built around the work of Jason Breshears (Archaix). The same inputs give the same results as the original. It runs in a browser instead of as a Windows program, and it adds the **Chronicon**, a calendar and cycle explorer.
 
-A few words you'll see everywhere:
+A few words you'll see everywhere. Natorion uses the plain names; the classic names (from the original v12 and its community) are in the second column, so you can follow older guides and videos too.
 
-| Word | Plain meaning |
-|---|---|
-| **X-Date** | A date you put in. An anchor. |
-| **Y** | The number of days between two of your X-Dates. |
-| **Operation** | A small formula that turns Y into another number of days. |
-| **Z** | The number an operation gives back. |
-| **Z-Date** | X-Date + Z days. A projected date. |
-| **MSRF** | A list of special numbers. A Z that matches one scores extra. |
-| **T-Date** | A target date you want to test. Optional. |
+| Plain name | Classic name | What it means |
+|---|---|---|
+| **Anchor date** | X-Date | A date you put in: a day when something happened. |
+| **Gap** | Y | The number of days between two of your anchor dates. |
+| **Formula** | Operation | A small sum that turns the gap into another number of days. |
+| **Strong / light formula** | Alpha / beta operation | A strong formula's match counts 1 point; a light one's counts ½. |
+| **Z** | Z-value | The number a formula gives back. |
+| **Projected date** | Z-Date | Anchor date + Z days: a date the formulas point to. |
+| **Match** | Hit | One formula landing on a projected date. |
+| **Strength** | Score | How strongly a projected date is pointed to: its matches plus its resonance. |
+| **Resonance number** | MSRF number | One of a list of special numbers. A Z that matches one scores extra. |
+| **Common / Key / Vortex** | Normal / Important / Vortex | The three kinds of resonance number, from weaker to stronger. |
+| **Resonance level** | Tier I–VII | How many "dimensions of arithmetic" a resonance number appears in (see the [MSRF Formulas](formulas.html) page). |
+| **Target date** | T-Date | A date you want to test. Optional. |
 
 ---
 
@@ -70,19 +75,19 @@ If double-clicking opens something other than a browser, right-click the file, c
 Along the top:
 
 - **NATORION** — the name.
-- **Cipher · Operations · Chronicon · Studio · Files · Guide** — the six screens.
+- **Cipher · Formulas · Chronicon · Studio · Files · Guide** — the six screens.
 - **Event picker** (drop-down, top right) — switch between events, or pick **+ New event**.
 - **Saved** — your work is stored in this browser. It says "Saving…" for a moment after each change.
 - **◐** — switch between dark and light.
 
 On the **Cipher** screen:
 
-- **Left column** — everything you type in: the event's name, scope, X-Dates, T-Dates, filters, timeline layers and notes.
-- **Right column** — the results: a status line, the timeline, and the Z-Dates table.
+- **Left column** — everything you type in: the event's name, scope, anchor dates, target dates, filters, timeline layers and notes.
+- **Right column** — the results: a status line, the timeline, and the projected dates table.
 
 The status line reads like this:
 
-> **15** Y-pairs · **36** operations · **463** Z-Dates projected, **260** shown · UTC days · 9 ms
+> **15** gaps · **36** formulas · **463** dates projected, **260** shown · UTC days · 9 ms
 
 That means 15 pairs of dates were compared, 36 formulas were used, 463 distinct days were projected, and 260 of them passed your filters. (The shown count depends on today's date.)
 
@@ -92,7 +97,7 @@ That means 15 pairs of dates were compared, 36 formulas were used, 463 distinct 
 
 The app opens with an example (six dates from July 2026 to April 2028), so there is something on screen straight away. To use your own dates:
 
-1. On **Cipher**, find **X-Dates**.
+1. On **Cipher**, find **Anchor dates**.
 2. Click a date box and pick a date from the calendar, or type it.
 3. To add another, click **+ Add**. The new one starts a day after the last.
 4. To remove one, click **✕**. To switch one off without deleting it, untick its box.
@@ -107,75 +112,75 @@ The app opens with an example (six dates from July 2026 to April 2028), so there
 7-4-26-8-20-26-3-9-27          ← the file-name style
 ```
 
-Leave **Replace the current X-Dates** ticked to start fresh, or untick it to add to what's there.
+Leave **Replace the current anchor dates** ticked to start fresh, or untick it to add to what's there.
 
 The results update by themselves about a fifth of a second after you stop typing.
 
 ---
 
-## 5. Reading the Z-Dates table
+## 5. Reading the projected dates table
 
 Each row is one projected day.
 
 | Column | What it tells you |
 |---|---|
 | **#** | Its position in the current sort. |
-| **Z-Date** | The day, with the weekday underneath. In HH:MM scope, the sunset-to-sunset window. |
-| **+Days** | Days after your last X-Date. |
-| **Score** | Strength. See chapter 7. |
-| **Hits** | How many things landed on this day: ● 1 · ▲ 2 · ◆ 3 · ★ 4+. |
-| **MSRF** | Special numbers matched, colour-coded: blue normal, gold important, red vortex. |
-| **Operations** | Which formulas produced it, by number. A solid outline is worth a full point (alpha); a dashed one half a point (beta). Hover to see the formula. |
+| **Projected date** | The day, with the weekday underneath. In HH:MM scope, the sunset-to-sunset window. |
+| **+Days** | Days after your last anchor date. |
+| **Strength** | How strongly the day is pointed to (the score). See chapter 7. |
+| **Matches** | How many things landed on this day (hits): ● 1 · ▲ 2 · ◆ 3 · ★ 4+. |
+| **Resonance** | Resonance (MSRF) numbers matched, colour-coded: blue common, gold key, red vortex. |
+| **Formulas** | Which formulas produced it, by number. A solid outline is a strong formula, worth a full point; a dashed one is light, worth half a point. Hover to see the formula. |
 | **Marks** | Extra signs from the Chronicon. See chapter 17. |
 
-**Sort** (top of the table): *Date* (soonest first), *Score* (strongest first), *MSRF* (most special-number weight first), *Hits* (most hits first) or *Operations* (most formulas first).
+**Sort** (top of the table): *Date* (soonest first), *Strength* (strongest first), *Resonance* (most resonance weight first), *Matches* (most matches first) or *Formulas* (most formulas first).
 
-**Find…** narrows the table: type `2028` for rows in 2028, or `1656` for rows matching that MSRF number.
+**Find…** narrows the table: type `2028` for rows in 2028, or `1656` for rows matching that resonance number.
 
-**Click a row** (or press Enter on it) to open its **derivation** on the right. It lists every formula that landed on the day, from which two X-Dates, with what Y and what Z. It also shows exactly how the score adds up. From there you can:
+**Click a row** (or press Enter on it) to open its **derivation** on the right. It lists every formula that landed on the day, from which two anchor dates, with what gap (Y) and what Z. It also shows exactly how the score adds up. From there you can:
 
 - **Open in Chronicon** — see that day on every calendar;
-- **Add as X-Date** — use it as a new anchor;
-- **Add as T-Date** — test it as a target.
+- **Add as anchor date** — use it as a new anchor;
+- **Add as target date** — test it as a target.
 
 ---
 
-## 6. How a Z-Date is made — a worked example
+## 6. How a projected date is made — a worked example
 
-Take two X-Dates: **X1 = 07/04/2026** and **X2 = 08/20/2026**.
+Take two anchor dates: **X1 = 07/04/2026** and **X2 = 08/20/2026**.
 
 1. **Y** is the days between them: **47**.
 2. Operation **#9** is `X2 + Y x OPH_PHI`: "start from X2, add Y times 1.618."
 3. **Z** = 47 × 1.618 = **76.05** days.
-4. **Z-Date** = 08/20/2026 + 76 days = **11/04/2026**.
-5. Z rounds to **76**, which is on the Normal MSRF list, so the day scores extra.
+4. **Projected date** = 08/20/2026 + 76 days = **11/04/2026**.
+5. Z rounds to **76**, which is on the common resonance (Normal MSRF) list, so the day scores extra.
 
-The same pair feeds all thirty-six operations. #2 reverses the digits of 47 to get 74 and lands on 11/02/2026 (74 is also on the list). #1 simply adds 47 days to X2, landing on 10/06/2026. With more X-Dates there are more pairs: six dates make 15 pairs, and 15 pairs × 36 formulas give up to 540 projections. When several land on the **same day**, they merge into one row, and that row's score climbs.
+The same pair feeds all thirty-six formulas. #2 reverses the digits of 47 to get 74 and lands on 11/02/2026 (74 is also on the list). #1 simply adds 47 days to X2, landing on 10/06/2026. With more anchor dates there are more pairs: six dates make 15 pairs, and 15 pairs × 36 formulas give up to 540 projections. When several land on the **same day**, they merge into one row, and that row's score climbs.
 
 > A small precision note, kept from the original: 76.05 rounds to 76.1, exactly 0.1 from the vortex number 76.2, on the very edge of its ±0.1 window. In the computer's floating-point arithmetic, 76.2 − 76.1 comes out a hair over 0.1 (0.10000000000000853), so it counts as the normal number 76, not the vortex. Natorion reproduces the original v12's arithmetic exactly, down to cases like this.
 
 ---
 
-## 7. Scores, hits and MSRF numbers
+## 7. Strength, matches and resonance numbers
 
-**Hits** simply count: each formula that lands on the day is one hit, and each MSRF match is one more.
+**Matches** (hits) simply count: each formula that lands on the day is one match, and each resonance match is one more.
 
-**Score** weighs them:
+**Strength** (score) weighs them:
 
-- Each **alpha** formula hit: **+1**.
-- Each **beta** formula hit: **+½**.
-- Each MSRF match: **+1** (normal) or **+2** (important or vortex).
-- Then the best MSRF class **multiplies** the total: **×1.5** normal, **×2** important or vortex. The one match that provides the multiplier is not also added as points.
+- Each **strong** (alpha) formula match: **+1**.
+- Each **light** (beta) formula match: **+½**.
+- Each resonance (MSRF) match: **+1** (common) or **+2** (key or vortex).
+- Then the best resonance class **multiplies** the total: **×1.5** common, **×2** key or vortex. The one match that provides the multiplier is not also added as points.
 
-In the worked example, 11/04/2026 has one alpha hit (1 point) and one normal MSRF match (the multiplier): **1 × 1.5 = 1.5**.
+In the worked example, 11/04/2026 has one strong formula match (1 point) and one common resonance match (the multiplier): **1 × 1.5 = 1.5**.
 
-**The MSRF sets** are three fixed lists taken from the original app:
+**The resonance (MSRF) sets** are three fixed lists taken from the original app:
 
 - **Vortex** (12 numbers, matched within 0.1): 21.7, 32.6, 43.5, 65.3, 76.2, 87.1, 217.8, 326.7, 435.6, 653.4, 762.3, 871.2.
 - **Important** (53 whole numbers), e.g. 84, 126, 360, 432, 1260, 1656, 2520.
 - **Normal** (325 whole numbers), e.g. 12, 138, 144, 365, 666, 1461, 2559.
 
-A Z that ends in exactly **.5** (such as 137.5) matches nothing; the rule is that it leans to neither side. The full lists are in the **Guide** screen under *The three MSRF sets*.
+A Z that ends in exactly **.5** (such as 137.5) matches nothing; the rule is that it leans to neither side. The full lists are in the **Guide** screen under *The three resonance (MSRF) sets*. The [MSRF Formulas](formulas.html) page adds each number's resonance level (Tier I–VII).
 
 **Scoring system.** Files from the original v7 and earlier used plain addition with no multiplier. A file can ask for that older system, and Natorion honours it.
 
@@ -185,19 +190,19 @@ A Z that ends in exactly **.5** (such as 137.5) matches nothing; the rule is tha
 
 The timeline draws everything in the table as a picture.
 
-- **Gold vertical lines** — your X-Dates, labelled X1, X2…
+- **Gold vertical lines** — your anchor dates, labelled X1, X2…
 - **Red dotted line** — today.
-- **Dashed blue lines** — T-Dates.
-- **Stalks** — Z-Dates. Taller means a higher score. The shape on top matches the Hits column (● ▲ ◆ ★), and the colour matches its best MSRF class.
+- **Dashed blue lines** — target dates.
+- **Stalks** — projected dates. Taller means more strength. The shape on top matches the Matches column (● ▲ ◆ ★), and the colour matches its best resonance class.
 - **Bottom lane** — moon phases and eclipses, when you switch them on (see below).
 
 **Moving around:** scroll the mouse wheel (or pinch) to zoom, drag to slide, and double-click empty space or press **Fit** to see everything. With the timeline selected, the arrow keys slide and **+ / − / 0** zoom.
 
-**Click a stalk** to select that Z-Date. Arcs appear, one from each X-Date that projects onto it; solid arcs are alpha formulas, dashed are beta. **Double-click a stalk** to open its derivation.
+**Click a stalk** to select that projected date. Arcs appear, one from each anchor date that projects onto it; solid arcs are strong formulas, dashed are light. **Double-click a stalk** to open its derivation.
 
 **PNG** saves the current view as a picture.
 
-**Timeline layers** (left column) switch parts on and off: the chart itself, the Z labels, each of the eight moon phases, and total or partial solar and lunar eclipses. A moon phase or eclipse appears only when it falls within about a day of one of your X- or Z-Dates.
+**Timeline layers** (left column) switch parts on and off: the chart itself, the Z labels, each of the eight moon phases, and total or partial solar and lunar eclipses. A moon phase or eclipse appears only when it falls within about a day of one of your X- or projected dates.
 
 ---
 
@@ -207,11 +212,11 @@ Filters hide rows; they never change scores. Open **Filters** in the left column
 
 | Filter | On by default | Hides… |
 |---|---|---|
-| Before the last X-Date | ✔ | projections earlier than your last anchor |
-| On the last X-Date | ✔ | projections landing on it |
+| Before the last anchor date | ✔ | projections earlier than your last anchor |
+| On the last anchor date | ✔ | projections landing on it |
 | Before today | ✔ | anything already in the past |
 | On today | | anything landing today |
-| Beyond N days | ✔ (2559) | anything more than N days after your last X-Date |
+| Beyond N days | ✔ (2559) | anything more than N days after your last anchor date |
 | Hits below N | | rows with fewer than N hits (2 is a good choice) |
 | Score below N | | rows scoring under N |
 | No MSRF match | | rows without an MSRF match |
@@ -222,11 +227,11 @@ If the table is empty and says *Every projection was filtered out*, loosen a fil
 
 ---
 
-## 10. T-Dates: asking about one particular day
+## 10. Target dates: asking about one particular day
 
-A **T-Date** (target date) asks: *does anything land on this day?*
+A **Target date** (target date) asks: *does anything land on this day?*
 
-Add one under **T-Dates**. While at least one T-Date is ticked, the table shows **only** Z-Dates that fall on a T-Date. An empty table means nothing lands there. Untick the T-Date to go back to seeing everything.
+Add one under **Target dates**. While at least one target date is ticked, the table shows **only** projected dates that fall on a target date. An empty table means nothing lands there. Untick the target date to go back to seeing everything.
 
 ---
 
@@ -238,9 +243,9 @@ Under **Event → Scope** there are two ways to count:
 
 **HH:MM · sunset.** This follows the ancient reckoning in which a day begins at sunset:
 
-- Each X-Date gets a **time**, read as local time at the event's place.
+- Each anchor date gets a **time**, read as local time at the event's place.
 - Y counts **sunsets** between dates instead of midnights.
-- Each Z-Date becomes a **window** from one sunset to the next, e.g. *04/08/2028 19:53 → 04/09/2028 19:53*.
+- Each projected date becomes a **window** from one sunset to the next, e.g. *04/08/2028 19:53 → 04/09/2028 19:53*.
 
 Choose the place by typing **Latitude** and **Longitude**, or pick from **Place** (Giza, Jerusalem, Dallas, London, Tokyo and around fifty more). The **Time zone** shows what the app worked out from that position. Latitude is limited to 65° north or south, because the sun behaves too strangely near the poles for "sunset" to mean one moment a day.
 
@@ -248,38 +253,38 @@ HH:MM takes a moment longer, since it calculates real sunsets.
 
 ---
 
-## 12. Operations: the thirty-six formulas
+## 12. Formulas: the thirty-six operations
 
-The **Operations** screen lists the current event's formulas. A new event runs **all thirty-six**, every one switched on: the standard sixteen from the original v12 (#1–16), the ten extras (#17–26) and the ten mirrors (#27–36). The sixteen from the original v12:
+The **Formulas** screen lists the current event's formulas. A new event runs **all thirty-six**, every one switched on: the standard sixteen from the original v12 (#1–16), the ten extras (#17–26) and the ten mirrors (#27–36). The sixteen from the original v12:
 
 | # | Formula | Says | Class |
 |---|---|---|---|
-| 1 | `X2+oph_round(Y)` | X2 plus Y — the isometric date | alpha |
-| 2 | `X2+oph_flip(oph_round(Y))` | X2 plus Y with its digits reversed | alpha |
-| 3 | `X2+Y/OPH_CRV` | X2 plus Y ÷ 5.08 | beta |
-| 4 | `X1+(Y/2.0)xOPH_PI` | X1 plus half of Y × 3.14 | beta |
-| 5 | `X2+Y/OPH_PHI` | X2 plus Y ÷ 1.618 | alpha |
-| 6 | `X2+(Y/2.0)xOPH_PHI` | X2 plus half of Y × 1.618 | alpha |
-| 7 | `X1+(Y/2.0)xOPH_CRV` | X1 plus half of Y × 5.08 | beta |
-| 8 | `X2+(Y/2.0)xOPH_PI` | X2 plus half of Y × 3.14 | beta |
-| 9 | `X2+YxOPH_PHI` | X2 plus Y × 1.618 | alpha |
-| 10 | `X1+YxOPH_PI` | X1 plus Y × 3.14 — the radius projection | alpha |
-| 11 | `X2+(Y/2.0)xOPH_CRV` | X2 plus half of Y × 5.08 | beta |
-| 12 | `X2+YxOPH_PI` | X2 plus Y × 3.14 | beta |
-| 13 | `X1+YxOPH_CRV` | X1 plus Y × 5.08 | beta |
-| 14 | `X2+YxOPH_CRV` | X2 plus Y × 5.08 | beta |
-| 15 | `X1+YxOPH_HEP` | X1 plus Y × 7.01 — hepta-cycle | alpha |
-| 16 | `X2+YxOPH_HEP` | X2 plus Y × 7.01 — hepta-cycle | alpha |
+| 1 | `X2+oph_round(Y)` | X2 plus Y — the isometric date | strong |
+| 2 | `X2+oph_flip(oph_round(Y))` | X2 plus Y with its digits reversed | strong |
+| 3 | `X2+Y/OPH_CRV` | X2 plus Y ÷ 5.08 | light |
+| 4 | `X1+(Y/2.0)xOPH_PI` | X1 plus half of Y × 3.14 | light |
+| 5 | `X2+Y/OPH_PHI` | X2 plus Y ÷ 1.618 | strong |
+| 6 | `X2+(Y/2.0)xOPH_PHI` | X2 plus half of Y × 1.618 | strong |
+| 7 | `X1+(Y/2.0)xOPH_CRV` | X1 plus half of Y × 5.08 | light |
+| 8 | `X2+(Y/2.0)xOPH_PI` | X2 plus half of Y × 3.14 | light |
+| 9 | `X2+YxOPH_PHI` | X2 plus Y × 1.618 | strong |
+| 10 | `X1+YxOPH_PI` | X1 plus Y × 3.14 — the radius projection | strong |
+| 11 | `X2+(Y/2.0)xOPH_CRV` | X2 plus half of Y × 5.08 | light |
+| 12 | `X2+YxOPH_PI` | X2 plus Y × 3.14 | light |
+| 13 | `X1+YxOPH_CRV` | X1 plus Y × 5.08 | light |
+| 14 | `X2+YxOPH_CRV` | X2 plus Y × 5.08 | light |
+| 15 | `X1+YxOPH_HEP` | X1 plus Y × 7.01 — hepta-cycle | strong |
+| 16 | `X2+YxOPH_HEP` | X2 plus Y × 7.01 — hepta-cycle | strong |
 
 On this screen you can:
 
 - **Tick or untick** a formula to use it or not.
 - **Edit** it by typing. A red message explains any mistake.
-- Change its **Class** to alpha (1 point) or beta (½ point).
+- Change its **Class** to strong (1 point, alpha) or light (½ point, beta).
 - **↑** move it up, **⎘** duplicate it, **✕** remove it.
-The extras, #17–26, all beta: `X1+Yx2.718`, `X2+Yx2.718`, `X1+Yx1.38`, `X2+Yx1.38`, `X1+Yx5.52`, `X2+Yx5.52`, `X1+(Y/2.0)x5.52`, `X1+Yx2.178`, `X2+Yx2.178`, `X2+Yx0.360`.
+The extras, #17–26, all light (beta): `X1+Yx2.718`, `X2+Yx2.718`, `X1+Yx1.38`, `X2+Yx1.38`, `X1+Yx5.52`, `X2+Yx5.52`, `X1+(Y/2.0)x5.52`, `X1+Yx2.178`, `X2+Yx2.178`, `X2+Yx0.360`.
 
-The mirrors, #27–36, all beta, complete the X1/X2 grid of the sixteen: `X1+oph_round(Y)`, `X1+oph_flip(oph_round(Y))`, `X1+Y/OPH_CRV`, `X1+Y/OPH_PHI`, `X1+(Y/2.0)xOPH_PHI`, `X1+YxOPH_PHI`, `X1+(Y/2.0)xOPH_HEP`, `X2+(Y/2.0)xOPH_HEP`, `X1+Y/OPH_PI`, `X2+Y/OPH_PI`.
+The mirrors, #27–36, all light (beta), complete the X1/X2 grid of the sixteen: `X1+oph_round(Y)`, `X1+oph_flip(oph_round(Y))`, `X1+Y/OPH_CRV`, `X1+Y/OPH_PHI`, `X1+(Y/2.0)xOPH_PHI`, `X1+YxOPH_PHI`, `X1+(Y/2.0)xOPH_HEP`, `X2+(Y/2.0)xOPH_HEP`, `X1+Y/OPH_PI`, `X2+Y/OPH_PI`.
 
 - **Add extras 17–26** / **Add mirrors** — put back whichever of those ten are missing.
 - **Restore all 36 defaults** — undo all your changes: the thirty-six, all on.
@@ -348,7 +353,7 @@ The first four are the original program's. The other sixteen are Natorion's, sha
 
 The formula must give a number above zero when Y is 10, or it is flagged.
 
-**Try one** at the bottom of the screen tests a formula on any Y. It shows the result and whether it hits an MSRF number. Put in `X2+oph_flip(oph_round(Y))` with Y = 138 and you get 831: 138 in the mirror.
+**Try one** at the bottom of the screen tests a formula on any Y. It shows the result and whether it hits a resonance number, with its resonance level and phi shadow. Put in `X2+oph_flip(oph_round(Y))` with Y = 138 and you get 831: 138 in the mirror.
 
 > **Safe by design.** Formulas are read by a strict little grammar and never run as program code. A shared `.oph` file can't make the app do anything except arithmetic. The original v12 could be tricked this way; Natorion can't.
 
@@ -356,7 +361,7 @@ The formula must give a number above zero when Y is 10, or it is flagged.
 
 ## 14. Several events in one document
 
-A document can hold many **events**. Each is a separate set of X-Dates with its own settings: one for markets, one for a family history, one for a historical sequence.
+A document can hold many **events**. Each is a separate set of anchor dates with its own settings: one for markets, one for a family history, one for a historical sequence.
 
 - **Switch** with the drop-down at the top right.
 - **Add** with **+ New event** (in that drop-down, or on **Files**).
@@ -405,11 +410,11 @@ Under the dial:
 - **The cycles**, each with a progress bar: **Annus Mundi** toward AM 6000; the **Phoenix** 138-year grid; **Nemesis X** on its 792-year loop with a 60-year inner transit; the **NER** 600-year periods; and the **Maya baktun**.
 - **The moon** — a drawing of that day's phase, its age, how much is lit, the lunation number, and how many moons and Metonic 19-year cycles separate it from today.
 - **Resonance** — flags that light up for a Phoenix node year, a Metonic match with this year, a mirror year, and "138" in the Long Count.
-- **Z-Dates in this year** — every projection from your current event that falls in the year on the dial. Click one to jump to it.
+- **Projected dates in this year** — every projection from your current event that falls in the year on the dial. Click one to jump to it.
 - **The calendar wall** — the day on **nineteen** calendars: Gregorian, Anunna turnings, Annus Mundi (Archaix, with the Hebrew date beneath), Egyptian civil, Maya, Julian, Julian Day, Islamic, Persian, Indian, Coptic, Ethiopic, Buddhist, Chinese sexagenary, Byzantine, Kali Yuga, Holocene, French Republican and Unix.
 - **The event ledger** — the Archaix chronology from 5239 BC to 2178, filterable by Phoenix, Nemesis, NER, Baktun or key events. Click a row to set the dial to that year.
 
-**The bridge.** **Use as X-Date** adds the dial's day to your current event. From any Z-Date's derivation, **Open in Chronicon** comes the other way.
+**The bridge.** **Use as anchor date** adds the dial's day to your current event. From any projected date's derivation, **Open in Chronicon** comes the other way.
 
 **The Dossier.** Below the ledger sit the eight written chapters of the Chronicon, kept as written: the Instrument; the Stone in Annus Mundi, with the four renders of the Great Pyramid commenced, capped, drowned and re-emerged; Petrie ↔ Breshears, with the table where the surveyor's measures meet the calendar; the Sigil in the Odometer (5138, the 138-faced year); the numbers that fold; the Convergence; the cornerstone (who Jason Breshears is); and the Anunna reckoning and the calendar wall. Click a chapter's title to open it. The figures that depend on today — AM of today, years to 2040 and 2046, the days left in the 138-faced year — are live.
 
@@ -419,7 +424,7 @@ Under the dial:
 
 ## 17. Resonance marks: palindromes, 19 and 138
 
-The **Marks** column of the Z-Dates table adds four kinds of sign:
+The **Marks** column of the projected dates table adds four kinds of sign:
 
 | Mark | Meaning |
 |---|---|
@@ -438,16 +443,16 @@ Mirrors turn up everywhere once you look: 19 and 91, 138 and 831. Formula #2, `o
 
 The **Studio** screen turns the open event into a production package for an animated history video in the painterly style of a European animated feature: a voiceover script, look cards for the characters, one image prompt for every paragraph, one animation prompt for every image, a thumbnail prompt, and the title, description and tags for the upload. No model writes any of it. The script is prose templates filled with the event's own numbers — the dates, the day-counts, the formulas that land, the special numbers, the moons and eclipses, the Chronicon's calendars and cycles — so the same event always gives the same package, and it never leaves your browser.
 
-**The plan.** Choose a length: **5 min** (800–875 words, 35–40 paragraphs), **10 min** (1,600–1,750 words, 65–80 paragraphs) or **15 min** (2,400–2,625 words, 95–120 paragraphs), at 160–175 spoken words a minute. The cards show the word and paragraph counts, the images and clips, the batches of five, and the strongest Z-Date, which is the film's climax. Beneath them sit the timestamps of the five sections and four checks against the brief: the counts, three etymology drops and three "still exists today" anchors, the closing call to subscribe, the banned phrases, the style tag on every image, and no shot type twice running. A ✕ names exactly what fell short.
+**The plan.** Choose a length: **5 min** (800–875 words, 35–40 paragraphs), **10 min** (1,600–1,750 words, 65–80 paragraphs) or **15 min** (2,400–2,625 words, 95–120 paragraphs), at 160–175 spoken words a minute. The cards show the word and paragraph counts, the images and clips, the batches of five, and the strongest projected date, which is the film's climax. Beneath them sit the timestamps of the five sections and four checks against the brief: the counts, three etymology drops and three "still exists today" anchors, the closing call to subscribe, the banned phrases, the style tag on every image, and no shot type twice running. A ✕ names exactly what fell short.
 
 - **Working title** — the name used in the script and the upload text. Empty means the event's name.
 - **Chronicler** — the film's anchor character, who keeps the ledger. Empty means Natori.
-- **Era palette** — the wardrobe, the settings and the colours: Ancient / Mediterranean, Medieval European or Golden Age / Renaissance. Left alone, the year of the first X-Date decides.
+- **Era palette** — the wardrobe, the settings and the colours: Ancient / Mediterranean, Medieval European or Golden Age / Renaissance. Left alone, the year of the first anchor date decides.
 - **Variation** — 1 to 19. Each picks different phrasings; the numbers never change.
 
 **The steps** follow the brief's order, and each has a **Copy** button:
 
-1. **Script** — only the spoken narration, numbered §1, §2 …, every paragraph 15–40 words, one scene each. It opens on the first X-Date, plants the strongest projected day within three paragraphs, walks through the anchors, the formulas and the Chronicon, climbs the Z-Dates from weakest to strongest, opens the strongest one in full, and closes on the page it opened on, ending with "Subscribe for more stories from history brought to life."
+1. **Script** — only the spoken narration, numbered §1, §2 …, every paragraph 15–40 words, one scene each. It opens on the first anchor date, plants the strongest projected day within three paragraphs, walks through the anchors, the formulas and the Chronicon, climbs the projected dates from weakest to strongest, opens the strongest one in full, and closes on the page it opened on, ending with "Subscribe for more stories from history brought to life."
 2. **Look cards** — a fixed description of each character: the Chronicler, the Surveyor, the Astronomer, the Watchman at Sunset in HH:MM scope, and the crowd. Each is pasted word for word into every image where the character appears, so they look the same in every frame.
 3. **Images** — one prompt per paragraph in batches of five, each ending with the mandatory style tag. **Next 5 ›** moves to the next batch.
 4. **Clips** — one motion-only animation prompt per image for Seedance 2.5, 5–10 seconds each, batched the same way. The last clip returns to the first frame, so the film closes where it began.
@@ -485,17 +490,17 @@ The **Studio** screen turns the open event into a production package for an anim
 
 **Troubleshooting and questions:**
 
-**"At least 2 X-Dates are required."** Add a second date and make sure both are ticked.
+**"At least 2 X-Dates are required."** Add a second anchor date and make sure both are ticked.
 
 **"X2 must come after X1."** Your dates are out of order. Use ↑ to sort them oldest first.
 
 **"X1 and X2 must be different days."** Two dates are the same day (or, in HH:MM scope, fall between the same two sunsets).
 
-**"At least 1 Operation is required."** Every formula is off or broken. Go to Operations and tick some, or click **Restore all 36 defaults**.
+**"At least 1 Operation is required."** Every formula is off or broken. Go to Formulas and tick some, or click **Restore all 36 defaults**.
 
 **"HH:MM scope needs a latitude within ±65°…"** Fix the latitude or longitude, or pick a place from the list.
 
-**The table is empty.** Read the message in it. Usually a filter is hiding everything (chapter 9) or a T-Date is on (chapter 10).
+**The table is empty.** Read the message in it. Usually a filter is hiding everything (chapter 9) or a target date is on (chapter 10).
 
 **A formula is red.** Read the message beneath it. Common slips: a missing bracket, a capital `X` in the middle, or a name the app doesn't know.
 
@@ -509,7 +514,7 @@ The **Studio** screen turns the open event into a production package for an anim
 
 **Does it predict the future?** It is a study instrument for the number patterns in Jason Breshears' work. It shows where those patterns point; it makes no claim that they predict anything.
 
-**The Studio says "Seed the anchors first."** It writes from the Cipher's results, so it needs an event that projects: two or more X-Dates, ticked, and at least one working formula. If every projection is hidden by the filters, the Studio reads the full cast instead and says so in its checks.
+**The Studio says "Seed the anchors first."** It writes from the Cipher's results, so it needs an event that projects: two or more anchor dates, ticked, and at least one working formula. If every projection is hidden by the filters, the Studio reads the full cast instead and says so in its checks.
 
 ---
 

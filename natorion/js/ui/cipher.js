@@ -211,12 +211,12 @@
     var bits = [];
     if (res.errors.length) bits.push(el("span.err", { text: res.errors.join(" ") }));
     else {
-      bits.push(el("span", {}, [el("b", { text: String(res.ys.length) }), " Y-pair" + (res.ys.length === 1 ? "" : "s")]));
-      bits.push(el("span", {}, [el("b", { text: String(ops.length - badOps) }), " operation" + (ops.length - badOps === 1 ? "" : "s")]));
-      bits.push(el("span", {}, [el("b", { text: String(res.zs.length) }), " Z-Dates projected, ", el("b", { text: String(res.byDate.length) }), " shown"]));
+      bits.push(el("span", {}, [el("b", { text: String(res.ys.length) }), " gap" + (res.ys.length === 1 ? "" : "s")]));
+      bits.push(el("span", {}, [el("b", { text: String(ops.length - badOps) }), " formula" + (ops.length - badOps === 1 ? "" : "s")]));
+      bits.push(el("span", {}, [el("b", { text: String(res.zs.length) }), " dates projected, ", el("b", { text: String(res.byDate.length) }), " shown"]));
       bits.push(el("span", { text: (hh() ? zone + " · sunset days" : "UTC days") + " · " + res.elapsedMs + " ms" }));
     }
-    if (badOps) bits.push(el("span.err", { text: badOps + " operation" + (badOps === 1 ? " has" : "s have") + " an error — see Operations" }));
+    if (badOps) bits.push(el("span.err", { text: badOps + " formula" + (badOps === 1 ? " has" : "s have") + " an error — see Formulas" }));
     D.fill(status, bits);
 
     // results
@@ -242,9 +242,9 @@
       var sky = (marksByDay.get(dayMs) || []).filter(function (g, k, arr) { return arr.findIndex(function (h) { return h.name === g.name; }) === k; });
       var dateCell = el("td.date", {}, [zLabel(t, zone), el("small", { text: hh() ? "→ " + T.msToDateString(t.end, zone) + " " + T.msToTimeString(t.end, zone) : T.weekday(t.start, "UTC") })]);
       var hitClass = t.hits >= 4 ? "h4" : "h" + t.hits;
-      var msrf = el("div.pills", {}, t.msrf.map(function (m) { return el("span.pill." + m.cls.key, { text: m.number, title: m.cls.name + " MSRF, from Z = " + m.r.z }); }));
+      var msrf = el("div.pills", {}, t.msrf.map(function (m) { return el("span.pill." + m.cls.key, { text: m.number, title: m.cls.name + " resonance (MSRF), from Z = " + m.r.z }); }));
       var opsCell = el("div.pills", {}, t.ops.map(function (h) {
-        return el("span.pill." + (h.r.op.weight >= C.POINTS_ALPHA ? "alpha" : "beta"), { text: "#" + (h.r.opIndex + 1), title: "Operation " + (h.r.opIndex + 1) + ": " + h.r.op.equation + " · X" + (h.y.x1 + 1) + "→X" + (h.y.x2 + 1) + " · Y " + h.y.Y + " · Z " + h.r.zValue });
+        return el("span.pill." + (h.r.op.weight >= C.POINTS_ALPHA ? "alpha" : "beta"), { text: "#" + (h.r.opIndex + 1), title: "Formula " + (h.r.opIndex + 1) + ": " + h.r.op.equation + " · X" + (h.y.x1 + 1) + "→X" + (h.y.x2 + 1) + " · Y " + h.y.Y + " · Z " + h.r.zValue });
       }));
       var marks = el("td.marks", {}, [
         rz.palindrome ? el("span", { title: "Palindromic date", text: "⮌ " }) : null,
@@ -272,9 +272,9 @@
     // empty state
     if (res.errors.length || !rows.length) {
       var head, text;
-      if (enabledX < 2) { head = "Seed the anchors"; text = "Add two or more X-Dates — the days you want to project from."; }
+      if (enabledX < 2) { head = "Seed the anchors"; text = "Add two or more anchor dates — the days you want to project from."; }
       else if (res.errors.length) { head = "Not yet"; text = res.errors[0]; }
-      else if (search) { head = "Nothing matches"; text = "No Z-Date matches “" + search + "”."; }
+      else if (search) { head = "Nothing matches"; text = "No projected date matches “" + search + "”."; }
       else { head = "Every projection was filtered out"; text = "Loosen a filter on the left — “Before today” and “Beyond N days” hide the most."; }
       D.fill(empty, [el("b", { text: head }), text]);
       empty.hidden = false;
@@ -336,26 +336,26 @@
     $("detailTitle").textContent = "Z" + (t.ordinal + 1) + " · " + zLabel(t, zone);
     var dayMs = hh() ? (function () { var w = T.wall(t.start, zone); return T.utcMs(w.y, w.m, w.d); })() : t.start;
     var rz = NC.chron.resonance(dayMs, todayUtcDay(res));
-    var multTxt = res.system === C.SCORING.GTE_V8 && t.multiplier > 1 ? " × " + t.multiplier + " (best MSRF: " + t.msrf[0].cls.name + ")" : "";
+    var multTxt = res.system === C.SCORING.GTE_V8 && t.multiplier > 1 ? " × " + t.multiplier + " (best resonance: " + t.msrf[0].cls.name + ")" : "";
     var msrfPoints = NC.engine.msrfSubscore(t.msrf, res.system);
     var kids = [
       el("p", {}, hh() ? ["The window from the sunset of ", el("b", { text: T.msToDateString(t.start, zone) + " " + T.msToTimeString(t.start, zone) }), " to the sunset of ", el("b", { text: T.msToDateString(t.end, zone) + " " + T.msToTimeString(t.end, zone) }), " (" + zone + ")."]
-        : [el("b", { text: T.weekday(t.start, "UTC") + " " + T.msToDateString(t.start, "UTC") }), ", " + (res.last != null ? Math.round((t.start - res.last) / DAY) + " days after the last X-Date, " : "") + Math.abs(rz.distance) + " days " + (rz.distance >= 0 ? "from" : "before") + " today."]),
-      el("p.score-line", {}, ["score ", el("b", { text: String(t.score) }), " = (" + t.opScore + " operation point" + (t.opScore === 1 ? "" : "s") + " + " + msrfPoints + " MSRF point" + (msrfPoints === 1 ? "" : "s") + ")" + multTxt + " · " + t.hits + " hit" + (t.hits === 1 ? "" : "s")]),
+        : [el("b", { text: T.weekday(t.start, "UTC") + " " + T.msToDateString(t.start, "UTC") }), ", " + (res.last != null ? Math.round((t.start - res.last) / DAY) + " days after the last anchor date, " : "") + Math.abs(rz.distance) + " days " + (rz.distance >= 0 ? "from" : "before") + " today."]),
+      el("p.score-line", {}, ["strength ", el("b", { text: String(t.score) }), " = (" + t.opScore + " formula point" + (t.opScore === 1 ? "" : "s") + " + " + msrfPoints + " resonance point" + (msrfPoints === 1 ? "" : "s") + ")" + multTxt + " · " + t.hits + " match" + (t.hits === 1 ? "" : "es")]),
       el("h3", { text: "Derivation — " + t.ops.length + (t.ops.length === 1 ? " projection lands here" : " projections land here") }),
       el("ol.derive", {}, t.ops.map(function (h) {
         var from = h.r.op.startingX === 1 ? h.y.x1 : h.y.x2;
         var m = t.msrf.find(function (x) { return x.r === h.r; });
         return el("li" + (m ? ".msrf" : ""), {}, [
-          el("div.eq", { text: "#" + (h.r.opIndex + 1) + "  " + h.r.op.equation + (h.r.op.weight >= C.POINTS_ALPHA ? "  · alpha +1" : "  · beta +½") }),
+          el("div.eq", { text: "#" + (h.r.opIndex + 1) + "  " + h.r.op.equation + (h.r.op.weight >= C.POINTS_ALPHA ? "  · strong +1" : "  · light +½") }),
           el("div.path", { text: "X" + (h.y.x1 + 1) + " " + T.msToDateString(h.y.x1Ms, zone) + " → X" + (h.y.x2 + 1) + " " + T.msToDateString(h.y.x2Ms, zone) + " · Y = " + h.y.Y + " · Z = " + h.r.zValue + " days from X" + (from + 1) + (m ? " · MSRF " + m.cls.name + " " + m.number : "") })
         ]);
       })),
       rz.palindrome || rz.by19 || rz.by138 ? el("p.mono.small", { text: "Resonance: " + [rz.palindrome ? "⮌ palindromic date" : "", rz.by19 ? rz.distance + " days = 19 × " + rz.distance / 19 : "", rz.by138 ? rz.distance + " days = 138 × " + rz.distance / 138 : ""].filter(Boolean).join(" · ") }) : null,
       el("div.drawer-actions", {}, [
         el("button", { type: "button", text: "Open in Chronicon", onclick: function () { $("detailDialog").close(); NC.chronView.show(dayMs); } }),
-        el("button.ghost", { type: "button", text: "Add as X-Date", onclick: function () { addFromZ(t, "x"); } }),
-        el("button.ghost", { type: "button", text: "Add as T-Date", onclick: function () { addFromZ(t, "t"); } })
+        el("button.ghost", { type: "button", text: "Add as anchor date", onclick: function () { addFromZ(t, "x"); } }),
+        el("button.ghost", { type: "button", text: "Add as target date", onclick: function () { addFromZ(t, "t"); } })
       ])
     ];
     D.fill(body, kids);
@@ -365,7 +365,7 @@
     var zone = S.state.results.zone, d = T.msToInputDate(t.start, zone);
     if (hh()) d = T.msToInputDate(t.end - 60000, zone);   // inside the window, before its closing sunset
     var y = +d.date.split("/")[2];
-    if (!(y >= 1 && y <= C.MAX_YEAR)) { D.toast(d.date + " is outside the years X- and T-Dates can hold (1 to " + C.MAX_YEAR + ").", true); return; }
+    if (!(y >= 1 && y <= C.MAX_YEAR)) { D.toast(d.date + " is outside the years anchor and target dates can hold (1 to " + C.MAX_YEAR + ").", true); return; }
     S.change(function (e) { var k = kind === "x" ? "x_dates" : "t_dates"; e[k] = (e[k] || []).concat([d]); });
     renderDates(kind);
     D.toast("Added " + d.date + " as a" + (kind === "x" ? "n X" : " T") + "-Date.");

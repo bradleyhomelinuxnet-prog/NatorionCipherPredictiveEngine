@@ -19,7 +19,7 @@
     $("opsCount").textContent = on + " of " + list.length + " on";
     D.fill(body, list.map(function (o, i) {
       var chk = o.enabled === true ? sample(o, i, list) : { text: "off", err: null };
-      var eq = el("input", { type: "text", value: o.equation, spellcheck: "false", autocomplete: "off", "aria-label": "Operation " + (i + 1) + " equation", "aria-invalid": chk.err ? "true" : null });
+      var eq = el("input", { type: "text", value: o.equation, spellcheck: "false", autocomplete: "off", "aria-label": "Formula " + (i + 1) + " equation", "aria-invalid": chk.err ? "true" : null });
       var err = el("div.err", { text: chk.err || "", hidden: !chk.err });
       var zCell = el("td.num.mono", { text: chk.text });
       eq.addEventListener("input", D.debounce(function () {
@@ -33,8 +33,8 @@
         el("td", {}, [el("input", { type: "checkbox", checked: o.enabled === true, "aria-label": "Use operation " + (i + 1), onchange: function (e) { S.change(function () { o.enabled = e.target.checked; }); render(); } })]),
         el("td", {}, [eq, err]),
         el("td", {}, [(function () {
-          var s = el("select", { "aria-label": "Operation " + (i + 1) + " class" }, [
-            el("option", { value: "1", text: "alpha · 1" }), el("option", { value: "0.5", text: "beta · ½" })
+          var s = el("select", { "aria-label": "Formula " + (i + 1) + " strength" }, [
+            el("option", { value: "1", text: "strong · 1" }), el("option", { value: "0.5", text: "light · ½" })
           ]);
           s.value = o.weight >= C.POINTS_ALPHA ? "1" : "0.5";
           if (o.weight !== 1 && o.weight !== 0.5) s.appendChild(el("option", { value: String(o.weight), text: "custom · " + o.weight })), s.value = String(o.weight);
@@ -59,12 +59,12 @@
     if (!Number.isFinite(Y)) { out.textContent = "Give Y a number."; return; }
     var z = c.fn(Y), m = NC.msrfMatch(NC.round1(NC.round2(z)));
     out.textContent = "normalised  " + c.normalized + "\nZ = " + NC.round2(z) + " days from X" + c.startingX +
-      (m ? "\nMSRF " + m.cls.name.toLowerCase() + " match: " + m.number + " (×" + m.cls.mult + ")" : "\nno MSRF match") +
+      (m ? "\nresonance (MSRF) " + m.cls.name.toLowerCase() + " match: " + m.number + " (×" + m.cls.mult + ")" : "\nno resonance match") +
       (NC.formulas ? tierLine(NC.formulas.magnitude(NC.round2(z))) + "\nphi shadow of Z  " + NC.round2(NC.formulas.phiShadow(z).shadow) : "");
   }
   // The MSRF tier of the matched (or nearest whole) number: see formulas.html.
   function tierLine(t) {
-    if (!t.tier) return "\nno MSRF tier";
+    if (!t.tier) return "\nno resonance level";
     return "\n" + t.tier + (t.apex ? " (Apex " + t.apex + ")" : "") + " · " + t.dims + (t.apex ? "+" : "") + " dimensions" + (t.exact ? "" : " · nearest whole " + t.number);
   }
 
