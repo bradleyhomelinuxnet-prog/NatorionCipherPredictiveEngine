@@ -157,6 +157,14 @@ async function main() {
     check("switching them off unticks them and keeps the rows", /^36 of 41 on$/.test(await text(page, "#opsCount")), await text(page, "#opsCount"));
     await page.click('button[data-screen="cipher"]');
 
+    console.log("addenda in the Chronicon ledger");
+    await page.click('button[data-screen="chronicon"]');
+    await page.click('#ledgerSeg button[data-k="add"]');
+    check("the Addenda filter lists the switched-on addendum's dates", await page.evaluate(() =>
+      document.querySelectorAll("#ledgerBody tr").length === 5 && /Yvonne Love/.test(document.getElementById("ledgerBody").textContent)));
+    await page.click('#ledgerSeg button[data-k="all"]');
+    await page.click('button[data-screen="cipher"]');
+
     console.log("the Test it panel");
     await page.click("#testPanel > summary");
     await page.click("#btRun");

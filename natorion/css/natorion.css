@@ -535,3 +535,6 @@ dialog h2 { margin-bottom: 8px; }
 .op-set-head small { color: var(--dim); overflow-wrap: anywhere; }
 .op-set .hint { margin: 2px 0 8px 24px; }
 .set-warn { color: var(--gold-2); }
+
+/* Addenda in the Chronicon ledger */
+.dot.d-add { background: transparent; box-shadow: inset 0 0 0 2px var(--gold-2); }

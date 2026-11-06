@@ -18,6 +18,7 @@
 
 Done
 - **MSRF tiers and the phi shadow** (Nov 2026): `natorion/formulas.html`, and in the Formulas try-it box.
+- **Addenda and Isometric & Long Cycles** (Nov 2026): `natorion/isometric.html`, with community findings switched on and off and joined to the Chronicon ledger.
 - **Backtest and cycle echoes**, from Natorion Web (Nov 2026): the **Test it** panel under the projected dates. Same method and statistics; checked on pure-noise dates by `natorion/tests/backtest.js`. Natorion's default is an exact-day match, because with all 36 formulas on, the projections cover about two-thirds of the days near any date, so a ±1-day match is nearly free.
 
 Still to port, most useful first

@@ -63,7 +63,7 @@
     D.seg($("eraSeg"), era, function (v) { era = v; render(); });
     $("chSlider").value = Math.max(-5238, Math.min(2178, a));
     $("chMonth").value = p.m; $("chDay").value = p.d;
-    var ev = CH.LEDGER.find(function (x) { return x[0] === a; });
+    var ev = ledgerAll().find(function (x) { return x[0] === a; });
     var lcTxt = c.lc > 0 ? String(c.lc) : "pre-count";
     D.fill($("chMoment"), [
       el("div", {}, [b(fy(a)), "the moment"]),
@@ -151,8 +151,11 @@
     s("circle", { cx: Cc, cy: Cc, r: R, fill: "none", stroke: "rgba(0,0,0,.35)", "stroke-width": "1" });
   }
 
+  // The ledger plus the events of any switched-on addendum (Isometric & Long Cycles page).
+  function ledgerAll() { return NC.addenda ? NC.addenda.ledger(CH.LEDGER) : CH.LEDGER; }
+
   function renderLedger() {
-    var rows = CH.LEDGER.filter(function (x) { return ledgerFilter === "all" || x[1] === ledgerFilter; }).map(function (x) {
+    var rows = ledgerAll().filter(function (x) { return ledgerFilter === "all" || x[1] === ledgerFilter; }).map(function (x) {
       var a = x[0], mk = CH.ledgerMarks(a), am = a + 3894, pal = CH.isPal(a <= 0 ? 1 - a : a);
       return el("tr", { data: { y: String(a) }, tabindex: "0", title: "Open " + CH.fmtYear(a) }, [
         el("td", {}, [el("span.dot.d-" + x[1]), CH.fmtYear(a), pal ? el("span.pal", { text: " ⮌" }) : null]),

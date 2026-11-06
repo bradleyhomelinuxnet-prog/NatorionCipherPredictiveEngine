@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Isometric & Long Cycles</title>
+<meta name="description" content="Natorion: addenda you can switch on and off, and tools for isometric centres, long cycles (19, 100, 138, 434, 600, 1900, 2170 years) and the sky over any date, each set against chance.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%2308080d' stroke='%23d8a943' stroke-width='3'/%3E%3Cpath d='M32 8 L32 56 M14 20 L50 44 M50 20 L14 44' stroke='%23f3d27a' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23d3402f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #08080d; --panel: #14141f; --ink: #ece5d2; --ink-2: #c9c0a8; --dim: #938c77;
+  --line: rgba(216,169,67,.22); --line-2: rgba(216,169,67,.45);
+  --gold: #d8a943; --gold-2: #f3d27a; --cyan: #54b8c9; --red: #e25544; --violet: #9b7fd0;
+  --field: rgba(8,8,13,.7);
+  --f-display: "Cinzel", Georgia, serif; --f-prose: "EB Garamond", Georgia, serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f3ede0; --panel: #fffaf0; --ink: #1f1a12; --ink-2: #3f372a; --dim: #6f6552;
+    --line: rgba(138,100,18,.22); --line-2: rgba(138,100,18,.45);
+    --gold: #8a6412; --gold-2: #6b4c08; --cyan: #1f6f7d; --red: #b0301f; --violet: #5d3f99; --field: #fff;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f3ede0; --panel: #fffaf0; --ink: #1f1a12; --ink-2: #3f372a; --dim: #6f6552;
+  --line: rgba(138,100,18,.22); --line-2: rgba(138,100,18,.45);
+  --gold: #8a6412; --gold-2: #6b4c08; --cyan: #1f6f7d; --red: #b0301f; --violet: #5d3f99; --field: #fff;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 19px/1.5 var(--f-prose); }
+a { color: var(--gold-2); }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+h1 { font: 700 clamp(26px, 5vw, 38px)/1.1 var(--f-display); letter-spacing: .06em; margin: 0; color: var(--gold-2); }
+h2 { font: 700 20px/1.2 var(--f-display); letter-spacing: .08em; margin: 0 0 4px; color: var(--gold); }
+.lede { color: var(--ink-2); margin: 12px 0 0; max-width: 62ch; }
+nav a { font: 500 14px var(--f-mono); margin-left: 14px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 20px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; }
+.card p.sub { color: var(--dim); margin: 0 0 12px; font-size: 16px; }
+label { font: 500 13px var(--f-mono); color: var(--dim); display: block; margin-bottom: 4px; letter-spacing: .04em; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+input[type=number], select { font: 500 18px var(--f-mono); background: var(--field); color: var(--ink); border: 1px solid var(--line-2); border-radius: 6px; padding: 8px 10px; width: 150px; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--gold-2); outline-offset: 2px; }
+.out { font: 15px/1.6 var(--f-mono); margin-top: 14px; }
+.out dt { color: var(--dim); }
+.out dd { margin: 0 0 6px; color: var(--ink); }
+.big { font: 600 30px var(--f-mono); color: var(--gold-2); }
+.meter { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin: 8px 0 4px; }
+.meter i { height: 12px; border-radius: 3px; background: var(--line); }
+.meter i.on { background: var(--gold); }
+.meter.apex i.on { background: var(--red); }
+.pill { display: inline-block; font: 600 12px var(--f-mono); padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
+.pill.normal { color: var(--cyan); } .pill.important { color: var(--gold); } .pill.vortex { color: var(--red); } .pill.none { color: var(--dim); }
+table { width: 100%; border-collapse: collapse; font: 14px var(--f-mono); }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--dim); font-weight: 500; }
+.scroll { overflow-x: auto; }
+.tiers { margin-top: 20px; }
+.tier { border-top: 1px solid var(--line); padding: 12px 0; }
+.tier h3 { font: 700 15px var(--f-display); letter-spacing: .08em; margin: 0 0 6px; color: var(--ink); display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.tier h3 small { font: 13px var(--f-mono); color: var(--dim); letter-spacing: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chips button { font: 13px var(--f-mono); background: transparent; color: var(--ink-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; cursor: pointer; }
+.chips button:hover { border-color: var(--gold); color: var(--gold-2); }
+.chips button.hit { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+code { font: 14px var(--f-mono); background: var(--field); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; }
+.eqs code { display: inline-block; margin: 3px 6px 3px 0; cursor: pointer; }
+.fine { color: var(--dim); font-size: 15px; }
+.note { border-left: 3px solid var(--gold); padding: 4px 12px; color: var(--ink-2); font-size: 16px; margin: 12px 0 0; }
+.toggle { font: 13px var(--f-mono); background: transparent; border: 1px solid var(--line-2); color: var(--ink-2); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+
+.addendum { border-top: 1px solid var(--line); padding: 12px 0; }
+.addendum:first-of-type { border-top: 0; }
+.addendum h3 { font: 600 17px/1.3 var(--f-prose); margin: 0; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.addendum .by { color: var(--dim); font-size: 15px; margin: 2px 0 6px 28px; }
+.addendum ul { margin: 4px 0 0 28px; padding-left: 16px; font-size: 16px; }
+.ok { color: var(--cyan); font-family: var(--f-mono); font-size: 13px; }
+.bad { color: var(--red); font-family: var(--f-mono); font-size: 13px; }
+.spans { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.spans label { font: 13px var(--f-mono); color: var(--ink-2); display: inline-flex; gap: 6px; align-items: center; cursor: pointer; margin: 0; }
+.dates td input, .dates td select { font: 14px var(--f-mono); width: 100%; min-width: 0; padding: 5px 6px; background: var(--field); color: var(--ink); border: 1px solid var(--line-2); border-radius: 5px; }
+.dates td.y { width: 90px; } .dates td.e { width: 70px; } .dates td.md { width: 64px; } .dates td.x { width: 34px; }
+.btn { font: 600 13px var(--f-mono); background: transparent; color: var(--gold-2); border: 1px solid var(--line-2); border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+.btn:hover { border-color: var(--gold); }
+.flag { display: inline-block; font: 600 12px var(--f-mono); color: var(--gold-2); border: 1px solid var(--line-2); border-radius: 999px; padding: 0 7px; margin: 1px 2px; }
+.flag.day { color: var(--cyan); }
+.summary { font-size: 16px; margin: 8px 0; }
+.summary b { color: var(--gold-2); }
+.sky { font: 13px/1.7 var(--f-mono); }
+.sky .hit { color: var(--gold-2); font-weight: 600; }
+h3.sub { font: 700 14px var(--f-display); letter-spacing: .08em; color: var(--ink); margin: 18px 0 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Isometric &amp; Long Cycles</h1>
+    <nav><a href="index.html">Natorion Cipher</a><a href="ADDENDA.md">Notes</a><button class="toggle" id="theme" type="button">Theme</button></nav>
+  </header>
+  <p class="lede">Addenda are community findings you can switch on and off: their dates join the Chronicon ledger. The tools below test findings like them on your own dates: the years between dates, the year exactly midway (the isometric centre), the long cycles each gap fits, and the sky over each day. Every count comes with what chance alone would give.</p>
+
+  <section class="card" style="margin-top:20px" aria-labelledby="ad-h">
+    <h2 id="ad-h">Addenda</h2>
+    <p class="sub">Tick one to add its dates to the Chronicon ledger. Each claim is checked here: ✓ means the arithmetic or the sky bears it out.</p>
+    <div id="addenda"></div>
+  </section>
+
+  <section class="card" style="margin-top:16px" aria-labelledby="sp-h">
+    <h2 id="sp-h">Cycles to look for</h2>
+    <p class="sub">A gap counts when it is a whole multiple of a switched-on cycle. The more cycles you switch on, the more gaps count by luck, and the chance figures below rise with them.</p>
+    <div class="spans" id="spans"></div>
+  </section>
+
+  <section class="card" style="margin-top:16px" aria-labelledby="dt-h">
+    <h2 id="dt-h">Your dates</h2>
+    <p class="sub">Years before 1 CE are BC. Month and day are optional; with them you get the sky over that day. Dates before 15 Oct 1582 are read as Julian, as historical sources give them.</p>
+    <div class="scroll"><table class="dates"><thead><tr><th>Year</th><th>Era</th><th>Month</th><th>Day</th><th>What happened</th><th></th></tr></thead><tbody id="dates"></tbody></table></div>
+    <p class="row" style="margin-top:10px"><button class="btn" id="addDate" type="button">+ Add a date</button> <select id="loadAd" aria-label="Load an addendum's dates"></select> <button class="btn" id="clearDates" type="button">Clear</button></p>
+  </section>
+
+  <section class="card" style="margin-top:16px" aria-labelledby="res-h">
+    <h2 id="res-h">What turns up</h2>
+    <div id="results" aria-live="polite"></div>
+  </section>
+
+  <p class="fine" style="margin-top:24px">The chronology, its ledger and its cycles are Jason Breshears' (Archaix). Addenda are their authors' own readings, credited on each. The sky comes from Astronomy Engine, the library the original v12 used, at 0h UT as printed ephemerides give it; the Moon moves about 13° a day. Most of the ledger sits on regular cycles (138-year Phoenix nodes, 600-year NER nodes, baktuns), so equally spaced triples of ledger events are built into it and are not independent evidence; the chance figures here count gaps, not triples, for that reason. This is a pattern tool for study.</p>
+</div>
+
+<script src="js/vendor/astronomy.min.js"></script>
+<script src="js/chronicon/chronicon.js"></script>
+<script src="js/chronicon/addenda.js"></script>
+<script>
+(function () {
+  "use strict";
+  var AD = NC.addenda, CH = NC.chron, $ = function (id) { return document.getElementById(id); };
+  var st = AD.load();
+  var DKEY = "natorion.isometric.dates.v1", dates;
+  function el(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) { if (k === "text") e.textContent = attrs[k]; else if (k === "cls") e.className = attrs[k]; else if (attrs[k] != null) e.setAttribute(k, attrs[k]); });
+    (kids || []).forEach(function (c) { if (c != null) e.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return e;
+  }
+  function fill(node, kids) { while (node.firstChild) node.removeChild(node.firstChild); kids.forEach(function (k) { if (k) node.appendChild(k); }); }
+  function saveDates() { try { localStorage.setItem(DKEY, JSON.stringify(dates)); } catch (e) {} }
+  function loadDates() { try { return JSON.parse(localStorage.getItem(DKEY) || "null"); } catch (e) { return null; } }
+  function fromAddendum(a) { return a.events.map(function (ev) { return { y: ev.y, m: ev.m || null, d: ev.d || null, text: ev.text }; }); }
+  function ledger() { return AD.ledger(CH.LEDGER, st); }
+  function spans() { return AD.enabledSpans(st.spans); }
+
+  /* ---- addenda ---- */
+  function chainCheck(ch) {
+    var ys = ch.years, gaps = ys.slice(1).map(function (y, i) { return y - ys[i]; });
+    var m = ch.text.match(/(\d{3,4}) years/), claimed = m ? +m[1] : null;
+    var ok = gaps.every(function (g) { return g > 0; }) && (!claimed || gaps.reduce(function (a, b) { return a + b; }, 0) === claimed || gaps.every(function (g) { return g === claimed; }));
+    return { ok: ok, gaps: gaps };
+  }
+  function renderAddenda() {
+    fill($("addenda"), AD.ADDENDA.map(function (a) {
+      var cb = el("input", { type: "checkbox", id: "ad-" + a.id }); cb.checked = !!st.on[a.id];
+      cb.addEventListener("change", function () { st.on[a.id] = cb.checked; AD.save(st); renderResults(); });
+      var items = a.chains.map(function (ch) {
+        var c = chainCheck(ch);
+        return el("li", {}, [ch.text + " ", el("span", { cls: c.ok ? "ok" : "bad", text: c.ok ? "✓ " + c.gaps.join(" + ") : "✗ the years give " + c.gaps.join(" + ") })]);
+      });
+      // Sky claims, checked live.
+      a.events.forEach(function (ev) {
+        if (!ev.m) return;
+        var s = AD.sky(AD.dateMs(ev), 1); if (!s) return;
+        var txt = AD.civilDate(AD.dateMs(ev)) + ": largest gathering " + s.stellium.count + " of 7 in " + s.stellium.sign + (s.solar ? "; " + s.solar.kind + " solar eclipse" : "") + (s.lunar ? "; " + s.lunar.kind + " lunar eclipse" : "");
+        items.push(el("li", {}, ["Sky, computed here: " + txt]));
+      });
+      a.events.forEach(function (ev) {
+        if (ev.m) return;
+        var ecl = AD.solarEclipsesInYear(ev.y).filter(function (e) { return e.kind === "total" || e.kind === "annular"; });
+        if (ecl.length && /[Ss]un dark/.test(ev.text)) items.push(el("li", {}, ["Computed here: " + AD.fmtYear(ev.y) + " had " + ecl.map(function (e) { return "a " + e.kind + " solar eclipse on " + AD.civilDate(e.ms); }).join(" and ") + ". ", el("span", { cls: "ok", text: "✓ fits “the Sun darkened”" })]));
+      });
+      return el("div", { cls: "addendum" }, [
+        el("h3", {}, [cb, el("label", { for: "ad-" + a.id, text: a.title })]),
+        el("p", { cls: "by", text: a.author + " · " + a.written + " · " + a.source }),
+        el("ul", {}, items)
+      ]);
+    }));
+    var sel = $("loadAd");
+    fill(sel, [el("option", { value: "", text: "Load an addendum's dates…" })].concat(AD.ADDENDA.map(function (a) { return el("option", { value: a.id, text: a.author + ": " + a.title.slice(0, 40) + "…" }); })));
+  }
+
+  /* ---- spans ---- */
+  function renderSpans() {
+    fill($("spans"), AD.SPANS.map(function (s) {
+      var cb = el("input", { type: "checkbox", id: "sp-" + s.id, title: s.note }); cb.checked = !!st.spans[s.id];
+      cb.addEventListener("change", function () { st.spans[s.id] = cb.checked; AD.save(st); renderResults(); });
+      return el("label", { for: "sp-" + s.id, title: s.note }, [cb, s.label]);
+    }));
+  }
+
+  /* ---- dates ---- */
+  function renderDates() {
+    fill($("dates"), dates.map(function (d, i) {
+      var yr = el("input", { type: "number", min: "1", step: "1", value: String(d.y <= 0 ? 1 - d.y : d.y), "aria-label": "Year " + (i + 1) });
+      var era = el("select", { "aria-label": "Era " + (i + 1) }, [el("option", { value: "ce", text: "CE" }), el("option", { value: "bc", text: "BC" })]); era.value = d.y <= 0 ? "bc" : "ce";
+      var mo = el("input", { type: "number", min: "1", max: "12", value: d.m ? String(d.m) : "", placeholder: "—", "aria-label": "Month " + (i + 1) });
+      var dy = el("input", { type: "number", min: "1", max: "31", value: d.d ? String(d.d) : "", placeholder: "—", "aria-label": "Day " + (i + 1) });
+      var tx = el("input", { type: "text", value: d.text || "", placeholder: "what happened", "aria-label": "Event " + (i + 1) });
+      var del = el("button", { cls: "btn", type: "button", "aria-label": "Remove date " + (i + 1), text: "×" });
+      function upd() {
+        var n = parseInt(yr.value, 10); if (!(n >= 1)) return;
+        d.y = era.value === "bc" ? 1 - n : n;
+        var m = parseInt(mo.value, 10), dd = parseInt(dy.value, 10);
+        d.m = m >= 1 && m <= 12 ? m : null; d.d = dd >= 1 && dd <= 31 ? dd : null; d.text = tx.value;
+        saveDates(); renderResults();
+      }
+      [yr, era, mo, dy, tx].forEach(function (x) { x.addEventListener("change", upd); });
+      del.addEventListener("click", function () { dates.splice(i, 1); saveDates(); renderDates(); renderResults(); });
+      return el("tr", {}, [el("td", { cls: "y" }, [yr]), el("td", { cls: "e" }, [era]), el("td", { cls: "md" }, [mo]), el("td", { cls: "md" }, [dy]), el("td", {}, [tx]), el("td", { cls: "x" }, [del])]);
+    }));
+  }
+
+  /* ---- results ---- */
+  function label(d) { return AD.fmtYear(d.y) + (d.text ? " (" + d.text.split(/[;:—,(]/)[0].trim().slice(0, 40) + ")" : ""); }
+  function flags(ms) { return ms.map(function (m) { return el("span", { cls: "flag", text: (m.k > 1 ? m.k + " × " : "") + m.span.years }); }); }
+  function summary(n, of, exp, what) {
+    var verdict = n <= exp ? "no more than chance would give" : (n >= 2 * exp + 2 ? "well above what chance would give" : "a little above chance");
+    return el("p", { cls: "summary" }, [el("b", { text: n + " of " + of }), " " + what + " · chance alone ≈ " + exp.toFixed(1) + " · " + verdict + "."]);
+  }
+  function renderResults() {
+    var sp = spans(), L = ledger(), out = [];
+    if (dates.length < 1) { fill($("results"), [el("p", { cls: "sub", text: "Add a date, or load an addendum's." })]); return; }
+
+    out.push(el("h3", { cls: "sub", text: "Gaps between your dates" }));
+    if (dates.length >= 2) {
+      var P = AD.pairs(dates, sp);
+      out.push(summary(P.flagged, P.list.length, P.expected, "gaps are a whole multiple of a switched-on cycle"));
+      out.push(el("div", { cls: "scroll" }, [el("table", {}, [
+        el("thead", {}, [el("tr", {}, [el("th", { text: "From" }), el("th", { text: "To" }), el("th", { text: "Years" }), el("th", { text: "Cycles" }), el("th", { text: "Centre" })])]),
+        el("tbody", {}, P.list.sort(function (a, b) { return b.multiples.length - a.multiples.length || a.older.y - b.older.y; }).map(function (p) {
+          return el("tr", {}, [el("td", { text: label(p.older) }), el("td", { text: label(p.newer) }), el("td", { text: String(p.gap) }),
+            el("td", {}, flags(p.multiples).concat(p.sameDay ? [el("span", { cls: "flag day", text: "same day & month" })] : [])),
+            el("td", { text: p.centre == null ? "—" : AD.fmtYear(p.centre) })]);
+        }))])]));
+    } else out.push(el("p", { cls: "sub", text: "Needs two dates." }));
+
+    out.push(el("p", { cls: "fine", text: "A caution on these chance figures: dates picked because they fit cannot test themselves. The figure means most on dates gathered before looking for the pattern." }));
+    out.push(el("h3", { cls: "sub", text: "Isometric centres" }));
+    var C = AD.centres(dates, L, 50);
+    out.push(C.length ? el("ul", {}, C.map(function (c) {
+      return el("li", {}, [el("b", { text: AD.fmtYear(c.centre.y) }), " is exactly " + c.half + " years from both " + AD.fmtYear(c.a.y) + " and " + AD.fmtYear(c.b.y) + ": " + c.centre.text]);
+    })) : el("p", { cls: "sub", text: "No date or ledger event sits exactly midway between two of your dates (half-span of 50 years or more)." }));
+
+    out.push(el("h3", { cls: "sub", text: "Years to the ledger events" }));
+    out.push(el("p", { cls: "fine", text: "Much of the ledger sits on regular grids: the 600-year NER nodes all fall on years ending in 62 CE or 39 BC. So each date is compared with the years around it, not with a flat rate." }));
+    dates.forEach(function (d) {
+      var K = AD.counters(d, L, sp);
+      var hits = K.flagged.filter(function (c) { return c.event[1] !== "add" || c.event[0] !== d.y; });
+      var pct = Math.round(100 * K.neighboursAsGood);
+      out.push(el("p", { cls: "summary" }, [el("b", { text: label(d) + ": " }), K.flagged.length + " of " + K.list.length + " ledger events sit a whole number of cycles away · nearby years (±1–" + K.shift + ") average " + K.expected.toFixed(1) + " · " +
+        (pct <= 5 ? "better than " + (100 - pct) + "% of its neighbours" : pct + "% of nearby years do as well or better") + "."]));
+      if (hits.length) out.push(el("ul", {}, hits.slice(0, 8).map(function (c) {
+        return el("li", {}, [Math.abs(c.years) + " years " + (c.years > 0 ? "after " : "before ") + AD.fmtYear(c.event[0]) + " ", el("span", {}, flags(c.multiples)), " " + c.event[2].slice(0, 90)]);
+      })));
+    });
+
+    out.push(el("h3", { cls: "sub", text: "The sky" }));
+    dates.forEach(function (d) {
+      if (d.m && d.d) {
+        var s = AD.sky(AD.dateMs(d), 3); if (!s) return;
+        out.push(el("p", { cls: "sky" }, [el("b", { text: AD.civilDate(AD.dateMs(d)) + " · 0h UT  " }), s.bodies.map(function (b) { return b.body + " " + b.sign.slice(0, 3) + " " + b.deg + "°" + String(b.min).padStart(2, "0"); }).join(" · ")]));
+        var notes = [];
+        notes.push(s.stellium.count >= 4 ? el("span", { cls: "hit", text: s.stellium.count + " of 7 together in " + s.stellium.sign }) : s.stellium.count + " at most in one sign");
+        if (s.solar) notes.push(el("span", { cls: "hit", text: " · " + s.solar.kind + " solar eclipse " + AD.civilDate(s.solar.ms) }));
+        if (s.lunar) notes.push(el("span", { cls: "hit", text: " · " + s.lunar.kind + " lunar eclipse " + AD.civilDate(s.lunar.ms) }));
+        out.push(el("p", { cls: "sky" }, notes));
+      } else {
+        var e = AD.solarEclipsesInYear(d.y);
+        out.push(el("p", { cls: "sky" }, [el("b", { text: AD.fmtYear(d.y) + " · solar eclipses that year: " }), e.length ? e.map(function (x) { return x.kind + " " + AD.civilDate(x.ms); }).join(" · ") : "none found"]));
+      }
+    });
+    out.push(el("p", { cls: "fine", text: "The Sun is in the same sign on the same calendar day every year, so a shared Sun sign on an anniversary is a calendar fact, not a coincidence. Four or more of the seven in one sign happens on roughly one day in twenty; all seven, far more rarely." }));
+    fill($("results"), out);
+  }
+
+  $("addDate").addEventListener("click", function () { dates.push({ y: new Date().getFullYear(), m: null, d: null, text: "" }); saveDates(); renderDates(); renderResults(); });
+  $("clearDates").addEventListener("click", function () { dates = []; saveDates(); renderDates(); renderResults(); });
+  $("loadAd").addEventListener("change", function () {
+    var a = AD.ADDENDA.find(function (x) { return x.id === $("loadAd").value; }); if (!a) return;
+    dates = fromAddendum(a); saveDates(); renderDates(); renderResults(); $("loadAd").value = "";
+  });
+  $("theme").addEventListener("click", function () {
+    var r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    r.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("nc-formulas-theme", r.dataset.theme); } catch (_) {}
+  });
+  try { var th = localStorage.getItem("nc-formulas-theme"); if (th) document.documentElement.dataset.theme = th; } catch (_) {}
+
+  dates = loadDates() || fromAddendum(AD.ADDENDA[0]).concat([{ y: -4308, m: null, d: null, text: "Phoenix named; the PreAdamic world destroyed" }, { y: -4038, m: null, d: null, text: "Capture of Luna; NER calendar begins" }]);
+  renderAddenda(); renderSpans(); renderDates(); renderResults();
+})();
+</script>
+</body>
+</html>

@@ -42,6 +42,8 @@ jobs:
         run: node natorion/tests/formulas.js
       - name: Backtest and cycle echoes, with the noise calibration
         run: node natorion/tests/backtest.js
+      - name: Addenda, isometric centres, long cycles and the sky
+        run: node natorion/tests/addenda.js
       - name: Studio examples match the code
         run: node natorion/examples/generate.js && git diff --exit-code natorion/examples
       - name: Install Playwright Chromium
